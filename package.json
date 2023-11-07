@@ -1,7 +1,11 @@
 {
-  "name": "gcp-app",
+  "name": "micro-grants",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Allo Team",
+    "email": "allo@gitcoin.co"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
