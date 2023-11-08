@@ -12,7 +12,7 @@ const user = {
 };
 
 const navigation = [
-  { name: "Dashboard", href: "/", current: true },
+  // { name: "Dashboard", href: "/", current: true },
   { name: "Applications", href: "/application", current: false },
   // { name: "Calendar", href: "/calendar", current: false },
 ];
@@ -26,9 +26,12 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
+export default function Navbar() {
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure
+      as="nav"
+      className="bg-gradient-to-r from-teal-200 to-teal-500"
+    >
       {({ open }: { open: boolean }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -46,26 +49,24 @@ export default function Example() {
                     )}
                   </Disclosure.Button>
                 </div>
-                <div className="flex flex-shrink-0 items-center">
+                <div className="flex flex-shrink-0 items-center cursor-pointer">
                   <Image
                     className="h-8 w-auto"
                     src={logo}
                     alt="Allo"
                     height={32}
                     width={32}
+                    onClick={() => {
+                      window.location.href = "/";
+                    }}
                   />
                 </div>
-                <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
+                <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4 cursor-pointer">
                   {navigation.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={classNames(
-                        item.current
-                          ? "bg-gray-900 text-white"
-                          : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                        "rounded-md px-3 py-2 text-sm font-medium"
-                      )}
+                      className="hover:bg-white hover:text-black rounded-md px-3 py-2 text-sm font-medium"
                       aria-current={item.current ? "page" : undefined}
                     >
                       {item.name}
@@ -77,7 +78,7 @@ export default function Example() {
                 <div className="flex-shrink-0">
                   <button
                     type="button"
-                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-green-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+                    className="relative inline-flex border border-white text-white hover:bg-white hover:text-black items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold"
                   >
                     {/* Add wallet connect button */}
                     Connect
