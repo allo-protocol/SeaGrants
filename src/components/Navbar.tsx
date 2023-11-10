@@ -30,7 +30,7 @@ export default function Navbar() {
   return (
     <Disclosure
       as="nav"
-      className="bg-gradient-to-r from-teal-200 to-teal-500"
+      className="bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 fixed w-full z"
     >
       {({ open }: { open: boolean }) => (
         <>
