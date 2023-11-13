@@ -1,5 +1,6 @@
 import { Application } from "@/app/pool/new/types";
 import { classNames } from "@/utils/common";
+import Image from "next/image";
 
 export default function ApplicationCard(props: { application: Application }) {
   const statuses = {
@@ -14,10 +15,12 @@ export default function ApplicationCard(props: { application: Application }) {
   return (
     <>
       <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-        <img
+        <Image
+          className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
           src={application.imageUrl}
           alt={application.title}
-          className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
+          height={48}
+          width={48}
         />
         <div className="text-sm font-medium leading-6 text-gray-900">
           {application.title}

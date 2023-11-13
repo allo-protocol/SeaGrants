@@ -1,4 +1,5 @@
 "use client";
+
 import Container from "@/components/Container";
 
 import { MicroGrantsStrategy } from "../../../../../../Allo-SDK/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
@@ -82,7 +83,7 @@ const NewPool = () => {
 
     const poolCreationData = {
       profileId:
-        "0xc9a3fd1618bcff93ea3c1cd94e3b1ac052007733c1a720e5d990699a0949e891",
+        "0xc875155e7c39263cd9bc6aa12e269ea359fe3fddf500fcffe23388178d1a5fdd", // Jaxcoder on Alfajores
       strategy: address,
       initStrategyData: initStrategyData,
       token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -129,12 +130,11 @@ const NewPool = () => {
       <div>
         Deploy a new Strategy: <br />
         <button
-          style={{
-            backgroundColor: "lightblue",
-            padding: "5px",
-            borderRadius: "5px",
+          className="bg-blue-300 p-2 rounded-md"
+          onClick={() => {
+            console.log("deploy");
+            deploy();
           }}
-          onClick={() => deploy()}
         >
           deploy
         </button>
@@ -147,11 +147,7 @@ const NewPool = () => {
             <br />
             Create a pool: <br />
             <button
-              style={{
-                backgroundColor: "lightblue",
-                padding: "5px",
-                borderRadius: "5px",
-              }}
+              className="bg-blue-300 p-2 rounded-md"
               onClick={() => createPool()}
             >
               create pool

@@ -1,7 +1,6 @@
 "use client";
-import {
-  getDefaultWallets,
-} from "@rainbow-me/rainbowkit";
+
+import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
@@ -14,7 +13,7 @@ import {
   mainnet,
   optimism,
   polygon,
-  polygonMumbai
+  polygonMumbai,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -26,7 +25,7 @@ dotenv.config();
 
 const stagingChains = [
   celoAlfajores,
-  goerli,
+  // goerli,
   sepolia,
   polygonMumbai,
   arbitrumGoerli,
@@ -51,12 +50,12 @@ const { chains, publicClient } = configureChains(
         (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
     }),
     publicProvider(),
-  ],
+  ]
 );
 
 const { connectors } = getDefaultWallets({
   appName: "Micro Grants",
-  projectId: process.env.PROJECT_ID as string || "YOUR_PROJECT_ID",
+  projectId: (process.env.PROJECT_ID as string) || "YOUR_PROJECT_ID",
   chains,
 });
 

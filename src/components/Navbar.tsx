@@ -30,7 +30,7 @@ export default function Navbar() {
       className="bg-transparent backdrop-filter bg-white bg-opacity-30 w-full z"
     >
       {({ open }: { open: boolean }) => (
-        <>
+        <nav>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
               <div className="flex">
@@ -150,7 +150,7 @@ export default function Navbar() {
               </div>
             </div>
           </Disclosure.Panel>
-        </>
+        </nav>
       )}
     </Disclosure>
   );
