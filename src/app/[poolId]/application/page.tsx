@@ -1,10 +1,10 @@
-import ApplicationPage from "../../../components/ApplicationCard";
+import ApplicationPage from "@/components/ApplicationsPage";
+import Container from "@/components/Container";
 
 export default function Application() {
   return (
-    <div>
-      {/* NOTE: this is a placeholder for the application page. */}
+    <Container>
       <ApplicationPage />
-    </div>
+    </Container>
   );
 }

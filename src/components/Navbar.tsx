@@ -7,6 +7,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../app/assets/logo.svg";
+import { classNames } from "@/utils/common";
 
 const user = {
   address: "0x0",
@@ -21,10 +22,6 @@ const userNavigation = [
   { name: "Settings", href: "/settings" },
   { name: "Sign out", href: "/log-out" },
 ];
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export default function Navbar() {
   return (
