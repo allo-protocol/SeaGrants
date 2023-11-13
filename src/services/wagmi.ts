@@ -41,8 +41,15 @@ const availableChains =
 const { chains, publicClient } = configureChains(
   [...stagingChains],
   [
-    alchemyProvider({ apiKey: process.env.ALCHEMY_ID as string }),
-    infuraProvider({ apiKey: process.env.INFURA_ID as string }),
+    alchemyProvider({
+      apiKey:
+        (process.env.ALCHEMY_ID as string) ||
+        "ajWJk5YwtfTZ5vCAhMg8I8L61XFhyJpa",
+    }),
+    infuraProvider({
+      apiKey:
+        (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
+    }),
     publicProvider(),
   ],
 );
