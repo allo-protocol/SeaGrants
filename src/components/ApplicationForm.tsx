@@ -77,7 +77,7 @@ export default function ApplicationForm() {
                 />
               </div>
               <p className="text-xs leading-5 text-gray-600 mt-2">
-                Write a brief description about the project and why it's
+                Write a brief description about the project and why it&apos;s
                 applying to the round
               </p>
             </div>

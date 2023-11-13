@@ -1,32 +1,33 @@
+import { Application } from "@/app/pool/new/types";
 import ApplicationCard from "./ApplicationCard";
 
 export default function ApplicationList() {
-  const applications = [
+  const applications: Application[] = [
     {
       id: 1,
-      name: "Tuple",
+      title: "Tuple",
       imageUrl: "https://tailwindui.com/img/logos/48x48/tuple.svg",
-      date: "December 13, 2022",
-      dateTime: "2022-12-13",
-      amount: "$2,000.00",
+      createdAt: "December 13, 2022",
+      // dateTime: "2022-12-13",
+      amountRequested: "$2,000.00",
       status: "Paid",
     },
     {
       id: 2,
-      name: "SavvyCal",
+      title: "SavvyCal",
       imageUrl: "https://tailwindui.com/img/logos/48x48/savvycal.svg",
-      date: "January 22, 2023",
-      dateTime: "2023-01-22",
-      amount: "$14,000.00",
-      status: "Approved",
+      createdAt: "January 22, 2023",
+      // dateTime: "2023-01-22",
+      amountRequested: "$14,000.00",
+      status: "Accepted",
     },
     {
       id: 3,
-      name: "Reform",
+      title: "Reform",
       imageUrl: "https://tailwindui.com/img/logos/48x48/reform.svg",
-      date: "January 23, 2023",
-      dateTime: "2023-01-23",
-      amount: "$7,600.00",
+      createdAt: "January 23, 2023",
+      // dateTime: "2023-01-23",
+      amountRequested: "$7,600.00",
       status: "Pending",
     },
   ];
