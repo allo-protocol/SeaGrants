@@ -1,8 +1,20 @@
+"use client";
+
 import { PhotoIcon } from "@heroicons/react/20/solid";
 
 export default function ApplicationForm() {
+  const handleCancel = () => {
+    console.log("cancel");
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    console.log("submit");
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="space-y-12">
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
           <div>
@@ -24,7 +36,7 @@ export default function ApplicationForm() {
                 Name
               </label>
               <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 sm:max-w-md">
                   <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
                   <input
                     type="text"
@@ -45,7 +57,7 @@ export default function ApplicationForm() {
                 Website
               </label>
               <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 sm:max-w-md">
                   <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
                     http://
                   </span>
@@ -72,7 +84,7 @@ export default function ApplicationForm() {
                   id="about"
                   name="about"
                   rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                   defaultValue={""}
                 />
               </div>
@@ -95,7 +107,7 @@ export default function ApplicationForm() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -113,7 +125,7 @@ export default function ApplicationForm() {
                   name="recipient-address"
                   id="recipient-address"
                   autoComplete="given-name"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                 />
                 <p className="text-xs leading-5 text-gray-600 mt-2">
                   The wallet to which the funds would be sent to.
@@ -137,7 +149,7 @@ export default function ApplicationForm() {
                   <div className="mt-4 flex text-sm leading-6 text-gray-600">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                      className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-600 focus-within:ring-offset-2 hover:text-green-500"
                     >
                       <span>Upload a file</span>
                       <input
@@ -186,7 +198,7 @@ export default function ApplicationForm() {
                   name="profile-owner"
                   id="profile-owner"
                   placeholder=" 0x..."
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -204,7 +216,7 @@ export default function ApplicationForm() {
                   name="nonce"
                   id="nonce"
                   placeholder="0"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -215,13 +227,15 @@ export default function ApplicationForm() {
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button
           type="button"
-          className="text-sm font-semibold leading-6 text-gray-900"
+          className="text-sm font-semibold leading-6 text-gray-900 hover:text-white hover:bg-red-500 rounded-md px-3 py-2"
+          onClick={handleCancel}
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-green-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
+          onClick={handleSubmit}
         >
           Save
         </button>
