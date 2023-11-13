@@ -5,9 +5,9 @@ import { Fragment } from "react"
 
 export default function ApplicationCard(props: { application: any }) {
   const statuses = {
+    Paid: 'text-green-700 bg-blue-50 ring-green-600/20',
     Approved: 'text-green-700 bg-green-50 ring-green-600/20',
-    Pending: 'text-gray-600 bg-gray-50 ring-gray-500/10',
-    Rejected: 'text-red-700 bg-red-50 ring-red-600/10',
+    Pending: 'text-gray-600 bg-yellow-50 ring-gray-500/10'
   };
 
   const application = props.application;
@@ -24,7 +24,7 @@ export default function ApplicationCard(props: { application: any }) {
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
         <div className="flex justify-between gap-x-4 py-3">
-          <dt className="text-gray-500">Last invoice</dt>
+          <dt className="text-gray-500">Submitted On</dt>
           <dd className="text-gray-700">
             <time dateTime={application.dateTime}>{application.date}</time>
           </dd>
@@ -35,7 +35,7 @@ export default function ApplicationCard(props: { application: any }) {
             <div className="font-medium text-gray-900">{application.amount}</div>
             <div
               className={classNames(
-                // statuses[application.status],
+                statuses[application.status],
                 'rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset'
               )}
             >

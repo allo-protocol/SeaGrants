@@ -9,7 +9,7 @@ export default function ApplicationList() {
       date: "December 13, 2022",
       dateTime: "2022-12-13",
       amount: "$2,000.00",
-      status: "Approved",
+      status: "Paid",
     },
     {
       id: 2,
