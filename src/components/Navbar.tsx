@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -75,23 +76,14 @@ export default function Navbar() {
               </div>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <button
-                    type="button"
-                    className="relative inline-flex border border-white text-white hover:bg-white hover:text-black items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold"
-                  >
-                    {/* Add wallet connect button */}
-                    Connect
-                  </button>
+                  <ConnectButton
+                    label="Connect"
+                    accountStatus="address"
+                    chainStatus="icon"
+                    showBalance={false}
+                  />
                 </div>
                 <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
-                  {/* <button
-                    type="button"
-                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  </button> */}
 
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
