@@ -1,4 +1,4 @@
-import ApplicationPage from "../../components/ApplicationCard";
+import ApplicationPage from "../../../components/ApplicationCard";
 
 export default function Application() {
   return (
