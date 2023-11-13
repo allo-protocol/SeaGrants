@@ -13,6 +13,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@allo-protocol/allo-v2-sdk": "^1.0.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^1.2.0",
