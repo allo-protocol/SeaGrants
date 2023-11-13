@@ -30,7 +30,7 @@ export default function Navbar() {
   return (
     <Disclosure
       as="nav"
-      className="bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 w-full z"
+      className="bg-transparent backdrop-filter bg-white bg-opacity-30 w-full z"
     >
       {({ open }: { open: boolean }) => (
         <>
