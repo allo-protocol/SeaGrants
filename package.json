@@ -13,6 +13,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@allo-protocol/allo-v2-sdk": "^1.0.0",
     "@headlessui/react": "^1.7.17",
     "next": "14.0.1",
     "react": "^18",
