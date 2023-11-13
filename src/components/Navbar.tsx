@@ -7,6 +7,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../app/assets/logo.svg";
+import { classNames } from "@/utils/common";
 
 const user = {
   address: "0x0",
@@ -22,15 +23,11 @@ const userNavigation = [
   { name: "Sign out", href: "/log-out" },
 ];
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function Navbar() {
   return (
     <Disclosure
       as="nav"
-      className="bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 fixed w-full z"
+      className="bg-transparent backdrop-filter bg-white bg-opacity-30 w-full z"
     >
       {({ open }: { open: boolean }) => (
         <>
@@ -84,7 +81,6 @@ export default function Navbar() {
                   />
                 </div>
                 <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
-
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
                     <Transition
@@ -104,7 +100,7 @@ export default function Navbar() {
                                 href={item.href}
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700"
+                                  "block px-4 py-2 text-sm text-gray-700",
                                 )}
                               >
                                 {item.name}
@@ -131,7 +127,7 @@ export default function Navbar() {
                     item.current
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                    "block rounded-md px-3 py-2 text-base font-medium"
+                    "block rounded-md px-3 py-2 text-base font-medium",
                   )}
                   aria-current={item.current ? "page" : undefined}
                 >

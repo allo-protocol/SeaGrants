@@ -21,30 +21,35 @@ import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { infuraProvider } from "wagmi/providers/infura";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 const stagingChains = [
   celoAlfajores,
   goerli,
   sepolia,
   polygonMumbai,
-  arbitrumGoerli
+  arbitrumGoerli,
 ];
 
-const productionChains = [
-  arbitrum,
-  base,
-  celo,
-  mainnet,
-  polygon,
-  optimism
-];
+const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
 
-const availableChains = process.env.ENVIRONMENT === "dev" ? stagingChains : productionChains;
+// todo: fix it
+const availableChains =
+  process.env.ENVIRONMENT === "dev" ? stagingChains : productionChains;
 
 const { chains, publicClient } = configureChains(
-  [...availableChains],
+  [...stagingChains],
   [
-    alchemyProvider({ apiKey: process.env.ALCHEMY_ID as string }),
-    infuraProvider({ apiKey: process.env.INFURA_ID as string }),
+    alchemyProvider({
+      apiKey:
+        (process.env.ALCHEMY_ID as string) ||
+        "ajWJk5YwtfTZ5vCAhMg8I8L61XFhyJpa",
+    }),
+    infuraProvider({
+      apiKey:
+        (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
+    }),
     publicProvider(),
   ],
 );
