@@ -12,10 +12,9 @@ const user = {
 };
 
 const navigation = [
-  // { name: "Dashboard", href: "/", current: true },
   { name: "Applications", href: "/application", current: false },
-  // { name: "Calendar", href: "/calendar", current: false },
 ];
+
 const userNavigation = [
   { name: "My Profile", href: "/profile" },
   { name: "Settings", href: "/settings" },
