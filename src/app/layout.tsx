@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-
+import { WagmiConfig } from "wagmi";
+import { wagmiConfigData, chainData } from "@/services/wagmi";
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import '@rainbow-me/rainbowkit/styles.css';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,9 +20,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600`}>
-        <Navbar />
-        {children}
+      <body className={`${inter.className}`}>
+        <WagmiConfig config={wagmiConfigData}>
+          <RainbowKitProvider chains={chainData}>
+            <Navbar />
+            {children}
+          </RainbowKitProvider>
+        </WagmiConfig>
       </body>
     </html>
   );

@@ -15,9 +15,13 @@
   "dependencies": {
     "@allo-protocol/allo-v2-sdk": "^1.0.0",
     "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.0.18",
+    "@rainbow-me/rainbowkit": "^1.2.0",
     "next": "14.0.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "viem": "^1.19.0",
+    "wagmi": "^1.4.6"
   },
   "devDependencies": {
     "typescript": "^5",
