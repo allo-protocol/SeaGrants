@@ -5,7 +5,7 @@ export default function Home() {
           What do we want to show on landing page? This will depend on if the user 
           is logged in or not.
       */}
-      <span className="mt-80 text-xs">Micro Grants</span>
+      <span className="text-3xl xl:text-4xl mt-96">Micro Grants</span>
     </main>
   );
 }
