@@ -9,21 +9,20 @@ import Link from "next/link";
 import logo from "../app/assets/logo.svg";
 import { classNames } from "@/utils/common";
 
-const user = {
-  address: "0x0",
-};
-
-const navigation = [
-  { name: "Applications", href: "/application", current: false },
-];
-
-const userNavigation = [
-  { name: "My Profile", href: "/profile" },
-  { name: "Settings", href: "/settings" },
-  { name: "Sign out", href: "/log-out" },
-];
-
 export default function Navbar() {
+  // TODO: Update this to be dynamic or configurable.
+  const poolId: number = 4;
+
+  const navigation = [
+    { name: "Applications", href: `/${poolId}/application`, current: false },
+  ];
+
+  const userNavigation = [
+    { name: "My Profile", href: "/profile" },
+    { name: "Settings", href: "/settings" },
+    { name: "Sign out", href: "/log-out" },
+  ];
+
   return (
     <Disclosure
       as="nav"
@@ -63,12 +62,23 @@ export default function Navbar() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="hover:bg-white hover:text-black rounded-md px-3 py-2 text-sm font-medium"
+                      className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
                       aria-current={item.current ? "page" : undefined}
                     >
                       {item.name}
                     </Link>
                   ))}
+                </div>
+                <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4 cursor-pointer">
+                  <button
+                    type="button"
+                    className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                    onClick={() => {
+                      window.location.href = `/${poolId}/application/new`;
+                    }}
+                  >
+                    New Application
+                  </button>
                 </div>
               </div>
               <div className="flex items-center">
@@ -100,7 +110,7 @@ export default function Navbar() {
                                 href={item.href}
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700",
+                                  "block px-4 py-2 text-sm text-gray-700"
                                 )}
                               >
                                 {item.name}
@@ -127,7 +137,7 @@ export default function Navbar() {
                     item.current
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                    "block rounded-md px-3 py-2 text-base font-medium",
+                    "block rounded-md px-3 py-2 text-base font-medium"
                   )}
                   aria-current={item.current ? "page" : undefined}
                 >

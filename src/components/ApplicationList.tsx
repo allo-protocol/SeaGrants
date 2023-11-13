@@ -2,6 +2,7 @@ import { Application } from "@/app/pool/new/types";
 import ApplicationCard from "./ApplicationCard";
 
 export default function ApplicationList() {
+  // NOTE: This is just a placeholder for now.
   const applications: Application[] = [
     {
       id: 1,
@@ -33,20 +34,23 @@ export default function ApplicationList() {
   ];
 
   return (
-    <div>
-      <ul
-        role="list"
-        className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
-      >
-        {applications.map((application) => (
-          <li
-            key={application.id}
-            className="overflow-hidden rounded-xl border border-gray-200"
-          >
-            <ApplicationCard application={application} />
-          </li>
-        ))}
-      </ul>
+    <div className="flex flex-col">
+      <div></div>
+      <div>
+        <ul
+          role="list"
+          className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
+        >
+          {applications.map((application) => (
+            <li
+              key={application.id}
+              className="overflow-hidden rounded-xl border border-gray-200"
+            >
+              <ApplicationCard application={application} />
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
