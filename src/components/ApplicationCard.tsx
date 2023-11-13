@@ -1,7 +1,4 @@
-import { classNames } from "@/utils/common"
-import { Menu, Transition } from "@headlessui/react"
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline"
-import { Fragment } from "react"
+import { classNames } from "@/utils/common";
 
 export default function ApplicationCard(props: { application: any }) {
   const statuses = {
