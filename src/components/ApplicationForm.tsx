@@ -1,17 +1,56 @@
 "use client";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
+import { ProgressStatus } from "@/components/ProgressFeed";
+import Modal from "./Modal";
+import { useState } from "react";
+
+const steps = [
+  {
+    id: 1,
+    content: 'Applied to',
+    target: 'Front End Developer',
+    href: '#',
+    status: ProgressStatus.IS_SUCCESS,
+  },
+  {
+    id: 2,
+    content: 'Advanced to phone screening by',
+    target: 'Bethany Blake',
+    href: '#',
+    status: ProgressStatus.IN_PROGRESS,
+  },
+  {
+    id: 3,
+    content: 'Completed phone screening with',
+    target: 'Martha Gardner',
+    href: '#',
+    status: ProgressStatus.IS_ERROR,
+  },
+  {
+    id: 4,
+    content: 'Advanced to interview by',
+    target: 'Bethany Blake',
+    href: '#',
+    status: ProgressStatus.NOT_STARTED,
+  },
+]
 
 export default function ApplicationForm() {
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleCancel = () => {
     console.log("cancel");
+    // setIsOpen(false);
   };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    // setIsOpen(true);
 
     console.log("submit");
   };
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -235,10 +274,14 @@ export default function ApplicationForm() {
         <button
           type="submit"
           className="rounded-md bg-green-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
-          onClick={handleSubmit}
         >
           Save
         </button>
+
+        <Modal 
+          isOpen={isOpen}
+          steps={steps}
+        />
       </div>
     </form>
   );
