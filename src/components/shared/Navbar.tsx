@@ -20,8 +20,8 @@ export default function Navbar() {
   ];
 
   const userNavigation = [
-    { name: "My Profile", href: "/profile" },
-    { name: "Settings", href: "/settings" },
+    { name: "My Profile", href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui" },
+    { name: "Settings", href: "/settings/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui" },
     { name: "Sign out", href: "/log-out" },
   ];
 
@@ -137,8 +137,8 @@ export default function Navbar() {
                   href={item.href}
                   className={classNames(
                     item.current
-                      ? "bg-gray-900 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                      ? "bg-green-900 text-white-900"
+                      : "text-gray-900 hover:bg-green-700 hover:text-white",
                     "block rounded-md px-3 py-2 text-base font-medium"
                   )}
                   aria-current={item.current ? "page" : undefined}
@@ -154,7 +154,7 @@ export default function Navbar() {
                     key={item.name}
                     as="a"
                     href={item.href}
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-green-700 hover:text-white"
                   >
                     {item.name}
                   </Disclosure.Button>

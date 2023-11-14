@@ -39,3 +39,11 @@ export type TPool = {
   strategy: `0x${string}`; // address of the strategy contract
   balance: number;
 };
+
+export type TProfile = {
+  id: `0x${string}`;
+  recipientAddress: string;
+  profileOwner: string;
+  nonce: number;
+  members: `0x${string}`[];
+};
