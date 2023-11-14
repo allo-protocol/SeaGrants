@@ -4,12 +4,12 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import ProgressFeed, { Step } from "./ProgressFeed";
 
-export default function Modal(props : {
-  isOpen?: boolean,
-  openModalText?: string, 
-  closeModalText?: string,
-  title?: string,
-  steps: Step[],
+export default function Modal(props: {
+  isOpen: boolean;
+  openModalText?: string;
+  closeModalText?: string;
+  title?: string;
+  steps: Step[];
 }) {
   let [isOpen, setIsOpen] = useState(props.isOpen || false);
 
@@ -23,17 +23,17 @@ export default function Modal(props : {
 
   return (
     <>
-      { props.openModalText &&
+      {props.openModalText && (
         <div className="fixed inset-0 flex items-center justify-center">
           <button
             type="button"
             onClick={openModal}
             className="rounded-md bg-black/20 px-4 py-2 text-sm font-medium text-white hover:bg-black/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
-            >
+          >
             {props.openModalText}
           </button>
         </div>
-      }
+      )}
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -61,28 +61,28 @@ export default function Modal(props : {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  {props.title &&
+                  {props.title && (
                     <Dialog.Title
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900 mb-4"
                     >
                       {props.title}
                     </Dialog.Title>
-                  }
+                  )}
 
                   <ProgressFeed steps={props.steps} />
 
-                  {props.closeModalText && 
+                  {props.closeModalText && (
                     <div className="mt-4">
                       <button
                         type="button"
-                        className="text-right rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 text-xs"
+                        className="text-right rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                         onClick={closeModal}
                       >
                         {props.closeModalText}
                       </button>
                     </div>
-                  }
+                  )}
                 </Dialog.Panel>
               </Transition.Child>
             </div>

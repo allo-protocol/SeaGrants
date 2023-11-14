@@ -1,8 +1,8 @@
-import { Application } from "@/app/pool/new/types";
+import { IApplication } from "@/app/types";
 import { classNames } from "@/utils/common";
 import Image from "next/image";
 
-export default function ApplicationCard(props: { application: Application }) {
+export default function ApplicationCard(props: { application: IApplication }) {
   const statuses = {
     Paid: "text-green-700 bg-blue-50 ring-green-600/20",
     Approved: "text-green-700 bg-green-50 ring-green-600/20",
@@ -18,12 +18,12 @@ export default function ApplicationCard(props: { application: Application }) {
         <Image
           className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
           src={application.imageUrl}
-          alt={application.title}
+          alt={application.name}
           height={48}
           width={48}
         />
         <div className="text-sm font-medium leading-6 text-gray-900">
-          {application.title}
+          {application.name}
         </div>
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
