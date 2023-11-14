@@ -2,10 +2,8 @@
 
 import Container from "@/components/shared/Container";
 
-import { MicroGrantsStrategy } from "../../../../../../Allo-SDK/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
-import { Allo } from "../../../../../../Allo-SDK/allo-v2-sdk/dist/Allo/Allo";
-// import { MicroGrantsStrategy } from "@allo-protocol/allo-v2-sdk";
-// import { Allo } from "@allo-protocol/allo-v2-sdk";
+import { Allo } from "@allo-team/allo-v2-sdk/src/Allo/Allo";
+import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
 
 import {
   useNetwork,

@@ -1,22 +1,18 @@
 "use client";
 import React, { useState } from "react";
-import { Allo } from "@allo-team/allo-v2-sdk/src/Allo/Allo";
 import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
 
-import IPFSClient, { getIPFSClient } from "@/services/ipfs";
+import { getIPFSClient } from "@/services/ipfs";
 import {
   EProgressStatus,
   ETarget,
   TNewApplication,
   TProgressStep,
 } from "@/app/types";
-import { TransactionData } from "@allo-team/allo-v2-sdk/src/Common/types";
 import {
   usePrepareSendTransaction,
   useSendTransaction,
-  useWaitForTransaction,
 } from "wagmi";
-import { PrepareSendTransactionArgs } from "@wagmi/core";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
