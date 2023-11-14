@@ -21,6 +21,7 @@
     "@tailwindcss/forms": "^0.5.7",
     "dotenv": "^16.3.1",
     "next": "14.0.1",
+    "pino-pretty": "^10.2.3",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
