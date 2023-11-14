@@ -2,8 +2,8 @@
 
 import Container from "@/components/shared/Container";
 
-import { Allo } from "@allo-team/allo-v2-sdk/src/Allo/Allo";
-import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
+import { Allo } from "@allo-team/allo-v2-sdk/";
+import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk";
 
 import {
   useNetwork,
@@ -81,13 +81,13 @@ const NewPool = () => {
 
     const poolCreationData = {
       profileId:
-        "0xc875155e7c39263cd9bc6aa12e269ea359fe3fddf500fcffe23388178d1a5fdd", // Jaxcoder on Alfajores
+        "0xc9a3fd1618bcff93ea3c1cd94e3b1ac052007733c1a720e5d990699a0949e891", // Jaxcoder on Alfajores
       strategy: address,
       initStrategyData: initStrategyData,
       token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       amount: BigInt(0),
       metadata: {
-        protocol: 1,
+        protocol: BigInt(0),
         pointer: "bafkreiarrwctnfncvpgwopgxj7mfu2fvlyh7mnyts7hb2rt2qwpqkabelq",
       },
       managers: [],

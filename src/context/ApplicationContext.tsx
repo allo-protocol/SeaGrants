@@ -9,10 +9,8 @@ import {
   TNewApplication,
   TProgressStep,
 } from "@/app/types";
-import {
-  usePrepareSendTransaction,
-  useSendTransaction,
-} from "wagmi";
+import { sendTransaction } from "@wagmi/core";
+import { usePrepareSendTransaction, useWaitForTransaction } from "wagmi";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -54,18 +52,21 @@ export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
+  const [hash, setHash] = useState<undefined | `0x${string}`>();
   const [txData, setTxData] = useState({
     to: "0x",
     data: "0x",
     value: BigInt(0),
   });
-  const { config } = usePrepareSendTransaction(...(txData as any));
+  const { config } = usePrepareSendTransaction(txData as any);
+
   const {
-    data: hash,
-    isLoading,
-    isSuccess,
-    sendTransaction,
-  } = useSendTransaction(config);
+    data: creationTx,
+    isError: isCreationError,
+    isLoading: isCreationLoading,
+  } = useWaitForTransaction({
+    hash: hash,
+  });
 
   // const {
   //   data: transaction,
@@ -123,7 +124,7 @@ export const ApplicationContextProvider = (props: {
       recipientAddress: data.recipientAddress as `0x${string}`,
       requestedAmount: BigInt(0),
       metadata: {
-        protocol: 1,
+        protocol: BigInt(1),
         pointer: pointer.IpfsHash,
       },
     });
@@ -136,11 +137,13 @@ export const ApplicationContextProvider = (props: {
       value: BigInt(0),
     });
 
-    await sendTransaction!();
+    const tx = await sendTransaction!(txData as any);
+
+    setHash(tx.hash);
 
     console.log(hash);
 
-    if (isSuccess) {
+    if (!isCreationError && !isCreationLoading) {
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
     } else {
       updateStepStatus(1, EProgressStatus.IS_ERROR);

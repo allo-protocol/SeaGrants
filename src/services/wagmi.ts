@@ -25,7 +25,7 @@ dotenv.config();
 
 const stagingChains = [
   celoAlfajores,
-  // goerli,
+  goerli,
   sepolia,
   polygonMumbai,
   arbitrumGoerli,
