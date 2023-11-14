@@ -12,13 +12,19 @@ import { classNames } from "@/utils/common";
 export default function Navbar() {
   // TODO: Update this to be dynamic or configurable.
   const poolId: number = 4;
+  const chainId: number = 44787;
+  const profileId: string = "0xbni34gbiog345bio34g56bio";
 
   // TODO: Add chain id to the navigation links.
   const navigation = [
-    { name: "Applications", href: `/${poolId}/application`, current: false },
-    { name: "Pools", href: "/pools", current: false },
+    {
+      name: "Applications",
+      href: `/${chainId}/${poolId}/application`,
+      current: false,
+    },
+    { name: "Pools", href: "/pool", current: false },
     // TODO: ADD a profile id to the profile link.
-    { name: "Profile", href: "/profile/0xbni34gbiog345bio34g56bio", current: false },
+    { name: "Profile", href: `/profile/${profileId}`, current: false },
   ];
 
   const userNavigation = [
@@ -84,7 +90,7 @@ export default function Navbar() {
                     type="button"
                     className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
                     onClick={() => {
-                      window.location.href = `/${poolId}/application/new`;
+                      window.location.href = `/${chainId}/${poolId}/application/new`;
                     }}
                   >
                     New Application

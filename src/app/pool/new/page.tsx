@@ -76,12 +76,13 @@ const NewPool = () => {
       allocationStartTime: BigInt(dateInSeconds + 5 * 60),
       allocationEndTime: BigInt(dateInSeconds + 60 * 60 * 24 * 7), // + 7 days
       approvalThreshold: BigInt(1),
-      maxRequestedAmount: BigInt(1000000000000000000),
+      maxRequestedAmount: BigInt(1e18),
     });
 
     const poolCreationData = {
       profileId:
-        "0xc9a3fd1618bcff93ea3c1cd94e3b1ac052007733c1a720e5d990699a0949e891", // Jaxcoder on Alfajores
+        "0x31de6d041fe1fdf5e9f620ef818bc7eae2b768b2a3cbeeaf4bbc77b115e84db7", // Jaxcoder on Goerli
+        // "0xc9a3fd1618bcff93ea3c1cd94e3b1ac052007733c1a720e5d990699a0949e891", // Jaxcoder on Alfajores
       strategy: address,
       initStrategyData: initStrategyData,
       token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -111,7 +112,7 @@ const NewPool = () => {
 
   useEffect(() => {
     if (deployTx) {
-      setAddress(deployTx.contractAddress);
+      setAddress(deployTx.contractAddress); // 0x542d353c52d186d694c1c8369aa190aeea9f3093
     }
   }, [deployTx]);
 

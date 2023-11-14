@@ -88,7 +88,7 @@ export const ApplicationContextProvider = (props: {
 
     try {
       pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(0, "https://ipfs.ip/ipfs/" + pointer.IpfsHash);
+      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
       updateStepStatus(0, EProgressStatus.IS_SUCCESS);
       updateStepStatus(1, EProgressStatus.IN_PROGRESS);
     } catch (e) {
