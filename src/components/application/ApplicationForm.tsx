@@ -18,10 +18,10 @@ import { useSwitchNetwork } from "wagmi";
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
-  description: yup.string().required().min(150, "Must be at least 150 words"),
+  description: yup.string().required().min(10, "Must be at least 150 words"),
   email: yup.string().required().min(3).email("Must be a valid email address"),
   recipientAddress: yup.string().required("Recipient address is required"),
-  imageUrl: yup.string().required().url("Must be a valid image url"),
+  // imageUrl: yup.string().required().url("Must be a valid image url"),
   profileOwner: yup.string().required("A profile owner is required"),
   nonce: yup.number().required("A nonce is required").min(1),
 });
@@ -68,10 +68,9 @@ export default function ApplicationForm() {
     };
 
     const recipientId = await createApplication(newApplicationData, Number(chainId), Number(poolId));
-    console.log("recipientId", recipientId);
-
     setTimeout(() => {
       setIsOpen(false);
+      // TODO: redirect to the application page
       // window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
     }, 1000);
 
