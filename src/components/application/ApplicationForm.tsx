@@ -67,7 +67,7 @@ export default function ApplicationForm() {
       nonce: data.nonce,
     };
 
-    const recipientId = await createApplication(newApplicationData, 5, 11);
+    const recipientId = await createApplication(newApplicationData, Number(chainId), Number(poolId));
     console.log("recipientId", recipientId);
 
     setTimeout(() => {
