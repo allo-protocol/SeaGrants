@@ -11,13 +11,15 @@ import {
 } from "@/app/types";
 import { sendTransaction } from "@wagmi/core";
 import { useWaitForTransaction } from "wagmi";
+import { waitForTransactionReceipt } from "viem/actions";
+import { wagmiConfigData } from "@/services/wagmi";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
   createApplication: (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ) => Promise<string>;
 }
 
@@ -45,24 +47,13 @@ export const ApplicationContext = React.createContext<IApplicationContextProps>(
       console.log("hello World");
       return "";
     },
-  },
+  }
 );
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
-
-  // TODO: This does not work
-  const [hash, setHash] = useState<undefined | `0x${string}`>();
-
-  const {
-    data: creationTx,
-    isError: isCreationError,
-    isLoading: isCreationLoading,
-  } = useWaitForTransaction({
-    hash: hash,
-  });
 
   const updateStepStatus = (index: number, status: EProgressStatus) => {
     const newSteps = [...steps];
@@ -79,9 +70,8 @@ export const ApplicationContextProvider = (props: {
   const createApplication = async (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ): Promise<string> => {
-
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
 
@@ -109,7 +99,6 @@ export const ApplicationContextProvider = (props: {
     // 2. Create profile on registry
     // TODO
 
-
     // 3. Register Recipient
     const strategy = new MicroGrantsStrategy({ chain, poolId });
 
@@ -124,22 +113,23 @@ export const ApplicationContextProvider = (props: {
 
     console.log("registerRecipientData", registerRecipientData);
 
-    const tx = await sendTransaction({
-      to: registerRecipientData.to as string,
-      data: registerRecipientData.data,
-      value: BigInt(1),
-    });
+    try {
+      const tx = await sendTransaction({
+        to: registerRecipientData.to as string,
+        data: registerRecipientData.data,
+        value: BigInt(1),
+      });
 
-    setHash(tx.hash);
+      const reciept = await wagmiConfigData.publicClient.waitForTransactionReceipt({
+        hash: tx.hash,
+      });
+      console.log(tx.hash);
+      console.log("SHIT", reciept);
 
-    console.log(tx);
-
-    if (!isCreationError && !isCreationLoading) {
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-    } else {
+    } catch {
       updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
-
 
     // 3. Register application to pool
 
