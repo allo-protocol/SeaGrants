@@ -13,7 +13,7 @@ export type NewApplication = {
 
 export class ApplicationContext {
 
-  async createApplication(data: NewApplication) {
+  async createApplication(data: NewApplication): string {
     
     // 1. Pin the application metadata to IPFS
     const ipfsClient = getIPFSClient();
@@ -29,10 +29,15 @@ export class ApplicationContext {
 
     const pointer = await ipfsClient.pinJSON(metadata);
 
+    // toggle status
+
     // 2. Create profile on registry
     // TODO
 
     // 3. Register application to pool
 
+    const recipientId = "";
+
+    return recipientId;
   }
 }
