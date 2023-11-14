@@ -7,15 +7,13 @@ import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
-  EProgressStatus,
-  ETarget,
   TNewApplication,
   TProgressStep,
 } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
-// import { useSwitchNetwork } from "wagmi";
+import { useSwitchNetwork } from "wagmi";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -30,27 +28,23 @@ const schema = yup.object({
 
 export default function ApplicationForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
-  const router = useRouter();
-  const params = useSearchParams();
-  const poolId = params.get("poolId");
+  const params = useParams();
+  
+  const chainId = params["chainId"];
+  const poolId = params["poolId"];
 
   // todo: wtf does it not work? maybe we also need to push it a few levels higher into /[chainId]
-  // const network = useSwitchNetwork({
-  //   chainId: Number(poolId),
-  // });
-  // console.log("network", network);
-
-  console.log("poolId", poolId);
+  const network = useSwitchNetwork({
+    chainId: Number(chainId),
+  });
 
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm({
-    // TODO: uncomment
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {
@@ -73,25 +67,14 @@ export default function ApplicationForm() {
       nonce: data.nonce,
     };
 
-    // createApplication(newApplicationData).then((applicationId: string) => {
-    //   setIsOpen(false);
-    //   console.log("applicationId", applicationId);
-    //   // router.push(`/${poolId}/application/${applicationId}`);
-    // });
+    const recipientId = await createApplication(newApplicationData, 5, 11);
+    console.log("recipientId", recipientId);
 
-    const ipfsHash = await createApplication(newApplicationData, 5, 11);
-    console.log("ipfsHash", ipfsHash);
+    setTimeout(() => {
+      setIsOpen(false);
+      // window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
+    }, 1000);
 
-    // setValue("name", data.name);
-    // setValue("website", data.website);
-    // setValue("description", data.description);
-    // setValue("email", data.email);
-    // setValue("recipientAddress", data.recipientAddress);
-    // setValue("imageUrl", data.imageUrl);
-    // setValue("profileOwner", data.profileOwner);
-    // setValue("nonce", data.nonce);
-
-    // console.log("submit", data);
   };
 
   return (

@@ -111,8 +111,6 @@ export const ApplicationContextProvider = (props: {
       },
     });
 
-    console.log("registerRecipientData", registerRecipientData);
-
     try {
       const tx = await sendTransaction({
         to: registerRecipientData.to as string,
@@ -123,6 +121,7 @@ export const ApplicationContextProvider = (props: {
       const reciept = await wagmiConfigData.publicClient.waitForTransactionReceipt({
         hash: tx.hash,
       });
+
       console.log(tx.hash);
       console.log("SHIT", reciept);
 
