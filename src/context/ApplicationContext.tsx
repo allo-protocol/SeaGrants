@@ -58,7 +58,7 @@ export const ApplicationContextProvider = (props: {
     data: "0x",
     value: BigInt(0),
   });
-  const { config } = usePrepareSendTransaction(txData as any);
+  // const { config } = usePrepareSendTransaction(txData as any);
 
   const {
     data: creationTx,
@@ -93,7 +93,6 @@ export const ApplicationContextProvider = (props: {
     chain: number,
     poolId: number,
   ): Promise<string> => {
-    console.log("createApplication", data);
 
     const ipfsClient = getIPFSClient();
 
@@ -120,6 +119,10 @@ export const ApplicationContextProvider = (props: {
 
     const strategy = new MicroGrantsStrategy({ chain, poolId });
 
+    console.log("createApplication", data);
+    console.log("metadata", pointer.IpfsHash)
+
+
     const registerRecipientData = strategy.getRegisterRecipientData({
       recipientAddress: data.recipientAddress as `0x${string}`,
       requestedAmount: BigInt(0),
@@ -134,7 +137,7 @@ export const ApplicationContextProvider = (props: {
     setTxData({
       to: registerRecipientData.to as string,
       data: registerRecipientData.data,
-      value: BigInt(0),
+      value: BigInt(1),
     });
 
     const tx = await sendTransaction!(txData as any);
