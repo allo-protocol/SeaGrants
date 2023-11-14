@@ -10,7 +10,7 @@ import {
   TProgressStep,
 } from "@/app/types";
 import { sendTransaction } from "@wagmi/core";
-import { usePrepareSendTransaction, useWaitForTransaction } from "wagmi";
+import { useWaitForTransaction } from "wagmi";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -52,13 +52,9 @@ export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
+
+  // TODO: This does not work
   const [hash, setHash] = useState<undefined | `0x${string}`>();
-  const [txData, setTxData] = useState({
-    to: "0x",
-    data: "0x",
-    value: BigInt(0),
-  });
-  // const { config } = usePrepareSendTransaction(txData as any);
 
   const {
     data: creationTx,
@@ -67,14 +63,6 @@ export const ApplicationContextProvider = (props: {
   } = useWaitForTransaction({
     hash: hash,
   });
-
-  // const {
-  //   data: transaction,
-  //   isError: waitTxError,
-  //   isLoading: waitTxSuccess,
-  // } = useWaitForTransaction({
-  //   hash: hash,
-  // });
 
   const updateStepStatus = (index: number, status: EProgressStatus) => {
     const newSteps = [...steps];
@@ -94,6 +82,7 @@ export const ApplicationContextProvider = (props: {
     poolId: number,
   ): Promise<string> => {
 
+    // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
 
     const metadata = {
@@ -117,11 +106,12 @@ export const ApplicationContextProvider = (props: {
       // throw e;
     }
 
+    // 2. Create profile on registry
+    // TODO
+
+
+    // 3. Register Recipient
     const strategy = new MicroGrantsStrategy({ chain, poolId });
-
-    console.log("createApplication", data);
-    console.log("metadata", pointer.IpfsHash)
-
 
     const registerRecipientData = strategy.getRegisterRecipientData({
       recipientAddress: data.recipientAddress as `0x${string}`,
@@ -134,17 +124,15 @@ export const ApplicationContextProvider = (props: {
 
     console.log("registerRecipientData", registerRecipientData);
 
-    setTxData({
+    const tx = await sendTransaction({
       to: registerRecipientData.to as string,
       data: registerRecipientData.data,
       value: BigInt(1),
     });
 
-    const tx = await sendTransaction!(txData as any);
-
     setHash(tx.hash);
 
-    console.log(hash);
+    console.log(tx);
 
     if (!isCreationError && !isCreationLoading) {
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
@@ -152,10 +140,6 @@ export const ApplicationContextProvider = (props: {
       updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
 
-    // toggle status
-
-    // 2. Create profile on registry
-    // TODO
 
     // 3. Register application to pool
 
