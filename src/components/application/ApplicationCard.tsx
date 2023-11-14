@@ -4,9 +4,9 @@ import Image from "next/image";
 
 export default function ApplicationCard(props: { application: IApplication }) {
   const statuses = {
-    Paid: "text-green-700 bg-blue-50 ring-green-600/20",
-    Approved: "text-green-700 bg-green-50 ring-green-600/20",
-    Pending: "text-gray-600 bg-yellow-50 ring-gray-500/10",
+    Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
+    Accepted: "text-green-700 bg-green-50 ring-green-600/20",
+    Pending: "text-yellow-600 bg-yellow-50 ring-yellow-500/10",
     Rejected: "text-red-700 bg-red-50 ring-red-600/20",
   };
 
@@ -43,7 +43,7 @@ export default function ApplicationCard(props: { application: IApplication }) {
             </div>
             <div
               className={classNames(
-                // statuses[application.status],
+                statuses[application.status],
                 "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
               )}
             >
