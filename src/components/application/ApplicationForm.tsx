@@ -62,7 +62,7 @@ export default function ApplicationForm() {
     formState: { errors },
   } = useForm({
     // NOTE: Comment out to test
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   // NOTE: REMOVE IF NOT NEEDED
