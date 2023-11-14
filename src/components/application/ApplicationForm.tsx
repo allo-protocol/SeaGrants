@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useRouter } from "next/navigation";
 
 const steps = [
   {
@@ -20,22 +21,29 @@ const steps = [
   },
   {
     id: 2,
-    content: "Submitted application on",
-    target: "Celo network",
+    content: "Creating a profile",
+    target: "", // TODO: add
     href: "#",
     status: ProgressStatus.IN_PROGRESS,
   },
   {
     id: 3,
+    content: "Registering to pool",
+    target: "Celo network",
+    href: "#",
+    status: ProgressStatus.IN_PROGRESS,
+  },
+  {
+    id: 4,
     content: "Indexing your application",
     target: "Spec",
     href: "#",
     status: ProgressStatus.IN_PROGRESS,
   },
   {
-    id: 4,
+    id: 5,
     content: "Redirecting to your application page",
-    target: "Bethany Blake",
+    target: "",
     href: "#",
     status: ProgressStatus.NOT_STARTED,
   },
@@ -53,6 +61,10 @@ const schema = yup.object({
 });
 
 export default function ApplicationForm() {
+
+  const router = useRouter();
+  const poolId = 5; // FIXp
+
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -81,7 +93,7 @@ export default function ApplicationForm() {
     console.log("cancel");
     setIsOpen(false);
 
-    window.location.assign("/");
+    window.location.assign(`/${poolId}`);
   };
 
   const onHandleSubmit = (data: any) => {
