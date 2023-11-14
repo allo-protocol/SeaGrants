@@ -47,3 +47,39 @@ export type TProfile = {
   nonce: number;
   members: `0x${string}`[];
 };
+
+// Application
+export type TNewApplication = {
+  name: string;
+  website: string;
+  description: string;
+  email: string;
+  recipientAddress: string;
+  imageUrl: string;
+  profileOwner: string;
+  nonce: number;
+};
+
+// Progress Modal
+
+export enum ETarget {
+  NONE = "None",
+  IPFS = "IPFS",
+  CHAIN = "Blockchain",
+  SPEC = "Spec",
+}
+
+export enum EProgressStatus {
+  IS_SUCCESS = "IS_SUCCESS",
+  IN_PROGRESS = "IN_PROGRESS",
+  NOT_STARTED = "NOT_STARTED",
+  IS_ERROR = "IS_ERROR",
+}
+
+export type TProgressStep = {
+  id: number;
+  content: string;
+  target?: string;
+  href?: string;
+  status: EProgressStatus;
+};

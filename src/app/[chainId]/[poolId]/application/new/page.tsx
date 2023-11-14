@@ -1,10 +1,13 @@
 import ApplicationForm from "@/components/application/ApplicationForm";
 import Container from "@/components/shared/Container";
+import { ApplicationContextProvider } from "@/context/ApplicationContext";
 
 const newApplication = () => {
   return (
     <Container>
-      <ApplicationForm />
+      <ApplicationContextProvider>
+        <ApplicationForm />
+      </ApplicationContextProvider>
     </Container>
   );
 };

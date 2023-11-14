@@ -33,12 +33,13 @@ const stagingChains = [
 
 const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
 
-// todo: fix it
 const availableChains =
-  process.env.ENVIRONMENT === "dev" ? stagingChains : productionChains;
+  process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
+    ? stagingChains
+    : productionChains;
 
 const { chains, publicClient } = configureChains(
-  [...stagingChains],
+  [...availableChains],
   [
     alchemyProvider({
       apiKey:
@@ -50,7 +51,7 @@ const { chains, publicClient } = configureChains(
         (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
     }),
     publicProvider(),
-  ]
+  ],
 );
 
 const { connectors } = getDefaultWallets({

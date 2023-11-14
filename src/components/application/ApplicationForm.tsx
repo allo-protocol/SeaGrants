@@ -1,54 +1,21 @@
 "use client";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
-import { ProgressStatus } from "@/components/shared/ProgressFeed";
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useRouter } from "next/navigation";
-import { ApplicationContext, NewApplication } from "@/context/ApplicationContext";
-
-const steps = [
-  {
-    id: 1,
-    content: "Saving your application to ",
-    target: "IPFS",
-    // TODO: Change to actual IPFS link
-    href: "https://ipfs.ip/ipfs/0xwetvy2345tvbyuk23c45vtvbyuiv523tvbyuitbyuf5tvyu23cf45yu",
-    status: ProgressStatus.IS_SUCCESS,
-  },
-  {
-    id: 2,
-    content: "Creating a profile",
-    target: "", // TODO: add
-    href: "#",
-    status: ProgressStatus.IN_PROGRESS,
-  },
-  {
-    id: 3,
-    content: "Registering to pool",
-    target: "Celo network",
-    href: "#",
-    status: ProgressStatus.IN_PROGRESS,
-  },
-  {
-    id: 4,
-    content: "Indexing your application",
-    target: "Spec",
-    href: "#",
-    status: ProgressStatus.IN_PROGRESS,
-  },
-  {
-    id: 5,
-    content: "Redirecting to your application page",
-    target: "",
-    href: "#",
-    status: ProgressStatus.NOT_STARTED,
-  },
-];
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  EProgressStatus,
+  ETarget,
+  TNewApplication,
+  TProgressStep,
+} from "@/app/types";
+import { ApplicationContext } from "@/context/ApplicationContext";
+// import { useSwitchNetwork } from "wagmi";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -62,9 +29,18 @@ const schema = yup.object({
 });
 
 export default function ApplicationForm() {
-
+  const { steps, createApplication } = useContext(ApplicationContext);
   const router = useRouter();
-  const poolId = 5; // Fix ME
+  const params = useSearchParams();
+  const poolId = params.get("poolId");
+
+  // todo: wtf does it not work? maybe we also need to push it a few levels higher into /[chainId]
+  // const network = useSwitchNetwork({
+  //   chainId: Number(poolId),
+  // });
+  // console.log("network", network);
+
+  console.log("poolId", poolId);
 
   const [isOpen, setIsOpen] = useState(false);
   const {
@@ -83,10 +59,10 @@ export default function ApplicationForm() {
     window.location.assign(`/${poolId}`);
   };
 
-  const onHandleSubmit = (data: any) => {
+  const onHandleSubmit = async (data: any) => {
     setIsOpen(true);
 
-    const newApplicationData: NewApplication = {
+    const newApplicationData: TNewApplication = {
       name: data.name,
       website: data.website,
       description: data.description,
@@ -97,13 +73,15 @@ export default function ApplicationForm() {
       nonce: data.nonce,
     };
 
-    const applicationContext = new ApplicationContext();
-    
-    applicationContext.createApplication(newApplicationData).then((applicationId) => {
-      setIsOpen(false);
-      router.push(`/${poolId}/application/${applicationId}`);
-    });
-  
+    // createApplication(newApplicationData).then((applicationId: string) => {
+    //   setIsOpen(false);
+    //   console.log("applicationId", applicationId);
+    //   // router.push(`/${poolId}/application/${applicationId}`);
+    // });
+
+    const ipfsHash = await createApplication(newApplicationData, 5, 11);
+    console.log("ipfsHash", ipfsHash);
+
     // setValue("name", data.name);
     // setValue("website", data.website);
     // setValue("description", data.description);
@@ -113,7 +91,7 @@ export default function ApplicationForm() {
     // setValue("profileOwner", data.profileOwner);
     // setValue("nonce", data.nonce);
 
-    console.log("submit", data);
+    // console.log("submit", data);
   };
 
   return (
@@ -166,7 +144,7 @@ export default function ApplicationForm() {
               <div className="mt-2">
                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                   <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
-                    http://
+                    https://
                   </span>
                   <input
                     {...register("website")}

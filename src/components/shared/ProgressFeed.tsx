@@ -1,24 +1,8 @@
-import {
-  CheckIcon,
-} from "@heroicons/react/20/solid";
+import { EProgressStatus, TProgressStep } from "@/app/types";
+import { CheckIcon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-export enum ProgressStatus {
-  IS_SUCCESS = "IS_SUCCESS",
-  IN_PROGRESS = "IN_PROGRESS",
-  NOT_STARTED = "NOT_STARTED",
-  IS_ERROR = "IS_ERROR",
-}
-
-export type Step = {
-  id: number;
-  content: string;
-  status: ProgressStatus;
-  target?: string;
-  href?: string;
-};
-
-export default function ProgressFeed(props: { steps: Step[] }) {
+export default function ProgressFeed(props: { steps: TProgressStep[] }) {
   return (
     <div className="flow-root">
       <ul role="list" className="-mb-8">
@@ -33,7 +17,7 @@ export default function ProgressFeed(props: { steps: Step[] }) {
               ) : null}
               <div className="relative flex space-x-3">
                 <div>
-                  {event.status === ProgressStatus.IS_SUCCESS && (
+                  {event.status === EProgressStatus.IS_SUCCESS && (
                     <span
                       className={
                         "bg-green-500 h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
@@ -45,7 +29,7 @@ export default function ProgressFeed(props: { steps: Step[] }) {
                       />
                     </span>
                   )}
-                  {event.status === ProgressStatus.IS_ERROR && (
+                  {event.status === EProgressStatus.IS_ERROR && (
                     <span
                       className={
                         "bg-red-500 h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
@@ -57,12 +41,12 @@ export default function ProgressFeed(props: { steps: Step[] }) {
                       />
                     </span>
                   )}
-                  {event.status === ProgressStatus.IN_PROGRESS && (
+                  {event.status === EProgressStatus.IN_PROGRESS && (
                     <span className="relative z-10 w-8 h-8 flex items-center justify-center bg-white border-2 border-violet-500 rounded-full">
                       <span className="h-2.5 w-2.5 bg-violet-500 rounded-full animate-pulse" />
                     </span>
                   )}
-                  {event.status === ProgressStatus.NOT_STARTED && (
+                  {event.status === EProgressStatus.NOT_STARTED && (
                     <span className="relative z-10 w-8 h-8 flex items-center justify-center bg-white border-2 rounded-full border-grey-400"></span>
                   )}
                 </div>
