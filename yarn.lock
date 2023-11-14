@@ -12,10 +12,10 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.9.4.tgz#aae21cb858bbb0411949d5b7b3051f4209043f62"
   integrity sha512-UK0bHA7hh9cR39V+4gl2/NnBBjoXIxkuWAPCaY4X7fbH4L/azIi7ilWOCjMUYfpJgraLUAqkRi2BqrjME8Rynw==
 
-"@allo-team/allo-v2-sdk@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@allo-team/allo-v2-sdk/-/allo-v2-sdk-1.0.0.tgz#7b7502402fe7ebb1ea0bfc097623b7189f42cbbb"
-  integrity sha512-Y9Fkw41sixJVCB+/l6O70Pr4qJPp/Wj3GxB7XxyRzDKlVQB9j+NDE6vH1CxC4vQiJjLIZ4xafttSWjx5w+s9Xw==
+"@allo-team/allo-v2-sdk@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@allo-team/allo-v2-sdk/-/allo-v2-sdk-1.0.5.tgz#e4e4e21ca7f0a2fdccc09cd40d757e87f57fb38f"
+  integrity sha512-stnS1QlVJvZcbq5NEwxSHC7BCxAciQN0VxcaGFzNkgzBOo8e6Qp/PW2pdNbZ8QNJB0Vl/jQFOtl/oWbpfUe2hw==
   dependencies:
     dotenv "^16.3.1"
     events "^3.3.0"

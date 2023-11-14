@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
+import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk/";
 
 import { getIPFSClient } from "@/services/ipfs";
 import {
