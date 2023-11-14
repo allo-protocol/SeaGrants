@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/navigation";
+import { ApplicationContext, NewApplication } from "@/context/ApplicationContext";
 
 const steps = [
   {
@@ -63,34 +64,20 @@ const schema = yup.object({
 export default function ApplicationForm() {
 
   const router = useRouter();
-  const poolId = 5; // FIXp
+  const poolId = 5; // Fix ME
 
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
     handleSubmit,
     setValue,
-    // getValues,
     formState: { errors },
   } = useForm({
-    // NOTE: Comment out to test
-    resolver: yupResolver(schema),
+    // TODO: uncomment
+    // resolver: yupResolver(schema),
   });
 
-  // NOTE: REMOVE IF NOT NEEDED
-  // const {
-  //   name,
-  //   website,
-  //   description,
-  //   email,
-  //   recipientAddress,
-  //   imageUrl,
-  //   profileOwner,
-  //   nonce,
-  // } = getValues();
-
   const handleCancel = () => {
-    console.log("cancel");
     setIsOpen(false);
 
     window.location.assign(`/${poolId}`);
@@ -99,14 +86,32 @@ export default function ApplicationForm() {
   const onHandleSubmit = (data: any) => {
     setIsOpen(true);
 
-    setValue("name", data.name);
-    setValue("website", data.website);
-    setValue("description", data.description);
-    setValue("email", data.email);
-    setValue("recipientAddress", data.recipientAddress);
-    setValue("imageUrl", data.imageUrl);
-    setValue("profileOwner", data.profileOwner);
-    setValue("nonce", data.nonce);
+    const newApplicationData: NewApplication = {
+      name: data.name,
+      website: data.website,
+      description: data.description,
+      email: data.email,
+      recipientAddress: data.recipientAddress,
+      imageUrl: data.imageUrl,
+      profileOwner: data.profileOwner,
+      nonce: data.nonce,
+    };
+
+    const applicationContext = new ApplicationContext();
+    
+    applicationContext.createApplication(newApplicationData).then((applicationId) => {
+      setIsOpen(false);
+      router.push(`/${poolId}/application/${applicationId}`);
+    });
+  
+    // setValue("name", data.name);
+    // setValue("website", data.website);
+    // setValue("description", data.description);
+    // setValue("email", data.email);
+    // setValue("recipientAddress", data.recipientAddress);
+    // setValue("imageUrl", data.imageUrl);
+    // setValue("profileOwner", data.profileOwner);
+    // setValue("nonce", data.nonce);
 
     console.log("submit", data);
   };
