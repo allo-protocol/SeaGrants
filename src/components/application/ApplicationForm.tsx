@@ -12,28 +12,29 @@ import * as yup from "yup";
 const steps = [
   {
     id: 1,
-    content: "Applied to",
-    target: "Front End Developer",
-    href: "#",
+    content: "Saving your application to ",
+    target: "IPFS",
+    // TODO: Change to actual IPFS link
+    href: "https://ipfs.ip/ipfs/0xwetvy2345tvbyuk23c45vtvbyuiv523tvbyuitbyuf5tvyu23cf45yu",
     status: ProgressStatus.IS_SUCCESS,
   },
   {
     id: 2,
-    content: "Advanced to phone screening by",
-    target: "Bethany Blake",
+    content: "Submitted application on",
+    target: "Celo network",
     href: "#",
     status: ProgressStatus.IN_PROGRESS,
   },
   {
     id: 3,
-    content: "Completed phone screening with",
-    target: "Martha Gardner",
+    content: "Indexing your application",
+    target: "Spec",
     href: "#",
-    status: ProgressStatus.IS_ERROR,
+    status: ProgressStatus.IN_PROGRESS,
   },
   {
     id: 4,
-    content: "Advanced to interview by",
+    content: "Redirecting to your application page",
     target: "Bethany Blake",
     href: "#",
     status: ProgressStatus.NOT_STARTED,
@@ -57,22 +58,24 @@ export default function ApplicationForm() {
     register,
     handleSubmit,
     setValue,
-    getValues,
+    // getValues,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    // NOTE: Comment out to test
+    // resolver: yupResolver(schema),
   });
 
-  const {
-    name,
-    website,
-    description,
-    email,
-    recipientAddress,
-    imageUrl,
-    profileOwner,
-    nonce,
-  } = getValues();
+  // NOTE: REMOVE IF NOT NEEDED
+  // const {
+  //   name,
+  //   website,
+  //   description,
+  //   email,
+  //   recipientAddress,
+  //   imageUrl,
+  //   profileOwner,
+  //   nonce,
+  // } = getValues();
 
   const handleCancel = () => {
     console.log("cancel");
@@ -357,7 +360,7 @@ export default function ApplicationForm() {
           Save
         </button>
 
-        <Modal isOpen={isOpen} steps={steps} />
+        <Modal isOpen={isOpen} setIsOpen={setIsOpen} steps={steps} />
       </div>
     </form>
   );

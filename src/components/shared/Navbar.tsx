@@ -17,11 +17,19 @@ export default function Navbar() {
   const navigation = [
     { name: "Applications", href: `/${poolId}/application`, current: false },
     { name: "Pools", href: "/pools", current: false },
+    // TODO: ADD a profile id to the profile link.
+    { name: "Profile", href: "/profile/0xbni34gbiog345bio34g56bio", current: false },
   ];
 
   const userNavigation = [
-    { name: "My Profile", href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui" },
-    { name: "Settings", href: "/settings/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui" },
+    {
+      name: "My Profile",
+      href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
+    },
+    {
+      name: "Settings",
+      href: "/settings/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
+    },
     { name: "Sign out", href: "/log-out" },
   ];
 

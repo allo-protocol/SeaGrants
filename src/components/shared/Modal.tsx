@@ -6,19 +6,18 @@ import ProgressFeed, { Step } from "./ProgressFeed";
 
 export default function Modal(props: {
   isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
   openModalText?: string;
   closeModalText?: string;
   title?: string;
   steps: Step[];
 }) {
-  let [isOpen, setIsOpen] = useState(props.isOpen || false);
-
   function closeModal() {
-    setIsOpen(false);
+    props.setIsOpen(false);
   }
 
   function openModal() {
-    setIsOpen(true);
+    props.setIsOpen(true);
   }
 
   return (
@@ -35,7 +34,7 @@ export default function Modal(props: {
         </div>
       )}
 
-      <Transition appear show={isOpen} as={Fragment}>
+      <Transition appear show={props.isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child
             as={Fragment}
