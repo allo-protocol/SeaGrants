@@ -1,5 +1,5 @@
-import ApplicationForm from "@/components/ApplicationForm";
-import Container from "@/components/Container";
+import ApplicationForm from "@/components/application/ApplicationForm";
+import Container from "@/components/shared/Container";
 
 const newApplication = () => {
   return (

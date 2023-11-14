@@ -9,7 +9,6 @@ export type TApplication = {
   // name: string;
   recipientAddress: string;
   amountRequested: string;
-  
 };
 
 export interface IApplication extends TApplication {
@@ -28,3 +27,15 @@ export interface IApplication extends TApplication {
 //   profileOwner: string;
 //   nonce: number;
 // }
+
+export type TPool = {
+  id: number;
+  name: string;
+  chainId: number;
+  dates: {
+    start: string;
+    end: string;
+  };
+  strategy: `0x${string}`; // address of the strategy contract
+  balance: number;
+};

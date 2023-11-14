@@ -1,9 +1,9 @@
 "use client";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
-import { ProgressStatus } from "@/components/ProgressFeed";
-import Error from "@/components/Error";
-import Modal from "./Modal";
+import { ProgressStatus } from "@/components/shared/ProgressFeed";
+import Error from "@/components/shared/Error";
+import Modal from "../shared/Modal";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";

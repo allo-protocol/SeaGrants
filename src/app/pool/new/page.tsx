@@ -1,6 +1,6 @@
 "use client";
 
-import Container from "@/components/Container";
+import Container from "@/components/shared/Container";
 
 import { MicroGrantsStrategy } from "../../../../../../Allo-SDK/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/MicroGrantsStrategy";
 import { Allo } from "../../../../../../Allo-SDK/allo-v2-sdk/dist/Allo/Allo";

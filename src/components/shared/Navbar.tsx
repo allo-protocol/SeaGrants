@@ -6,15 +6,17 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "../app/assets/logo.svg";
+import logo from "../../app/assets/logo.svg";
 import { classNames } from "@/utils/common";
 
 export default function Navbar() {
   // TODO: Update this to be dynamic or configurable.
   const poolId: number = 4;
 
+  // TODO: Add chain id to the navigation links.
   const navigation = [
     { name: "Applications", href: `/${poolId}/application`, current: false },
+    { name: "Pools", href: "/pools", current: false },
   ];
 
   const userNavigation = [

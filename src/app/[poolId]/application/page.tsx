@@ -1,5 +1,5 @@
-import ApplicationPage from "@/components/ApplicationsPage";
-import Container from "@/components/Container";
+import ApplicationPage from "@/components/application/ApplicationsPage";
+import Container from "@/components/shared/Container";
 
 export default function Application() {
   return (
