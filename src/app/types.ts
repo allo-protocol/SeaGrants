@@ -62,16 +62,27 @@ export type TNewApplication = {
 };
 
 export type TNewPool = {
+  // pool metadata info
   profileId: string;
   name: string;
   website: string;
   description: string;
-  maxAmount: number;
-  imageUrl: string;
+  imageUrl?: string;
+  // chain info
+  tokenAddress: string;
+  fundPoolAmount: string;
+  maxAmount: string;
   managers: string[];
+  startDate: string;
+  endDate: string;
+  approvalThreshold: number;
+  useRegistryAnchor: boolean;
 };
 
-
+export type TPoolData = {
+  address: string;
+  poolId: number;
+};
 
 // Progress Modal
 
@@ -80,6 +91,8 @@ export enum ETarget {
   IPFS = "IPFS",
   CHAIN = "Blockchain",
   SPEC = "Spec",
+  POOL = "Pool",
+  ALLO = "Allo",
 }
 
 export enum EProgressStatus {

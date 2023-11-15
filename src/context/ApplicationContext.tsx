@@ -19,7 +19,7 @@ export interface IApplicationContextProps {
   createApplication: (
     data: TNewApplication,
     chain: number,
-    poolId: number
+    poolId: number,
   ) => Promise<string>;
 }
 
@@ -33,22 +33,19 @@ const initialSteps: TProgressStep[] = [
   },
   {
     id: 1,
-    content: "Registering to pool on",
-    target: ETarget.CHAIN,
+    content: "Registering your application on ",
+    target: ETarget.POOL,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>(
-  {
-    steps: initialSteps,
-    createApplication: async () => {
-      console.log("hello World");
-      return "";
-    },
-  }
-);
+export const ApplicationContext = React.createContext<IApplicationContextProps>({
+  steps: initialSteps,
+  createApplication: async () => {
+    return "";
+  },
+});
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
@@ -59,7 +56,7 @@ export const ApplicationContextProvider = (props: {
     const newSteps = [...steps];
     newSteps[index].target = target;
     setSteps(newSteps);
-  }
+  };
 
   const updateStepStatus = (index: number, status: EProgressStatus) => {
     const newSteps = [...steps];
@@ -76,9 +73,8 @@ export const ApplicationContextProvider = (props: {
   const createApplication = async (
     data: TNewApplication,
     chain: number,
-    poolId: number
+    poolId: number,
   ): Promise<string> => {
-
     const chainInfo = getChain(chain);
 
     updateStepTarget(1, `${chainInfo.name}`);
@@ -131,23 +127,29 @@ export const ApplicationContextProvider = (props: {
         value: BigInt(1),
       });
 
-      const reciept = await wagmiConfigData.publicClient.waitForTransactionReceipt({
-        hash: tx.hash,
-      });
+      const reciept =
+        await wagmiConfigData.publicClient.waitForTransactionReceipt({
+          hash: tx.hash,
+        });
 
       const { logs } = reciept;
-      const decodedLogs = logs.map((log) => decodeEventLog({ ...log, abi: MicroGrantsABI}));
-     
-      recipientId = (decodedLogs[0].args as any)['recipientId'];
+      const decodedLogs = logs.map((log) =>
+        decodeEventLog({ ...log, abi: MicroGrantsABI }),
+      );
+
+      recipientId = (decodedLogs[0].args as any)["recipientId"];
 
       console.log("Hash", tx.hash);
       console.log("recipientId", recipientId);
 
       updateStepTarget(1, `${chainInfo.name} at ${tx.hash}`);
-      updateStepHref(1, `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash);
-  
+      updateStepHref(
+        1,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+      );
+
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-    } catch(e) {
+    } catch (e) {
       console.log("Registering Application", e);
       updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
