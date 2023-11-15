@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import { useSwitchNetwork } from "wagmi";
+import CropModal from "../shared/CropModal";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -26,8 +27,12 @@ const schema = yup.object({
 
 export default function ApplicationForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
+  const [imageName, setImageName] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [openCropModal, setOpenCropModal] = useState(false);
+
   const params = useParams();
-  
+
   const chainId = params["chainId"];
   const poolId = params["poolId"];
 
@@ -42,13 +47,28 @@ export default function ApplicationForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {
     setIsOpen(false);
 
     window.location.assign(`/${poolId}`);
+  };
+
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Set the value of the imageUrl field to the selected file name
+      console.log(e);
+      setImageFile(e.target.result);
+      setImageName(file.name);
+      setOpenCropModal(true);
+    } else {
+      // Clear the value if no file is selected
+      setImageFile(null);
+      setImageName("");
+    }
   };
 
   const onHandleSubmit = async (data: any) => {
@@ -66,13 +86,18 @@ export default function ApplicationForm() {
       nonce: data.nonce,
     };
 
-    const recipientId = await createApplication(newApplicationData, Number(chainId), Number(poolId));
+    console.log(data.imageUrl);
+
+    const recipientId = await createApplication(
+      newApplicationData,
+      Number(chainId),
+      Number(poolId),
+    );
     setTimeout(() => {
       setIsOpen(false);
       // TODO: redirect to the application page
       // window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
     }, 1000);
-
   };
 
   return (
@@ -209,10 +234,11 @@ export default function ApplicationForm() {
                 />
               </div>
               <div>
-                {errors.requestedAmount && <Error message={errors.requestedAmount?.message!} />}
+                {errors.requestedAmount && (
+                  <Error message={errors.requestedAmount?.message!} />
+                )}
               </div>
             </div>
-
 
             <div className="sm:col-span-full">
               <label
@@ -266,12 +292,16 @@ export default function ApplicationForm() {
                         name="imageUrl"
                         type="file"
                         className="sr-only"
+                        onChange={handleFileChange}
                       />
                     </label>
                     <p className="pl-1">or drag and drop</p>
                   </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
                     PNG, JPG, SVG up to 5MB
+                  </p>
+                  <p className="text-xs leading-5 text-gray-600 mt-2">
+                    {imageName ? "File uploaded: " + imageName : ""}
                   </p>
                 </div>
               </div>
@@ -360,6 +390,11 @@ export default function ApplicationForm() {
         </button>
 
         <Modal isOpen={isOpen} setIsOpen={setIsOpen} steps={steps} />
+        <CropModal
+          file={imageFile}
+          isOpen={openCropModal}
+          setIsOpen={setOpenCropModal}
+        />
       </div>
     </form>
   );
