@@ -15,9 +15,12 @@ import { classNames } from "@/utils/common";
 import { useParams } from "next/navigation";
 // import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { NewApplicationIcon, NewPoolIcon } from "./Icons";
+import { useAccount, useNetwork } from "wagmi";
 
 export default function Navbar() {
   const params = useParams();
+  const { isConnected } = useAccount();
+  const { chain } = useNetwork();
 
   const chainId = params["chainId"];
   const poolId = params["poolId"];
@@ -44,9 +47,9 @@ export default function Navbar() {
     {
       name: "New Pool",
       description: "Create your own pool",
-      href: `/pool/new`,
+      href: `/${chainId || chain?.id}/new`,
       icon: NewPoolIcon,
-      show: true,
+      show: isConnected,
     },
   ];
 
@@ -186,7 +189,7 @@ export default function Navbar() {
                                 href={item.href}
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700"
+                                  "block px-4 py-2 text-sm text-gray-700",
                                 )}
                               >
                                 {item.name}
