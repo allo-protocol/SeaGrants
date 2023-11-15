@@ -1,26 +1,23 @@
-import { Application } from "@/app/pool/new/types";
-import { classNames } from "@/utils/common";
+import { IApplication } from "@/app/types";
+import { classNames, statusColorsScheme } from "@/utils/common";
+import Image from "next/image";
 
-export default function ApplicationCard(props: { application: Application }) {
-  const statuses = {
-    Paid: "text-green-700 bg-blue-50 ring-green-600/20",
-    Approved: "text-green-700 bg-green-50 ring-green-600/20",
-    Pending: "text-gray-600 bg-yellow-50 ring-gray-500/10",
-    Rejected: "text-red-700 bg-red-50 ring-red-600/20",
-  };
+export default function ApplicationCard(props: { application: IApplication }) {
 
   const application = props.application;
 
   return (
     <>
       <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-        <img
-          src={application.imageUrl}
-          alt={application.title}
+        <Image
           className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
+          src={application.imageUrl}
+          alt={application.name}
+          height={48}
+          width={48}
         />
         <div className="text-sm font-medium leading-6 text-gray-900">
-          {application.title}
+          {application.name}
         </div>
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
@@ -40,7 +37,7 @@ export default function ApplicationCard(props: { application: Application }) {
             </div>
             <div
               className={classNames(
-                // statuses[application.status],
+                statusColorsScheme[application.status],
                 "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
               )}
             >

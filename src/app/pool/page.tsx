@@ -1,5 +1,11 @@
+import PoolPage from "@/components/pool/PoolPage";
+
 const Pool = () => {
-  return <div>Pool Page</div>;
+  return (
+    <div>
+      <PoolPage />
+    </div>
+  );
 };
 
 export default Pool;

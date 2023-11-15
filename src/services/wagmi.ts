@@ -1,7 +1,6 @@
 "use client";
-import {
-  getDefaultWallets,
-} from "@rainbow-me/rainbowkit";
+
+import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
@@ -14,7 +13,7 @@ import {
   mainnet,
   optimism,
   polygon,
-  polygonMumbai
+  polygonMumbai,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -34,12 +33,13 @@ const stagingChains = [
 
 const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
 
-// todo: fix it
 const availableChains =
-  process.env.ENVIRONMENT === "dev" ? stagingChains : productionChains;
+  process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
+    ? stagingChains
+    : productionChains;
 
 const { chains, publicClient } = configureChains(
-  [...stagingChains],
+  [...availableChains],
   [
     alchemyProvider({
       apiKey:
@@ -56,7 +56,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "Micro Grants",
-  projectId: process.env.PROJECT_ID as string || "YOUR_PROJECT_ID",
+  projectId: (process.env.PROJECT_ID as string) || "YOUR_PROJECT_ID",
   chains,
 });
 
@@ -67,3 +67,13 @@ export const wagmiConfigData = createConfig({
 });
 
 export const chainData = chains;
+
+export const getChain = (chainId: number) => {
+  for (const chain of Object.values(chains)) {
+    if (chain.id === chainId) {
+      return chain;
+    }
+  }
+
+  throw new Error(`Chain with id ${chainId} not found`);
+}

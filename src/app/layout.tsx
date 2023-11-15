@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/shared/Navbar";
 import { WagmiConfig } from "wagmi";
 import { wagmiConfigData, chainData } from "@/services/wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import '@rainbow-me/rainbowkit/styles.css';
+import "@rainbow-me/rainbowkit/styles.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
         <WagmiConfig config={wagmiConfigData}>
           <RainbowKitProvider chains={chainData}>
             <Navbar />
-            {children}
+            <main className="mt-8">{children}</main>
           </RainbowKitProvider>
         </WagmiConfig>
       </body>

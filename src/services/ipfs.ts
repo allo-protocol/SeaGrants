@@ -2,12 +2,21 @@ export type Config = {
   jwt: string;
   readGateway: string;
   writeGateway: string;
-}
+};
 
 export const getIPFSClient = (): IPFSClient => {
-  const jwt = process.env.PINATA_JWT;
-  const readGateway = process.env.IPFS_READ_GATEWAY;
-  const writeGateway = process.env.IPFS_WRITE_GATEWAY;
+  console.log(
+    "=====================================================================",
+  );
+  const jwt = process.env.NEXT_PUBLIC_PINATA_JWT;
+  const readGateway = process.env.NEXT_PUBLIC_IPFS_READ_GATEWAY;
+  const writeGateway = process.env.NEXT_PUBLIC_IPFS_WRITE_GATEWAY;
+
+  console.log("IPFS Config", {
+    jwt,
+    readGateway,
+    writeGateway,
+  });
 
   if (!jwt || !readGateway || !writeGateway) {
     throw new Error("Missing IPFS configuration");
@@ -18,10 +27,9 @@ export const getIPFSClient = (): IPFSClient => {
     readGateway,
     writeGateway,
   });
-}
+};
 
 export default class IPFSClient {
-
   private jwt: string;
 
   private readGateway: string;
@@ -37,8 +45,8 @@ export default class IPFSClient {
     this.readGateway = config.readGateway;
     this.writeGateway = config.writeGateway;
 
-    this.pinJSONToIPFSUrl = `${this.writeGateway}/pinning/pinJSONToIPFS`;
-    this.pinFileToIPFSUrl = `${this.writeGateway}/pinning/pinFileToIPFS`;
+    this.pinJSONToIPFSUrl = `${this.writeGateway}pinning/pinJSONToIPFS`;
+    this.pinFileToIPFSUrl = `${this.writeGateway}pinning/pinFileToIPFS`;
   }
 
   fileUrl(cid: string) {
