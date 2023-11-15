@@ -61,6 +61,18 @@ export type TNewApplication = {
   nonce: number;
 };
 
+export type TNewPool = {
+  profileId: string;
+  name: string;
+  website: string;
+  description: string;
+  maxAmount: number;
+  imageUrl: string;
+  managers: string[];
+};
+
+
+
 // Progress Modal
 
 export enum ETarget {
