@@ -58,10 +58,12 @@ export default function ApplicationForm() {
 
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
+
+    console.log(file);
+
     if (file) {
       // Set the value of the imageUrl field to the selected file name
-      console.log(e);
-      setImageFile(e.target.result);
+      setImageFile(file);
       setImageName(file.name);
       setOpenCropModal(true);
     } else {
@@ -391,6 +393,7 @@ export default function ApplicationForm() {
 
         <Modal isOpen={isOpen} setIsOpen={setIsOpen} steps={steps} />
         <CropModal
+          aspectRatio={16 / 9}
           file={imageFile}
           isOpen={openCropModal}
           setIsOpen={setOpenCropModal}

@@ -3,9 +3,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";
 import ReactCrop, { type Crop, makeAspectCrop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 export default function CropModal(props: {
   file: any;
+  aspectRatio: any;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   openModalText?: string;
@@ -13,8 +15,7 @@ export default function CropModal(props: {
   title?: string;
 }) {
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-  const [cropValues, setCropValues] = useState({} as Crop);
-  const [crop, setCrop] = useState(cropValues);
+  const [crop, setCrop] = useState({} as Crop);
   const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
 
   function closeModal() {
@@ -28,32 +29,43 @@ export default function CropModal(props: {
   useEffect(() => {
     if (props.file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        setImageSrc(reader.result as unknown as string);
-      };
-      reader.readAsDataURL(props.file);
-      if (reader) {
-        const image = new Image();
-        image.src = reader!.result as unknown as string;
-        image.onload = () => {
-          setImageSize({ width: image.width, height: image.height });
-        };
 
-        setCropValues(
-          makeAspectCrop(
-            {
-              unit: "%",
-              width: 90,
-            },
-            16 / 9,
-            image.width,
-            image.height,
-          ),
-        );
-      }
+      reader.onload = async () => {
+        setImageSrc(reader.result as unknown as string);
+
+        try {
+          const blob = await fetch(reader.result as string).then((res) =>
+            res.blob(),
+          );
+          const imageBitmap = await createImageBitmap(blob);
+
+          setImageSize({
+            width: imageBitmap.width,
+            height: imageBitmap.height,
+          });
+
+          console.log(imageBitmap.width, imageBitmap.height);
+
+          // Continue with your logic, e.g., setting crop
+          setCrop(
+            makeAspectCrop(
+              {
+                unit: "%",
+                width: 90,
+              },
+              props.aspectRatio,
+              imageBitmap.width * 0.9,
+              imageBitmap.height * 0.9,
+            ),
+          );
+        } catch (error) {
+          console.error("Error loading image:", error);
+        }
+      };
+
+      reader.readAsDataURL(props.file);
     }
   }, [props.file]);
-
   const handleCropChange = (newCrop: any) => {
     setCrop(newCrop);
   };
@@ -120,13 +132,12 @@ export default function CropModal(props: {
                       {props.title}
                     </Dialog.Title>
                   )}
-                  fml
                   {imageSrc && (
                     <ReactCrop
                       crop={crop} // error here
                       onChange={(c) => setCrop(c)}
+                      aspect={props.aspectRatio}
                     >
-                      Yo
                       <img src={imageSrc as unknown as string} />
                     </ReactCrop>
                   )}
