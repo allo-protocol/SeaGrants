@@ -1,44 +1,61 @@
 import { TPool } from "@/app/types";
+import { classNames, statusColorsScheme, stringToColor } from "@/utils/common";
 import { formatEther } from "viem";
 
 const PoolCard = ({ pool }: { pool: TPool }) => {
+  const bg = stringToColor(pool.name);
+
   return (
-    <li
-      key={pool.id}
-      className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow"
-    >
-      <div className="flex w-full items-center justify-between space-x-6 p-6">
-        <div className="flex-1 truncate">
-          <div className="flex items-center space-x-3">
-            <h3 className="truncate text-sm font-medium text-gray-900">
-              {pool.name}
-            </h3>
-          </div>
-          <p className="mt-1 truncate text-sm text-gray-500">
-            {pool.dates.start} - {pool.dates.end}
-          </p>
-        </div>
-        {/* <img
-              className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
-              src={pool.imageUrl}
-              alt=""
-            /> */}
+    <>
+      <div
+        className={`flex items-center gap-x-4 border-b border-gray-900/5 p-6`}
+        style={{ backgroundColor: bg }}
+      >
+        {/* Add chain id logo */}
+        {/* <Image
+          src={pool.imageUrl}
+          alt={pool.name}
+          height={48}
+          width={48}
+        /> */}
+        <div className="text-sm font-medium text-gray-900">{pool.name}</div>
       </div>
-      <div>
-        <div className="-mt-px flex divide-x divide-gray-200">
-          <div className="flex w-0 flex-1">
-            <p className="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900">
-              {formatEther(BigInt(pool.balance))} Ξ
-            </p>
+      <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+        <div className="flex justify-between gap-x-4 py-3">
+          {/* Open/Closed status */}
+          <div
+          // className={classNames(
+          //   statusColorsScheme[pool.active],
+          //   "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+          // )}
+          >
+            {pool.active.toString()}
           </div>
-          <div className="-ml-px flex w-0 flex-1">
-            <div className="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900">
-              ?
+        </div>
+        <div className="flex justify-between gap-x-4 py-3">
+          <dt className="text-gray-500">Pool Amount</dt>
+          <dd className="flex items-start gap-x-2">
+            <div className="font-medium text-gray-900">
+              {formatEther(BigInt(pool.amount))} {pool.tokenSymbol}
             </div>
-          </div>
+          </dd>
         </div>
-      </div>
-    </li>
+
+        <div className="flex justify-between gap-x-4 py-3">
+          <dt className="text-gray-500">Start Date:</dt>
+          <dd className="text-gray-700">
+            <time dateTime={pool.dates.start}></time>
+          </dd>
+        </div>
+
+        <div className="flex justify-between gap-x-4 py-3">
+          <dt className="text-gray-500">End Date</dt>
+          <dd className="text-gray-700">
+            <time dateTime={pool.dates.end}>Ed </time>
+          </dd>
+        </div>
+      </dl>
+    </>
   );
 };
 

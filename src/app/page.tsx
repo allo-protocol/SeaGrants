@@ -1,11 +1,26 @@
+import PoolList from "@/components/pool/PoolList";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
+    <main>
       {/* NOTE:
           What do we want to show on landing page? This will depend on if the user 
           is logged in or not.
       */}
-      <span className="text-3xl xl:text-4xl mt-96">Micro Grants</span>
+      <div className="mx-auto max-w-2xl py-2 sm:py-48 lg:py-56">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            !MicroGrants
+          </h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            Micro-grant programs, common in web3 communities like Gitcoin,
+            Celo, and ENS to engage members and empower project contributions
+            aligned with their mission, often present challenges in
+            accessibility.
+          </p>
+        </div>
+      </div>
+      <PoolList />
     </main>
   );
 }

@@ -37,7 +37,9 @@ export type TPool = {
     end: string;
   };
   strategy: `0x${string}`; // address of the strategy contract
-  balance: number;
+  amount: number;
+  tokenSymbol: string;
+  active: boolean;
 };
 
 export type TProfile = {

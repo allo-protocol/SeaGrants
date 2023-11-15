@@ -25,16 +25,15 @@ export default function Navbar() {
   const chainId = params["chainId"];
   const poolId = params["poolId"];
 
-  const navigation = [{ name: "Pools", href: "/pool", current: false }];
+  // const navigation = [{ name: "Pools", href: "/pool", current: false }];
 
-  const userNavigation = [
-    {
-      name: "My Profile",
-      href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
-    },
-    // api endpoint calling logout function and redirect to /
-    { name: "Sign out", href: "/log-out" },
-  ];
+  // const userNavigation = [
+  //   {      name: "My Profile",
+  //     href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
+  //   },
+  //   // api endpoint calling logout function and redirect to /
+  //   { name: "Sign out", href: "/log-out" },
+  // ];
 
   const creations = [
     {
@@ -63,18 +62,6 @@ export default function Navbar() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
               <div className="flex">
-                <div className="-ml-2 mr-2 flex items-center md:hidden">
-                  {/* Mobile menu button */}
-                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400">
-                    <span className="absolute -inset-0.5" />
-                    <span className="sr-only">Open main menu</span>
-                    {open ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                    )}
-                  </Disclosure.Button>
-                </div>
                 <div className="flex flex-shrink-0 items-center cursor-pointer">
                   <Image
                     className="h-8 w-auto"
@@ -86,18 +73,6 @@ export default function Navbar() {
                       window.location.href = "/";
                     }}
                   />
-                </div>
-                <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4 cursor-pointer">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                      aria-current={item.current ? "page" : undefined}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
                 </div>
               </div>
               <div className="flex items-center">
@@ -169,71 +144,9 @@ export default function Navbar() {
                     showBalance={false}
                   />
                 </div>
-                <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
-                  {/* Profile dropdown */}
-                  <Menu as="div" className="relative ml-3">
-                    <Transition
-                      as={Fragment}
-                      enter="transition ease-out duration-200"
-                      enterFrom="transform opacity-0 scale-95"
-                      enterTo="transform opacity-100 scale-100"
-                      leave="transition ease-in duration-75"
-                      leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {userNavigation.map((item) => (
-                          <Menu.Item key={item.name}>
-                            {({ active }: { active: boolean }) => (
-                              <a
-                                href={item.href}
-                                className={classNames(
-                                  active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700",
-                                )}
-                              >
-                                {item.name}
-                              </a>
-                            )}
-                          </Menu.Item>
-                        ))}
-                      </Menu.Items>
-                    </Transition>
-                  </Menu>
-                </div>
               </div>
             </div>
           </div>
-
-          <Disclosure.Panel className="md:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-              {navigation.map((item) => (
-                <Disclosure.Button
-                  key={item.name}
-                  as="a"
-                  href={item.href}
-                  className="block rounded-md px-3 py-2 text-base font-medium"
-                  aria-current={item.current ? "page" : undefined}
-                >
-                  {item.name}
-                </Disclosure.Button>
-              ))}
-            </div>
-            <div className="border-t border-gray-700 pb-3 pt-4">
-              <div className="mt-3 space-y-1 px-2 sm:px-3">
-                {userNavigation.map((item) => (
-                  <Disclosure.Button
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-green-700 hover:text-white"
-                  >
-                    {item.name}
-                  </Disclosure.Button>
-                ))}
-              </div>
-            </div>
-          </Disclosure.Panel>
         </nav>
       )}
     </Disclosure>

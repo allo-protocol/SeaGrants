@@ -44,7 +44,6 @@ export default function ApplicationList() {
 
   return (
     <div className="flex flex-col">
-      <div></div>
       <div>
         <ul
           role="list"
