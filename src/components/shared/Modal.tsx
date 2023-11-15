@@ -1,8 +1,9 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
-import ProgressFeed, { Step } from "./ProgressFeed";
+import { Fragment } from "react";
+import ProgressFeed from "./ProgressFeed";
+import { TProgressStep } from "@/app/types";
 
 export default function Modal(props: {
   isOpen: boolean;
@@ -10,7 +11,7 @@ export default function Modal(props: {
   openModalText?: string;
   closeModalText?: string;
   title?: string;
-  steps: Step[];
+  steps: TProgressStep[];
 }) {
   function closeModal() {
     props.setIsOpen(false);

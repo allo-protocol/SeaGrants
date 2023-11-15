@@ -13,27 +13,26 @@ import Link from "next/link";
 import logo from "../../app/assets/logo.svg";
 import { classNames } from "@/utils/common";
 import { useParams } from "next/navigation";
-import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
+// import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { NewApplicationIcon, NewPoolIcon } from "./Icons";
+import { useAccount, useNetwork } from "wagmi";
 
 export default function Navbar() {
   const params = useParams();
+  const { isConnected } = useAccount();
+  const { chain } = useNetwork();
 
   const chainId = params["chainId"];
   const poolId = params["poolId"];
 
-  // TODO: Add chain id to the navigation links.
-  const navigation = [{ name: "Pools", href: "/pools", current: false }];
+  const navigation = [{ name: "Pools", href: "/pool", current: false }];
 
   const userNavigation = [
     {
       name: "My Profile",
       href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
     },
-    {
-      name: "Settings",
-      href: "/settings/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
-    },
+    // api endpoint calling logout function and redirect to /
     { name: "Sign out", href: "/log-out" },
   ];
 
@@ -41,16 +40,16 @@ export default function Navbar() {
     {
       name: "New Application",
       description: "Register / Update your application",
-      href: `/${chainId}/${poolId}/application/new`,
+      href: `/${chainId}/${poolId}/new`,
       icon: NewApplicationIcon,
       show: chainId && poolId,
     },
     {
       name: "New Pool",
       description: "Create your own pool",
-      href: `/pool/new`,
+      href: `/${chainId || chain?.id}/new`,
       icon: NewPoolIcon,
-      show: true,
+      show: isConnected,
     },
   ];
 
@@ -66,7 +65,7 @@ export default function Navbar() {
               <div className="flex">
                 <div className="-ml-2 mr-2 flex items-center md:hidden">
                   {/* Mobile menu button */}
-                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400">
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Open main menu</span>
                     {open ? (
@@ -213,12 +212,7 @@ export default function Navbar() {
                   key={item.name}
                   as="a"
                   href={item.href}
-                  className={classNames(
-                    item.current
-                      ? "bg-green-900 text-white-900"
-                      : "text-gray-900 hover:bg-green-700 hover:text-white",
-                    "block rounded-md px-3 py-2 text-base font-medium",
-                  )}
+                  className="block rounded-md px-3 py-2 text-base font-medium"
                   aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}

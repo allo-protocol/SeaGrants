@@ -19,7 +19,7 @@ const schema = yup.object({
   email: yup.string().required().min(3).email("Must be a valid email address"),
   requestedAmount: yup.number().required("Requested amount is required"),
   recipientAddress: yup.string().required("Recipient address is required"),
-  // imageUrl: yup.string().required().url("Must be a valid image url"),
+  imageUrl: yup.string().required().url("Must be a valid image url"),
   profileOwner: yup.string().required("A profile owner is required"),
   nonce: yup.number().required("A nonce is required").min(1),
 });
