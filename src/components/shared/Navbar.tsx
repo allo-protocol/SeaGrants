@@ -13,7 +13,7 @@ import Link from "next/link";
 import logo from "../../app/assets/logo.svg";
 import { classNames } from "@/utils/common";
 import { useParams } from "next/navigation";
-import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
+// import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { NewApplicationIcon, NewPoolIcon } from "./Icons";
 
 export default function Navbar() {
@@ -29,10 +29,7 @@ export default function Navbar() {
       name: "My Profile",
       href: "/profile/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
     },
-    {
-      name: "Settings",
-      href: "/settings/0xbyu2f3buf4g5buiuivb3f4g5vbyuiof45gbyui",
-    },
+    // api endpoint calling logout function and redirect to /
     { name: "Sign out", href: "/log-out" },
   ];
 
