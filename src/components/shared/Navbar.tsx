@@ -116,7 +116,7 @@ export default function Navbar() {
                             className={`${
                               open ? "text-black-300" : "text-black-300/70"
                             }
-                                ml-2 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80`}
+                                ml-2 h-5 w-5 transition duration-150 ease-in-out group-hover:text-black-300/80`}
                             aria-hidden="true"
                           />
                         </Popover.Button>
@@ -138,7 +138,7 @@ export default function Navbar() {
                                     <a
                                       key={item.name}
                                       href={item.href}
-                                      className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500/50"
+                                      className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-black-500/50"
                                     >
                                       <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
                                         <item.icon aria-hidden="true" />
@@ -162,23 +162,6 @@ export default function Navbar() {
                   </Popover>
                 </div>
 
-                {
-                  // <div className="hidden md:mr-6 md:flex md:items-center md:space-x-4 cursor-pointer">
-                  //   <span className='tooltip rounded shadow-lg p-1 bg-gray-100 -mt-8'>New Application</span>
-                  //   <PlusIcon className="h-6 w-6 bold" aria-hidden="true" onClick={() => {
-                  //     window.location.href = `/${chainId}/${poolId}/application/new`;
-                  //   }}/>
-                  //   {/* <button
-                  //     type="button"
-                  //     className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                  //     onClick={() => {
-                  //       window.location.href = `/${chainId}/${poolId}/application/new`;
-                  //     }}
-                  //   >
-                  //     New Application
-                  //   </button> */}
-                  // </div>
-                }
                 <div className="flex-shrink-0">
                   <ConnectButton
                     label="Connect"
