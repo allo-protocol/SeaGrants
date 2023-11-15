@@ -2,29 +2,25 @@
 
 import { Fragment } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Disclosure, Menu, Popover, Transition } from "@headlessui/react";
+import { Bars3Icon, ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../app/assets/logo.svg";
 import { classNames } from "@/utils/common";
+import { useParams } from "next/navigation";
+import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 
 export default function Navbar() {
-  // TODO: Update this to be dynamic or configurable.
-  const poolId: number = 4;
-  const chainId: number = 44787;
-  const profileId: string = "0xbni34gbiog345bio34g56bio";
+
+  const params = useParams();
+
+  const chainId = params["chainId"];
+  const poolId = params["poolId"];
 
   // TODO: Add chain id to the navigation links.
   const navigation = [
-    {
-      name: "Applications",
-      href: `/${chainId}/${poolId}/application`,
-      current: false,
-    },
-    { name: "Pools", href: "/pool", current: false },
-    // TODO: ADD a profile id to the profile link.
-    { name: "Profile", href: `/profile/${profileId}`, current: false },
+    { name: "Pools", href: "/pools", current: false },
   ];
 
   const userNavigation = [
@@ -39,6 +35,85 @@ export default function Navbar() {
     { name: "Sign out", href: "/log-out" },
   ];
 
+  const creations = [
+    {
+      name: 'New Application',
+      description: 'Register / Update your application',
+      href: `/${chainId}/${poolId}/application/new`,
+      icon: IconOne,
+    },
+    {
+      name: 'New Pool',
+      description: 'Create your own pool',
+      href: `/${chainId}/pool/new`,
+      icon: IconTwo,
+    }
+  ]
+
+  // TODO: move svg icons to a separate file.
+  // Ensure new application is shown only when chainId and poolId are present.
+  // Ensure new pool is shown only when chainId is present.
+
+  function IconTwo() {
+    return (
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 48 48"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="48" height="48" rx="8" fill="#FFEDD5" />
+        <path
+          d="M28.0413 20L23.9998 13L19.9585 20M32.0828 27.0001L36.1242 34H28.0415M19.9585 34H11.8755L15.9171 27"
+          stroke="#FB923C"
+          strokeWidth="2"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M18.804 30H29.1963L24.0001 21L18.804 30Z"
+          stroke="#FDBA74"
+          strokeWidth="2"
+        />
+      </svg>
+    )
+  }
+
+  function IconOne() {
+    return (
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 48 48"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="48" height="48" rx="8" fill="#FFEDD5" />
+        <path
+          d="M24 11L35.2583 17.5V30.5L24 37L12.7417 30.5V17.5L24 11Z"
+          stroke="#FB923C"
+          strokeWidth="2"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M16.7417 19.8094V28.1906L24 32.3812L31.2584 28.1906V19.8094L24 15.6188L16.7417 19.8094Z"
+          stroke="#FDBA74"
+          strokeWidth="2"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M20.7417 22.1196V25.882L24 27.7632L27.2584 25.882V22.1196L24 20.2384L20.7417 22.1196Z"
+          stroke="#FDBA74"
+          strokeWidth="2"
+        />
+      </svg>
+    )
+  }
+  
+  
   return (
     <Disclosure
       as="nav"
@@ -85,19 +160,83 @@ export default function Navbar() {
                     </Link>
                   ))}
                 </div>
-                <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4 cursor-pointer">
-                  <button
-                    type="button"
-                    className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    onClick={() => {
-                      window.location.href = `/${chainId}/${poolId}/application/new`;
-                    }}
-                  >
-                    New Application
-                  </button>
-                </div>
               </div>
               <div className="flex items-center">
+                { chainId && poolId &&
+
+                  <div className="top-16 w-auto max-w-sm">
+                    <Popover className="relative">
+                      {({ open }) => (
+                        <>
+                          <Popover.Button
+                            className={`
+                              ${open ? 'text-black' : 'text-black/90'}
+                              group inline-flex items-center rounded-md px-3 py-2 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75`}
+                          >
+                            <span>Create</span>
+                            <ChevronDownIcon
+                              className={`${open ? 'text-black-300' : 'text-black-300/70'}
+                                ml-2 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80`}
+                              aria-hidden="true"
+                            />
+                          </Popover.Button>
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-200"
+                            enterFrom="opacity-0 translate-y-1"
+                            enterTo="opacity-100 translate-y-0"
+                            leave="transition ease-in duration-150"
+                            leaveFrom="opacity-100 translate-y-0"
+                            leaveTo="opacity-0 translate-y-1"
+                          >
+                            <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-sm -translate-x-1/2 transform px-4 sm:px-0 lg:max-w-3xl">
+                              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black/5">
+                                <div className="relative grid gap-8 bg-white p-7 lg:grid-rows-2">
+                                  {creations.map((item) => (
+                                    <a
+                                      key={item.name}
+                                      href={item.href}
+                                      className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500/50"
+                                    >
+                                      <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
+                                        <item.icon aria-hidden="true" />
+                                      </div>
+                                      <div className="ml-4">
+                                        <p className="text-sm font-medium text-gray-900">
+                                          {item.name}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                          {item.description}
+                                        </p>
+                                      </div>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            </Popover.Panel>
+                          </Transition>
+                        </>
+                      )}
+                    </Popover>
+                  </div>
+              
+                  // <div className="hidden md:mr-6 md:flex md:items-center md:space-x-4 cursor-pointer">
+                  //   <span className='tooltip rounded shadow-lg p-1 bg-gray-100 -mt-8'>New Application</span>
+
+                  //   <PlusIcon className="h-6 w-6 bold" aria-hidden="true" onClick={() => {
+                  //     window.location.href = `/${chainId}/${poolId}/application/new`;
+                  //   }}/>
+                  //   {/* <button
+                  //     type="button"
+                  //     className="hover:bg-green-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                  //     onClick={() => {
+                  //       window.location.href = `/${chainId}/${poolId}/application/new`;
+                  //     }}
+                  //   >
+                  //     New Application
+                  //   </button> */}
+                  // </div>
+                }
                 <div className="flex-shrink-0">
                   <ConnectButton
                     label="Connect"

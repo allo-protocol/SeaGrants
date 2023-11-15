@@ -10,9 +10,7 @@ import {
   TProgressStep,
 } from "@/app/types";
 import { sendTransaction } from "@wagmi/core";
-import { useWaitForTransaction } from "wagmi";
-import { waitForTransactionReceipt } from "viem/actions";
-import { wagmiConfigData } from "@/services/wagmi";
+import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { decodeEventLog } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
 
@@ -35,7 +33,7 @@ const initialSteps: TProgressStep[] = [
   },
   {
     id: 1,
-    content: "Registering to pool",
+    content: "Registering to pool on",
     target: ETarget.CHAIN,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
@@ -57,6 +55,12 @@ export const ApplicationContextProvider = (props: {
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
 
+  const updateStepTarget = (index: number, target: string) => {
+    const newSteps = [...steps];
+    newSteps[index].target = target;
+    setSteps(newSteps);
+  }
+
   const updateStepStatus = (index: number, status: EProgressStatus) => {
     const newSteps = [...steps];
     newSteps[index].status = status;
@@ -74,6 +78,11 @@ export const ApplicationContextProvider = (props: {
     chain: number,
     poolId: number
   ): Promise<string> => {
+
+    const chainInfo = getChain(chain);
+
+    updateStepTarget(1, `${chainInfo.name}`);
+
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
 
@@ -134,8 +143,9 @@ export const ApplicationContextProvider = (props: {
       console.log("Hash", tx.hash);
       console.log("recipientId", recipientId);
 
-      // TODO: update block explorer based on chainId
-      updateStepHref(1, "https://goerli.etherscan.io/tx/" + tx.hash);
+      updateStepTarget(1, `${chainInfo.name} at ${tx.hash}`);
+      updateStepHref(1, `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash);
+  
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
     } catch(e) {
       console.log("Registering Application", e);
