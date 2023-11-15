@@ -22,6 +22,8 @@ const schema = yup.object({
   imageUrl: yup.string().required().url("Must be a valid image url"),
   startDate: yup.date().required("Start time is required"),
   endDate: yup.date().required("End time is required"),
+  tokenAddress: yup.string().required("Token address is required"),
+  useRegistryAnchor: yup.boolean().required("Registry anchor is required"),
 });
 
 export default function PoolForm() {
@@ -41,7 +43,7 @@ export default function PoolForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {

@@ -3,11 +3,11 @@
 import { classNames, statusColorsScheme } from "@/utils/common";
 import { useParams } from "next/navigation";
 import Breadcrumb from "../shared/Breadcrumb";
+import Image from "next/image";
 
 export default function Application() {
-
   const params = useParams();
-  
+
   const chainId = params["chainId"];
   const poolId = params["poolId"];
 
@@ -21,7 +21,7 @@ export default function Application() {
     breadcrumbs: [
       { id: 1, name: "Home", href: "/" },
       { id: 2, name: `Pool ${poolId}`, href: `/${chainId}/${poolId}` },
-      { id: 3, name: applicationName, href: "#"}
+      { id: 3, name: applicationName, href: "#" },
     ],
     logo: {
       src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
@@ -40,13 +40,13 @@ export default function Application() {
   };
 
   const overviews = [
-    { description: 'Amount', name: application.amountRequested },
-    { description: 'Start Date', name: (new Date().toLocaleString()) },
-    { description: 'End Date',  name: (new Date().toLocaleString()) },
-    { description: 'Approvals', name: '2', color : 'text-green-700' },
-    { description: 'Rejections', name: '3', color : 'text-red-700'},
-  ]
-    
+    { description: "Amount", name: application.amountRequested },
+    { description: "Start Date", name: new Date().toLocaleString() },
+    { description: "End Date", name: new Date().toLocaleString() },
+    { description: "Approvals", name: "2", color: "text-green-700" },
+    { description: "Rejections", name: "3", color: "text-red-700" },
+  ];
+
   return (
     <div className="bg-white">
       <div className="pt-6">
@@ -55,10 +55,12 @@ export default function Application() {
         {/* Banner */}
         <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <img
+            <Image
               src={application.logo.src}
               alt={application.logo.alt}
               className="h-full w-full object-cover object-center"
+              height={100}
+              width={700}
             />
           </div>
         </div>
@@ -75,14 +77,15 @@ export default function Application() {
           <div className="mt-4 lg:row-span-3 lg:mt-0">
             <div className="mt-6 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">
-
                 {/* Status */}
                 <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-sm font-medium leading-6 text-gray-900">Status</dt>
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Status
+                  </dt>
                   <dd className="mt-1 text-sm leading-6 text-gray-700 text-center sm:mt-0">
                     <div
                       className={classNames(
-                        statusColorsScheme[application.status],
+                        statusColorsScheme[application.status as keyof typeof statusColorsScheme],
                         "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
                       )}
                     >
@@ -91,12 +94,19 @@ export default function Application() {
                   </dd>
                 </div>
 
-                {overviews.map(overview => (
-                  <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                    <dt className="text-sm font-medium leading-6 text-gray-900">{overview.description}</dt>
-                    <dd className={classNames(
-                      overview.color ? overview.color :"",
-                      "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0")}
+                {overviews.map((overview, index) => (
+                  <div
+                    key={index}
+                    className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
+                  >
+                    <dt className="text-sm font-medium leading-6 text-gray-900">
+                      {overview.description}
+                    </dt>
+                    <dd
+                      className={classNames(
+                        overview.color ? overview.color : "",
+                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
+                      )}
                     >
                       {overview.name}
                     </dd>
@@ -127,7 +137,9 @@ export default function Application() {
               <h3 className="sr-only">Description</h3>
 
               <div className="space-y-6">
-                <p className="text-base text-gray-900">{application.description}</p>
+                <p className="text-base text-gray-900">
+                  {application.description}
+                </p>
               </div>
             </div>
 

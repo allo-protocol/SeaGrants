@@ -22,8 +22,7 @@ export default function Navbar() {
   const chainId = params["chainId"];
   const poolId = params["poolId"];
 
-  // TODO: Add chain id to the navigation links.
-  const navigation = [{ name: "Pools", href: "/pools", current: false }];
+  const navigation = [{ name: "Pools", href: "/pool", current: false }];
 
   const userNavigation = [
     {
@@ -41,7 +40,7 @@ export default function Navbar() {
     {
       name: "New Application",
       description: "Register / Update your application",
-      href: `/${chainId}/${poolId}/application/new`,
+      href: `/${chainId}/${poolId}/new`,
       icon: NewApplicationIcon,
       show: chainId && poolId,
     },
@@ -66,7 +65,7 @@ export default function Navbar() {
               <div className="flex">
                 <div className="-ml-2 mr-2 flex items-center md:hidden">
                   {/* Mobile menu button */}
-                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400">
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Open main menu</span>
                     {open ? (
@@ -190,7 +189,7 @@ export default function Navbar() {
                                 href={item.href}
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700",
+                                  "block px-4 py-2 text-sm text-gray-700"
                                 )}
                               >
                                 {item.name}
@@ -213,12 +212,7 @@ export default function Navbar() {
                   key={item.name}
                   as="a"
                   href={item.href}
-                  className={classNames(
-                    item.current
-                      ? "bg-green-900 text-white-900"
-                      : "text-gray-900 hover:bg-green-700 hover:text-white",
-                    "block rounded-md px-3 py-2 text-base font-medium",
-                  )}
+                  className="block rounded-md px-3 py-2 text-base font-medium"
                   aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}
