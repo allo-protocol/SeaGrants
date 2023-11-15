@@ -8,10 +8,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useParams } from "next/navigation";
-import {
-  TNewApplication,
-  TProgressStep,
-} from "@/app/types";
+import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import { useSwitchNetwork } from "wagmi";
 
@@ -20,6 +17,7 @@ const schema = yup.object({
   website: yup.string().required().url("Must be a valid website address"),
   description: yup.string().required().min(10, "Must be at least 150 words"),
   email: yup.string().required().min(3).email("Must be a valid email address"),
+  requestedAmount: yup.number().required("Requested amount is required"),
   recipientAddress: yup.string().required("Recipient address is required"),
   // imageUrl: yup.string().required().url("Must be a valid image url"),
   profileOwner: yup.string().required("A profile owner is required"),
@@ -61,6 +59,7 @@ export default function ApplicationForm() {
       website: data.website,
       description: data.description,
       email: data.email,
+      requestedAmount: data.requestedAmount,
       recipientAddress: data.recipientAddress,
       imageUrl: data.imageUrl,
       profileOwner: data.profileOwner,
@@ -192,6 +191,28 @@ export default function ApplicationForm() {
                 {errors.email && <Error message={errors.email?.message!} />}
               </div>
             </div>
+
+            <div className="sm:col-span-4">
+              <label
+                htmlFor="requested-amount"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Requested Amount
+              </label>
+              <div className="mt-2">
+                <input
+                  {...register("requestedAmount")}
+                  id="requested-amount"
+                  name="requested-amount"
+                  type="number"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+              <div>
+                {errors.requestedAmount && <Error message={errors.requestedAmount?.message!} />}
+              </div>
+            </div>
+
 
             <div className="sm:col-span-full">
               <label

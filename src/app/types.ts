@@ -53,6 +53,7 @@ export type TNewApplication = {
   name: string;
   website: string;
   description: string;
+  requestedAmount: number;
   email: string;
   recipientAddress: string;
   imageUrl: string;
