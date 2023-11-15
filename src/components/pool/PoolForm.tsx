@@ -10,31 +10,25 @@ import * as yup from "yup";
 import { useParams } from "next/navigation";
 import { TNewApplication, TNewPool } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
-import { useSwitchNetwork } from "wagmi";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 
 const schema = yup.object({
   profileId: yup.string().required("Recipient address is required"),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
   description: yup.string().required().min(10, "Must be at least 150 words"),
-  email: yup.string().required().min(3).email("Must be a valid email address"),
   maxAmount: yup.number().required("max amount is required"),
   // imageUrl: yup.string().required().url("Must be a valid image url"),
-  profileOwner: yup.string().required("A profile owner is required"),
-  nonce: yup.number().required("A nonce is required").min(1),
 });
 
 export default function PoolForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
   const params = useParams();
 
+  const { chain } = useNetwork();
+
   const chainId = params["chainId"];
   const poolId = params["poolId"];
-
-  // todo: wtf does it not work? maybe we also need to push it a few levels higher into /[chainId]
-  const network = useSwitchNetwork({
-    chainId: Number(chainId),
-  });
 
   const [isOpen, setIsOpen] = useState(false);
   const {
@@ -81,7 +75,7 @@ export default function PoolForm() {
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold leading-7 text-gray-900">
-              Project
+              New Pool
             </h2>
             <p className="mt-1 text-sm leading-6 text-gray-600">
               This information will be stored on IPFS and added as metadata to
@@ -90,6 +84,17 @@ export default function PoolForm() {
           </div>
 
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+            <div className="sm:col-span-full">
+              <label className="block text-sm font-medium leading-6 text-gray-900">
+                Selected Chain
+              </label>
+              <div className="mt-2">
+                <p className="text-xs leading-5 text-gray-600 mt-2">
+                  {chain?.name} ({chain?.id})
+                </p>
+              </div>
+            </div>
+
             <div className="sm:col-span-full">
               <label
                 htmlFor="profileId"
@@ -190,8 +195,8 @@ export default function PoolForm() {
                 )}
               </div>
               <p className="text-xs leading-5 text-gray-600 mt-2">
-                Write a brief description about the project and why it&apos;s
-                applying to the round
+                Write a brief description about the pool and who is allowed to
+                apply
               </p>
             </div>
 
@@ -256,8 +261,8 @@ export default function PoolForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
-          <div>
+        {/* <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3"> */}
+        {/* <div>
             <h2 className="text-base font-semibold leading-7 text-gray-900">
               Profile Information
             </h2>
@@ -268,9 +273,9 @@ export default function PoolForm() {
               unique to the owner. You can use the anchor wallet to recive funds
               , gather attestations and generate reputation for your project.
             </p>
-          </div>
+          </div> */}
 
-          {/* <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+        {/* <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-full">
               <label
                 htmlFor="profile-owner"
@@ -318,7 +323,7 @@ export default function PoolForm() {
               </div>
             </div>
           </div> */}
-        </div>
+        {/* </div> */}
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
