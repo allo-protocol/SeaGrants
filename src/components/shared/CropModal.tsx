@@ -51,8 +51,8 @@ export default function CropModal(props: {
                 width: 90,
               },
               props.aspectRatio,
-              imageBitmap.width * 0.9,
-              imageBitmap.height * 0.9,
+              imageBitmap.width,
+              imageBitmap.height,
             ),
           );
         } catch (error) {
@@ -89,8 +89,8 @@ export default function CropModal(props: {
       crop.y,
       crop.width,
       crop.height,
-      crop.x,
-      crop.y,
+      0,
+      0,
       scaledWidth,
       scaledHeight,
     );
