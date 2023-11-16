@@ -1,23 +1,33 @@
+"use client";
+
 import { TPoolData } from "@/app/types";
 import PoolCard from "./PoolCard";
 import { getMicroGrantsQuery, graphqlEndpoint } from "@/utils/query";
 import request from "graphql-request";
+import NotificationToast from "../shared/NotificationToast";
 
 const PoolList = async () => {
 
+  let isError = false;
+
   let pools: TPoolData[] = [];
-  // try {
-  //   pools = await request(
-  //     graphqlEndpoint,
-  //     getMicroGrantsQuery,
-  //     {}
-  //   );
-  // } catch (e) {
-  //   console.log(e);
-  // }
+  try {
+    pools = await request(
+      graphqlEndpoint,
+      getMicroGrantsQuery,
+      {}
+    );
+  } catch (e) {
+    isError = true;
+    console.log(e);
+  }
 
   return (
     <div className="flex flex-row items-center justify-center mx-4 mb-8">
+      {
+        isError &&
+        <NotificationToast success={false} title="Unable to fetch pools" />
+      }
       <ul
         role="list"
         className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
