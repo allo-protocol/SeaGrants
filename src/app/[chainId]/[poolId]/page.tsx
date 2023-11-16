@@ -1,10 +1,10 @@
-import ApplicationPage from "@/components/application/ApplicationsPage";
+import PoolDetail from "@/components/application/PoolDetail";
 import Container from "@/components/shared/Container";
 
-export default function Application() {
+export default function Pool() {
   return (
     <Container>
-      <ApplicationPage />
+      <PoolDetail />
     </Container>
   );
 }

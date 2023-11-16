@@ -1,6 +1,5 @@
 import { gql } from "graphql-request";
 
-
 export const graphqlEndpoint = process.env.GRAPHQL_URL || "";
 
 /** Returns all the MicroGrants pools */
@@ -15,14 +14,14 @@ export const getMicroGrantsQuery = gql`
       approvalThreshold
       maxRequestedAmount
       pool {
-          tokenMetadata
-          token
-          amount
-          metadataPointer
-          profile {
-            profileId
-            name
-          }
+        tokenMetadata
+        token
+        amount
+        metadataPointer
+        profile {
+          profileId
+          name
+        }
       }
     }
   }
@@ -30,9 +29,27 @@ export const getMicroGrantsQuery = gql`
 
 /** Returns the recipient information for micro grant strategy */
 export const getMicroGrantsRecipientsQuery = gql`
-  query getMicroGrantsRecipientsQuery($chainId: String!, $strategyId: String!) {
-    microGrant(chainId: $chainId, strategy: $strategyId) {
+  query getMicroGrantsRecipientsQuery($chainId: String!, $poolId: String!) {
+    microGrant(chainId: $chainId, poolId: $poolId) {
+      poolId
+      chainId
+      strategy
+      allocationStartTime
+      allocationEndTime
+      approvalThreshold
+      maxRequestedAmount
+      pool {
+        tokenMetadata
+        token
+        amount
+        metadataPointer
+        profile {
+          profileId
+          name
+        }
+      }
       microGrantRecipients {
+        recipientId
         recipientAddress
         recipientAddress
         requestedAmount
@@ -41,6 +58,28 @@ export const getMicroGrantsRecipientsQuery = gql`
         isUsingRegistryAnchor
         status
       }
+    }
+  }
+`;
+
+export const getMicroGrantRecipientQuery = gql`
+  query getMicroGrantRecipientQuery(
+    $chainId: String!
+    $poolId: String!
+    $recipientId: String!
+  ) {
+    microGrantRecipient(
+      chainId: $chainId
+      poolId: $poolId
+      recipientId: $recipientId
+    ) {
+      recipientId
+      recipientAddress
+      requestedAmount
+      metadataPointer
+      blockTimestamp
+      isUsingRegistryAnchor
+      status
     }
   }
 `;

@@ -1,8 +1,15 @@
+"use client";
+
 import { IApplication } from "@/app/types";
 import ApplicationCard from "./ApplicationCard";
+import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
+import request from "graphql-request";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function ApplicationList() {
-  // NOTE: This is just a placeholder for now.
+export default function PoolDetail() {
+  const params = useParams();
+  console.log("params", params);
   const applications: IApplication[] = [
     {
       id: 1,
@@ -41,6 +48,29 @@ export default function ApplicationList() {
       nonce: 3,
     },
   ];
+  let isError = false;
+  const [pools, setPools] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchPools = async () => {
+  //     try {
+  //       const response: any = await request(
+  //         graphqlEndpoint,
+  //         getMicroGrantsRecipientsQuery,
+  //         {}
+  //       );
+
+  //       console.log("response ================", response);
+
+  //       setPools(response["microGrantsRecipients"]);
+  //     } catch (e) {
+  //       isError = true;
+  //       console.log(e);
+  //     }
+  //   };
+
+  //   fetchPools();
+  // }, []);
 
   return (
     <div className="flex flex-col">

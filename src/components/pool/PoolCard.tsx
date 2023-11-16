@@ -8,6 +8,7 @@ import {
   statusColorsScheme,
   stringToColor,
 } from "@/utils/common";
+import Link from "next/link";
 import { formatEther } from "viem";
 
 const PoolCard = async ({ pool }: { pool: TPoolData }) => {
@@ -33,7 +34,7 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
   const amount = humanReadableAmount(poolDetail.amount, tokenMetadata.decimals);
 
   return (
-    <>
+    <Link href={`/${pool.chainId}/${pool.poolId}`}>
       <div
         className={`flex justify-between items-center gap-x-4 border-b border-gray-900/5 p-6`}
         style={{ backgroundColor: bg }}
@@ -89,7 +90,7 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
           </dd>
         </div>
       </dl>
-    </>
+    </Link>
   );
 };
 
