@@ -91,7 +91,8 @@ export default function CropModal(props: {
       crop.height,
     );
 
-    const base64Image = canvas.toDataURL("image/png");
+    const base64Image = canvas.toDataURL("image/png").toString();
+    console.log(base64Image);
     props.setBase64Image(base64Image);
     props.setIsOpen(false);
   };

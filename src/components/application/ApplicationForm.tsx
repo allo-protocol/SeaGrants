@@ -12,6 +12,7 @@ import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import { useSwitchNetwork } from "wagmi";
 import CropModal from "../shared/CropModal";
+import ImageUpload from "../shared/ImageUpload";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -27,21 +28,12 @@ const schema = yup.object({
 
 export default function ApplicationForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
-  const [imageName, setImageName] = useState("");
-  const [imageFile, setImageFile] = useState(null);
   const [base64Image, setBase64Image] = useState<string>("");
-
-  const [openCropModal, setOpenCropModal] = useState(false);
 
   const params = useParams();
 
   const chainId = params["chainId"];
   const poolId = params["poolId"];
-
-  // todo: wtf does it not work? maybe we also need to push it a few levels higher into /[chainId]
-  const network = useSwitchNetwork({
-    chainId: Number(chainId),
-  });
 
   const [isOpen, setIsOpen] = useState(false);
   const {
@@ -58,23 +50,6 @@ export default function ApplicationForm() {
     window.location.assign(`/${poolId}`);
   };
 
-  const handleFileChange = (e: any) => {
-    const file = e.target.files[0];
-
-    console.log(file);
-
-    if (file) {
-      // Set the value of the imageUrl field to the selected file name
-      setImageFile(file);
-      setImageName(file.name);
-      setOpenCropModal(true);
-    } else {
-      // Clear the value if no file is selected
-      setImageFile(null);
-      setImageName("");
-    }
-  };
-
   const onHandleSubmit = async (data: any) => {
     setIsOpen(true);
 
@@ -85,18 +60,19 @@ export default function ApplicationForm() {
       email: data.email,
       requestedAmount: data.requestedAmount,
       recipientAddress: data.recipientAddress,
-      imageUrl: data.imageUrl,
+      base64Image: base64Image,
       profileOwner: data.profileOwner,
       nonce: data.nonce,
     };
 
-    console.log(data.imageUrl);
+    console.log("newApplicationData", newApplicationData);
 
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),
       Number(poolId),
     );
+
     setTimeout(() => {
       setIsOpen(false);
       // TODO: redirect to the application page
@@ -271,45 +247,7 @@ export default function ApplicationForm() {
               </div>
             </div>
 
-            <div className="col-span-full">
-              <label
-                htmlFor="cover-photo"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Cover photo
-              </label>
-              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                <div className="text-center">
-                  <PhotoIcon
-                    className="mx-auto h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                    <label
-                      htmlFor="imageUrl"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                    >
-                      <span>Upload a file</span>
-                      <input
-                        {...register("imageUrl")}
-                        id="imageUrl"
-                        name="imageUrl"
-                        type="file"
-                        className="sr-only"
-                        onChange={handleFileChange}
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    PNG, JPG, SVG up to 5MB
-                  </p>
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    {imageName ? "File uploaded: " + imageName : ""}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ImageUpload setBase64Image={setBase64Image} />
           </div>
         </div>
 
@@ -394,15 +332,6 @@ export default function ApplicationForm() {
         </button>
 
         <Modal isOpen={isOpen} setIsOpen={setIsOpen} steps={steps} />
-        <CropModal
-          aspectRatio={16 / 9}
-          title={"Crop Image"}
-          file={imageFile}
-          isOpen={openCropModal}
-          setIsOpen={setOpenCropModal}
-          closeModalText={"Close"}
-          setBase64Image={setBase64Image}
-        />
       </div>
     </form>
   );

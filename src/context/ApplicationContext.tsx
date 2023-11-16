@@ -26,13 +26,20 @@ export interface IApplicationContextProps {
 const initialSteps: TProgressStep[] = [
   {
     id: 0,
-    content: "Saving your application to ",
+    content: "Saving your banner image to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
     id: 1,
+    content: "Saving your application to ",
+    target: ETarget.IPFS,
+    href: "",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    id: 2,
     content: "Registering your application on ",
     target: ETarget.POOL,
     href: "#",
@@ -87,20 +94,29 @@ export const ApplicationContextProvider = (props: {
       website: data.website,
       description: data.description,
       email: data.email,
-      imageUrl: data.imageUrl,
+      base64Image: data.base64Image,
       profileOwner: data.profileOwner,
     };
 
+    let imagePointer;
     let pointer;
 
     try {
-      pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      imagePointer = await ipfsClient.pinJSON({
+        data: metadata.base64Image,
+      });
+      metadata.base64Image = imagePointer.IpfsHash;
+      updateStepHref(0, "https://ipfs.io/ipfs/" + imagePointer.IpfsHash);
       updateStepStatus(0, EProgressStatus.IS_SUCCESS);
       updateStepStatus(1, EProgressStatus.IN_PROGRESS);
+
+      pointer = await ipfsClient.pinJSON(metadata);
+      updateStepHref(1, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       console.log("IPFS", e);
-      updateStepStatus(0, EProgressStatus.IS_ERROR);
+      updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
 
     // 2. Create profile on registry
@@ -142,16 +158,16 @@ export const ApplicationContextProvider = (props: {
       console.log("Hash", tx.hash);
       console.log("recipientId", recipientId);
 
-      updateStepTarget(1, `${chainInfo.name} at ${tx.hash}`);
+      updateStepTarget(2, `${chainInfo.name} at ${tx.hash}`);
       updateStepHref(
-        1,
+        2,
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
     } catch (e) {
       console.log("Registering Application", e);
-      updateStepStatus(1, EProgressStatus.IS_ERROR);
+      updateStepStatus(2, EProgressStatus.IS_ERROR);
     }
 
     return recipientId;

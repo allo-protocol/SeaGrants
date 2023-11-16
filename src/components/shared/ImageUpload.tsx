@@ -13,6 +13,7 @@ const ImageUpload = (props: {
     const file = e.target.files[0];
     if (file) {
       // Set the value of the imageUrl field to the selected file name
+      console.log(file);
       setImageFile(file);
       setImageName(file.name);
       setOpenCropModal(true);
@@ -46,6 +47,7 @@ const ImageUpload = (props: {
                 id="imageUrl"
                 name="imageUrl"
                 type="file"
+                accept="image/png, image/jpeg"
                 className="sr-only"
                 onChange={handleFileChange}
               />
@@ -53,7 +55,7 @@ const ImageUpload = (props: {
             <p className="pl-1">or drag and drop</p>
           </div>
           <p className="text-xs leading-5 text-gray-600 mt-2">
-            PNG, JPG, SVG up to 5MB
+            PNG, JPG up to 5MB
           </p>
           <p className="text-xs leading-5 text-gray-600 mt-2">
             {imageName ? "File uploaded: " + imageName : ""}
@@ -63,6 +65,7 @@ const ImageUpload = (props: {
       <CropModal
         aspectRatio={16 / 9}
         file={imageFile}
+        title={"Crop Image"}
         isOpen={openCropModal}
         setIsOpen={setOpenCropModal}
         closeModalText={"Close"}
