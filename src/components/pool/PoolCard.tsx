@@ -8,7 +8,7 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
   return (
     <>
       <div
-        className={`flex items-center gap-x-4 border-b border-gray-900/5 p-6`}
+        className={`flex justify-between items-center gap-x-4 border-b border-gray-900/5 p-6`}
         style={{ backgroundColor: bg }}
       >
         {/* Add chain id logo */}
@@ -18,24 +18,23 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
           height={48}
           width={48}
         /> */}
-        <div className="text-sm font-medium text-gray-900">{pool.name}</div>
+        <div className="flex text-sm font-medium text-gray-900">
+          {pool.name}
+        </div>
+        <div
+          className={classNames(
+            statusColorsScheme[
+              pool.active
+                ? ("Active" as keyof typeof statusColorsScheme)
+                : ("Closed" as keyof typeof statusColorsScheme)
+            ],
+            "flex rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+          )}
+        >
+          {pool.active ? "Active" : "Closed"}
+        </div>
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-        <div className="flex justify-between gap-x-4 py-3">
-          {/* Open/Closed status */}
-          <div
-            className={classNames(
-              statusColorsScheme[
-                pool.active
-                  ? ("Active" as keyof typeof statusColorsScheme)
-                  : ("Closed" as keyof typeof statusColorsScheme)
-              ],
-              "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
-            )}
-          >
-            {pool.active ? "Active" : "Closed"}
-          </div>
-        </div>
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">Pool Amount</dt>
           <dd className="flex items-start gap-x-2">

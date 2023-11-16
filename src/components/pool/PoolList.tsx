@@ -46,7 +46,7 @@ const pools: TPool[] = [
 
 const PoolList = () => {
   return (
-    <div className="flex flex-col mx-4 mb-8">
+    <div className="flex flex-row items-center justify-center mx-4 mb-8">
       <ul
         role="list"
         className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
