@@ -41,9 +41,6 @@ export default function CropModal(props: {
             height: imageBitmap.height,
           });
 
-          console.log(imageBitmap.width, imageBitmap.height);
-
-          // Continue with your logic, e.g., setting crop
           setCrop(
             makeAspectCrop(
               {
@@ -68,8 +65,6 @@ export default function CropModal(props: {
     if (!crop) {
       return;
     }
-
-    // scaling
     const scaledWidth = (imageSize.width * crop.width) / 100;
     const scaledHeight = (imageSize.height * crop.height) / 100;
 
@@ -96,7 +91,6 @@ export default function CropModal(props: {
     );
 
     const base64Image = canvas.toDataURL("image/png").toString();
-    console.log(base64Image);
     props.setBase64Image(base64Image);
     props.setIsOpen(false);
   };

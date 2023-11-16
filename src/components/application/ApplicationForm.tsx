@@ -65,8 +65,6 @@ export default function ApplicationForm() {
       nonce: data.nonce,
     };
 
-    console.log("newApplicationData", newApplicationData);
-
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),

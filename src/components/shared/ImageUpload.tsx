@@ -13,13 +13,10 @@ const ImageUpload = (props: {
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-      // Set the value of the imageUrl field to the selected file name
-      console.log(file);
       setImageFile(file);
       setImageName(file.name);
       setOpenCropModal(true);
     } else {
-      // Clear the value if no file is selected
       setImageFile(null);
       setImageName("");
     }
