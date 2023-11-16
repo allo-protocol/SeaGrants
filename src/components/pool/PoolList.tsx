@@ -1,5 +1,3 @@
-"use client";
-
 import { TPoolData } from "@/app/types";
 import PoolCard from "./PoolCard";
 import { getMicroGrantsQuery, graphqlEndpoint } from "@/utils/query";
