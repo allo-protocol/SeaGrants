@@ -7,6 +7,8 @@ export const statusColorsScheme = {
   Accepted: "text-green-700 bg-green-50 ring-green-600/20",
   Pending: "text-yellow-600 bg-yellow-50 ring-yellow-500/10",
   Rejected: "text-red-700 bg-red-50 ring-red-600/20",
+  Active: "text-green-700 bg-green-50 ring-green-600/20",
+  Closed: "text-red-700 bg-red-50 ring-red-600/20",
 };
 
 export function stringToColor2(str: string) {

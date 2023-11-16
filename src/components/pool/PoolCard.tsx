@@ -24,12 +24,16 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
         <div className="flex justify-between gap-x-4 py-3">
           {/* Open/Closed status */}
           <div
-          // className={classNames(
-          //   statusColorsScheme[pool.active],
-          //   "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
-          // )}
+            className={classNames(
+              statusColorsScheme[
+                pool.active
+                  ? ("Active" as keyof typeof statusColorsScheme)
+                  : ("Closed" as keyof typeof statusColorsScheme)
+              ],
+              "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+            )}
           >
-            {pool.active.toString()}
+            {pool.active ? "Active" : "Closed"}
           </div>
         </div>
         <div className="flex justify-between gap-x-4 py-3">
@@ -44,14 +48,14 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">Start Date:</dt>
           <dd className="text-gray-700">
-            <time dateTime={pool.dates.start}></time>
+            <time dateTime={pool.dates.start}>{pool.dates.start}</time>
           </dd>
         </div>
 
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">End Date</dt>
           <dd className="text-gray-700">
-            <time dateTime={pool.dates.end}>Ed </time>
+            <time dateTime={pool.dates.end}>{pool.dates.end}</time>
           </dd>
         </div>
       </dl>
