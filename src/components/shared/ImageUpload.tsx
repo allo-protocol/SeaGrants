@@ -4,6 +4,7 @@ import CropModal from "./CropModal";
 
 const ImageUpload = (props: {
   setBase64Image: (base64Image: string) => void;
+  aspectRatio?: number;
 }) => {
   const [imageName, setImageName] = useState("");
   const [imageFile, setImageFile] = useState(null);
@@ -78,7 +79,7 @@ const ImageUpload = (props: {
         </div>
       </div>
       <CropModal
-        aspectRatio={16 / 9}
+        aspectRatio={props.aspectRatio || 16 / 9}
         file={imageFile}
         title={"Crop Image"}
         isOpen={openCropModal}
