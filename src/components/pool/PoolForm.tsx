@@ -10,6 +10,7 @@ import { TNewPool } from "@/app/types";
 import { useNetwork } from "wagmi";
 import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";
+import ImageUpload from "../shared/ImageUpload";
 
 const schema = yup.object({
   profileId: yup.string().required("Recipient address is required"),
@@ -27,6 +28,7 @@ const schema = yup.object({
 });
 
 export default function PoolForm() {
+  const [base64Image, setBase64Image] = useState<string>("");
   const nowPlus10Minutes = new Date();
   nowPlus10Minutes.setMinutes(nowPlus10Minutes.getMinutes() + 10);
   const minDate = nowPlus10Minutes.toISOString().slice(0, -8);
@@ -70,7 +72,7 @@ export default function PoolForm() {
       endDate: data.endDate,
       useRegistryAnchor: data.useRegistryAnchor === "true" ? true : false,
       managers: [],
-      // imageUrl: data.imageUrl,
+      base64Image: base64Image,
     };
 
     console.log("newPoolData", newPoolData);
@@ -387,42 +389,7 @@ export default function PoolForm() {
                 )}
               </div> */}
             </div>
-
-            {/* <div className="col-span-full">
-              <label
-                htmlFor="cover-photo"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Cover photo
-              </label>
-              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                <div className="text-center">
-                  <PhotoIcon
-                    className="mx-auto h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                    <label
-                      htmlFor="imageUrl"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                    >
-                      <span>Upload a file</span>
-                      <input
-                        {...register("imageUrl")}
-                        id="imageUrl"
-                        name="imageUrl"
-                        type="file"
-                        className="sr-only"
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    PNG, JPG, SVG up to 5MB
-                  </p>
-                </div>
-              </div>
-            </div> */}
+            <ImageUpload setBase64Image={setBase64Image} />
           </div>
         </div>
 

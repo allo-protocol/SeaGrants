@@ -8,6 +8,7 @@ const ImageUpload = (props: {
   const [imageName, setImageName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [openCropModal, setOpenCropModal] = useState(false);
+  const [preview, setPreview] = useState("");
 
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
@@ -23,6 +24,18 @@ const ImageUpload = (props: {
       setImageName("");
     }
   };
+
+  const onCancel = () => {
+    setImageFile(null);
+    setImageName("");
+    props.setBase64Image("");
+  };
+
+  const onComplete = (base64Image: string) => {
+    props.setBase64Image(base64Image);
+    setPreview(base64Image);
+  };
+
   return (
     <div className="col-span-full">
       <label
@@ -33,10 +46,15 @@ const ImageUpload = (props: {
       </label>
       <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
         <div className="text-center">
-          <PhotoIcon
-            className="mx-auto h-12 w-12 text-gray-300"
-            aria-hidden="true"
-          />
+          {preview === "" && (
+            <PhotoIcon
+              className="mx-auto h-12 w-12 text-gray-300"
+              aria-hidden="true"
+            />
+          )}
+          {preview !== "" && (
+            <img style={{ maxWidth: "300px" }} src={preview} />
+          )}
           <div className="mt-4 flex text-sm leading-6 text-gray-600">
             <label
               htmlFor="imageUrl"
@@ -69,7 +87,8 @@ const ImageUpload = (props: {
         isOpen={openCropModal}
         setIsOpen={setOpenCropModal}
         closeModalText={"Close"}
-        setBase64Image={props.setBase64Image}
+        onCancel={onCancel}
+        setBase64Image={onComplete}
       />
     </div>
   );

@@ -84,7 +84,7 @@ export const ApplicationContextProvider = (props: {
   ): Promise<string> => {
     const chainInfo = getChain(chain);
 
-    updateStepTarget(1, `${chainInfo.name}`);
+    updateStepTarget(2, `${chainInfo.name}`);
 
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
@@ -101,14 +101,24 @@ export const ApplicationContextProvider = (props: {
     let imagePointer;
     let pointer;
 
-    try {
-      imagePointer = await ipfsClient.pinJSON({
-        data: metadata.base64Image,
-      });
-      metadata.base64Image = imagePointer.IpfsHash;
-      updateStepHref(0, "https://ipfs.io/ipfs/" + imagePointer.IpfsHash);
+    if (!metadata.base64Image || !metadata.base64Image.includes("base64")) {
+      const newSteps = [...steps];
+      newSteps.shift();
       updateStepStatus(0, EProgressStatus.IS_SUCCESS);
       updateStepStatus(1, EProgressStatus.IN_PROGRESS);
+      setSteps(newSteps);
+    }
+
+    try {
+      if (metadata.base64Image.includes("base64")) {
+        imagePointer = await ipfsClient.pinJSON({
+          data: metadata.base64Image,
+        });
+        metadata.base64Image = imagePointer.IpfsHash;
+        updateStepHref(0, "https://ipfs.io/ipfs/" + imagePointer.IpfsHash);
+        updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+        updateStepStatus(1, EProgressStatus.IN_PROGRESS);
+      }
 
       pointer = await ipfsClient.pinJSON(metadata);
       updateStepHref(1, "https://ipfs.io/ipfs/" + pointer.IpfsHash);

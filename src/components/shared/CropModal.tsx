@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import ReactCrop, { type Crop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
@@ -12,6 +12,7 @@ export default function CropModal(props: {
   setIsOpen: (isOpen: boolean) => void;
   setBase64Image: (base64Image: string) => void;
   closeModalText?: string;
+  onCancel: () => void;
   title?: string;
 }) {
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -68,10 +69,13 @@ export default function CropModal(props: {
       return;
     }
 
-    const { width, height } = imageSize;
+    // scaling
+    const scaledWidth = (imageSize.width * crop.width) / 100;
+    const scaledHeight = (imageSize.height * crop.height) / 100;
+
     const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = scaledWidth;
+    canvas.height = scaledHeight;
 
     const ctx = canvas.getContext("2d");
     const image = new Image();
@@ -85,10 +89,10 @@ export default function CropModal(props: {
       crop.y,
       crop.width,
       crop.height,
-      0,
-      0,
-      crop.width,
-      crop.height,
+      crop.x,
+      crop.y,
+      scaledWidth,
+      scaledHeight,
     );
 
     const base64Image = canvas.toDataURL("image/png").toString();
@@ -98,6 +102,7 @@ export default function CropModal(props: {
   };
 
   const handleClose = () => {
+    props.onCancel();
     props.setIsOpen(false);
   };
 
