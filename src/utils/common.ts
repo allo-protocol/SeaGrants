@@ -45,7 +45,7 @@ export function stringToColor(text: string) {
   // modulo function on str.length to chose between aa, bb, cc, dd
   const append = ["88", "aa", "66", "99"][str.length % 4];
   // return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}${append}`;
-  return `#${toTwoDigits(r)}${toTwoDigits(g)}${toTwoDigits(b)}${append}`
+  return `#${toTwoDigits(r)}${toTwoDigits(g)}${toTwoDigits(b)}${append}`;
 }
 
 function toTwoDigits(n: number) {
@@ -57,7 +57,16 @@ export function humanReadableAmount(amount: string, decimals: number = 18) {
   return formatUnits(BigInt(amount), decimals);
 }
 
-export function isPoolActive(allocationStartTime: number, allocationEndTime: number) {
+export function isPoolActive(
+  allocationStartTime: number,
+  allocationEndTime: number
+) {
   const now = Date.now() / 1000;
   return now >= allocationStartTime && now <= allocationEndTime;
 }
+
+export const prettyTimestamp = (timestamp: number) => {
+  const date = new Date(timestamp * 1000);
+
+  return `${date.toLocaleDateString()}`;
+};

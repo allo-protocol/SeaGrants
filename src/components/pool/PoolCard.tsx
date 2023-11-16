@@ -1,15 +1,21 @@
 import { TPoolData } from "@/app/types";
 import { getIPFSClient } from "@/services/ipfs";
-import { classNames, humanReadableAmount, isPoolActive, statusColorsScheme, stringToColor } from "@/utils/common";
+import {
+  classNames,
+  humanReadableAmount,
+  isPoolActive,
+  prettyTimestamp,
+  statusColorsScheme,
+  stringToColor,
+} from "@/utils/common";
+import { formatEther } from "viem";
 
-const PoolCard = async ({ pool }: { pool: TPoolData }) => {  
+const PoolCard = async ({ pool }: { pool: TPoolData }) => {
   const poolDetail = pool.pool;
-
   const ipfsClient = getIPFSClient();
-
   const DEFAULT_NAME = `Pool ${pool.poolId}`;
 
-  let metadata = {name: DEFAULT_NAME};
+  let metadata = { name: DEFAULT_NAME };
   try {
     metadata = await ipfsClient.fetchJson(poolDetail.metadataPointer);
   } catch {
@@ -19,8 +25,10 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
   if (metadata.name === undefined) metadata.name = DEFAULT_NAME;
 
   const bg = stringToColor(metadata.name);
-
-  const isActive = isPoolActive(pool.allocationStartTime, pool.allocationEndTime);
+  const isActive = isPoolActive(
+    pool.allocationStartTime,
+    pool.allocationEndTime
+  );
   const tokenMetadata = poolDetail.tokenMetadata;
   const amount = humanReadableAmount(poolDetail.amount, tokenMetadata.decimals);
 
@@ -58,7 +66,7 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
           <dt className="text-gray-500">Pool Amount</dt>
           <dd className="flex items-start gap-x-2">
             <div className="font-medium text-gray-900">
-              {amount} {tokenMetadata.symbol}
+              {formatEther(BigInt(amount))} {tokenMetadata.symbol ?? "ETH"}
             </div>
           </dd>
         </div>
@@ -66,14 +74,18 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">Start Date:</dt>
           <dd className="text-gray-700">
-            <time dateTime={pool.allocationStartTime.toString()}>{pool.allocationStartTime}</time>
+            <time dateTime={pool.allocationStartTime.toString()}>
+              {prettyTimestamp(pool.allocationStartTime)}
+            </time>
           </dd>
         </div>
 
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">End Date</dt>
           <dd className="text-gray-700">
-            <time dateTime={pool.allocationEndTime.toString()}>{pool.allocationEndTime}</time>
+            <time dateTime={pool.allocationEndTime.toString()}>
+              {prettyTimestamp(pool.allocationEndTime)}
+            </time>
           </dd>
         </div>
       </dl>
