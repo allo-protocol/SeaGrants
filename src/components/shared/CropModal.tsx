@@ -10,7 +10,7 @@ export default function CropModal(props: {
   aspectRatio: any;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  openModalText?: string;
+  setBase64Image: (base64Image: string) => void;
   closeModalText?: string;
   title?: string;
 }) {
@@ -20,10 +20,6 @@ export default function CropModal(props: {
 
   function closeModal() {
     props.setIsOpen(false);
-  }
-
-  function openModal() {
-    props.setIsOpen(true);
   }
 
   useEffect(() => {
@@ -66,17 +62,37 @@ export default function CropModal(props: {
       reader.readAsDataURL(props.file);
     }
   }, [props.file]);
-  const handleCropChange = (newCrop: any) => {
-    setCrop(newCrop);
-  };
 
-  const handleCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
-    console.log(croppedArea, croppedAreaPixels);
-    // You can store croppedArea or croppedAreaPixels in your state or handle it as needed
-  };
+  const handleDone = async () => {
+    if (!crop) {
+      return;
+    }
 
-  const handleDone = () => {
-    // Do something with the cropped image, for example, save it to state or send it to the server
+    const { width, height } = imageSize;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d");
+    const image = new Image();
+    image.src = imageSrc as unknown as string;
+
+    await image.decode();
+
+    ctx!.drawImage(
+      image,
+      crop.x,
+      crop.y,
+      crop.width,
+      crop.height,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/png");
+    props.setBase64Image(base64Image);
     props.setIsOpen(false);
   };
 
@@ -86,18 +102,6 @@ export default function CropModal(props: {
 
   return (
     <>
-      {props.openModalText && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <button
-            type="button"
-            onClick={openModal}
-            className="rounded-md bg-black/20 px-4 py-2 text-sm font-medium text-white hover:bg-black/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
-          >
-            {props.openModalText}
-          </button>
-        </div>
-      )}
-
       <Transition appear show={props.isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child
@@ -123,7 +127,7 @@ export default function CropModal(props: {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-md items-center transform overflow-hidden rounded-2xl bg-white p-6 align-middle shadow-xl transition-all">
                   {props.title && (
                     <Dialog.Title
                       as="h3"
@@ -141,17 +145,22 @@ export default function CropModal(props: {
                       <img src={imageSrc as unknown as string} />
                     </ReactCrop>
                   )}
-                  {props.closeModalText && (
-                    <div className="mt-4">
-                      <button
-                        type="button"
-                        className="text-right rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        onClick={closeModal}
-                      >
-                        {props.closeModalText}
-                      </button>
-                    </div>
-                  )}
+
+                  <div className="mt-6 flex items-center justify-end gap-x-6">
+                    <button
+                      type="button"
+                      className="bg-red-700 hover:bg-red-500 text-sm font-semibold leading-6 text-white rounded-md px-3 py-2"
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDone}
+                      className="bg-green-700 hover:bg-green-500 rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm"
+                    >
+                      Save
+                    </button>
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

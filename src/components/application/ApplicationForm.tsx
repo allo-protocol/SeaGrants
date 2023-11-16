@@ -29,6 +29,8 @@ export default function ApplicationForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
   const [imageName, setImageName] = useState("");
   const [imageFile, setImageFile] = useState(null);
+  const [base64Image, setBase64Image] = useState<string>("");
+
   const [openCropModal, setOpenCropModal] = useState(false);
 
   const params = useParams();
@@ -394,9 +396,12 @@ export default function ApplicationForm() {
         <Modal isOpen={isOpen} setIsOpen={setIsOpen} steps={steps} />
         <CropModal
           aspectRatio={16 / 9}
+          title={"Crop Image"}
           file={imageFile}
           isOpen={openCropModal}
           setIsOpen={setOpenCropModal}
+          closeModalText={"Close"}
+          setBase64Image={setBase64Image}
         />
       </div>
     </form>
