@@ -1,9 +1,17 @@
-import { TPool } from "@/app/types";
-import { classNames, statusColorsScheme, stringToColor } from "@/utils/common";
-import { formatEther } from "viem";
+import { TPoolData } from "@/app/types";
+import { getIPFSClient } from "@/services/ipfs";
+import { classNames, humanReadableAmount, isPoolActive, statusColorsScheme, stringToColor } from "@/utils/common";
 
-const PoolCard = ({ pool }: { pool: TPool }) => {
-  const bg = stringToColor(pool.name);
+const PoolCard = async ({ pool }: { pool: TPoolData }) => {  
+  const poolDetail = pool.pool;
+
+  const ipfsClient = getIPFSClient();
+  const metdata = await ipfsClient.fetchJson(poolDetail.metadataPointer);
+  const bg = stringToColor(metdata.name);
+
+  const isActive = isPoolActive(pool.allocationStartTime, pool.allocationEndTime);
+  const tokenMetadata = poolDetail.tokenMetadata;
+  const amount = humanReadableAmount(poolDetail.amount, tokenMetadata.decimals);
 
   return (
     <>
@@ -19,19 +27,19 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
           width={48}
         /> */}
         <div className="flex text-sm font-medium text-gray-900">
-          {pool.name}
+          {metdata.name}
         </div>
         <div
           className={classNames(
             statusColorsScheme[
-              pool.active
+              isActive
                 ? ("Active" as keyof typeof statusColorsScheme)
                 : ("Closed" as keyof typeof statusColorsScheme)
             ],
             "flex rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
           )}
         >
-          {pool.active ? "Active" : "Closed"}
+          {isActive ? "Active" : "Closed"}
         </div>
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
@@ -39,7 +47,7 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
           <dt className="text-gray-500">Pool Amount</dt>
           <dd className="flex items-start gap-x-2">
             <div className="font-medium text-gray-900">
-              {formatEther(BigInt(pool.amount))} {pool.tokenSymbol}
+              {amount} {tokenMetadata.symbol}
             </div>
           </dd>
         </div>
@@ -47,14 +55,14 @@ const PoolCard = ({ pool }: { pool: TPool }) => {
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">Start Date:</dt>
           <dd className="text-gray-700">
-            <time dateTime={pool.dates.start}>{pool.dates.start}</time>
+            <time dateTime={pool.allocationStartTime.toString()}>{pool.allocationStartTime}</time>
           </dd>
         </div>
 
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">End Date</dt>
           <dd className="text-gray-700">
-            <time dateTime={pool.dates.end}>{pool.dates.end}</time>
+            <time dateTime={pool.allocationEndTime.toString()}>{pool.allocationEndTime}</time>
           </dd>
         </div>
       </dl>

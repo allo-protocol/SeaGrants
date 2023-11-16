@@ -1,3 +1,5 @@
+import { formatUnits } from "viem";
+
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -46,9 +48,16 @@ export function stringToColor(text: string) {
   return `#${toTwoDigits(r)}${toTwoDigits(g)}${toTwoDigits(b)}${append}`
 }
 
-
 function toTwoDigits(n: number) {
   const hexString = n.toString(16);
   return hexString.length === 1 ? `${hexString}${hexString}` : hexString;
 }
 
+export function humanReadableAmount(amount: string, decimals: number = 18) {
+  return formatUnits(BigInt(amount), decimals);
+}
+
+export function isPoolActive(allocationStartTime: number, allocationEndTime: number) {
+  const now = Date.now() / 1000;
+  return now >= allocationStartTime && now <= allocationEndTime;
+}

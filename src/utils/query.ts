@@ -8,6 +8,7 @@ export const getMicroGrantsQuery = gql`
   {
     microGrants(orderBy: BLOCK_TIMESTAMP_DESC) {
       poolId
+      chainId
       strategy
       allocationStartTime
       allocationEndTime

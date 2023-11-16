@@ -81,10 +81,36 @@ export type TNewPool = {
   useRegistryAnchor: boolean;
 };
 
-export type TPoolData = {
+export type TNewPoolResponse = {
   address: string;
   poolId: number;
 };
+
+
+export type TPoolData = {
+  poolId: string,
+  chainId: string,
+  strategy: string,
+  allocationStartTime: number,
+  allocationEndTime: number,
+  approvalThreshold: number,
+  maxRequestedAmount: string,
+  pool: {
+    tokenMetadata: {
+      name?: string,
+      symbol?: string,
+      decimals?: number
+    }
+    token: string,
+    amount: string,
+    metadataPointer: string,
+    profile: {
+      profileId: string,
+      name: string
+    }
+  }
+}
+
 
 // Progress Modal
 

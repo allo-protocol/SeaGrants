@@ -7,7 +7,7 @@ import {
   EProgressStatus,
   ETarget,
   TNewPool,
-  TPoolData,
+  TNewPoolResponse,
   TProgressStep,
 } from "@/app/types";
 import {
@@ -19,7 +19,7 @@ import { getChain, wagmiConfigData } from "@/services/wagmi";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
-  createNewPool: (data: TNewPool, chain: number) => Promise<TPoolData>;
+  createNewPool: (data: TNewPool, chain: number) => Promise<TNewPoolResponse>;
 }
 
 const initialSteps: TProgressStep[] = [
@@ -89,7 +89,7 @@ export const NewPoolContextProvider = (props: {
   const createNewPool = async (
     data: TNewPool,
     chain: number,
-  ): Promise<TPoolData> => {
+  ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
 
     // return values
