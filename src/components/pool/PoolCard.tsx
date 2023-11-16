@@ -6,8 +6,19 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
   const poolDetail = pool.pool;
 
   const ipfsClient = getIPFSClient();
-  const metdata = await ipfsClient.fetchJson(poolDetail.metadataPointer);
-  const bg = stringToColor(metdata.name);
+
+  const DEFAULT_NAME = `Pool ${pool.poolId}`;
+
+  let metadata = {name: DEFAULT_NAME};
+  try {
+    metadata = await ipfsClient.fetchJson(poolDetail.metadataPointer);
+  } catch {
+    console.log("IPFS", "Unable to fetch metadata");
+  }
+
+  if (metadata.name === undefined) metadata.name = DEFAULT_NAME;
+
+  const bg = stringToColor(metadata.name);
 
   const isActive = isPoolActive(pool.allocationStartTime, pool.allocationEndTime);
   const tokenMetadata = poolDetail.tokenMetadata;
@@ -27,7 +38,7 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
           width={48}
         /> */}
         <div className="flex text-sm font-medium text-gray-900">
-          {metdata.name}
+          {metadata.name}
         </div>
         <div
           className={classNames(

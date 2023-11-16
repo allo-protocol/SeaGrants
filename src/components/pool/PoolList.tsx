@@ -10,15 +10,17 @@ const PoolList = async () => {
 
   let pools: TPoolData[] = [];
   try {
-    pools = await request(
+    const response: any = await request(
       graphqlEndpoint,
       getMicroGrantsQuery,
       {}
     );
+    pools = response["microGrants"];
   } catch (e) {
     isError = true;
     console.log(e);
   }
+
 
   return (
     <div className="flex flex-row items-center justify-center mx-4 mb-8">
