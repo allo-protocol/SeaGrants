@@ -2,7 +2,11 @@
 
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
-import ReactCrop, { type Crop, makeAspectCrop } from "react-image-crop";
+import ReactCrop, {
+  type Crop,
+  PixelCrop,
+  makeAspectCrop,
+} from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
 export default function CropModal(props: {
@@ -15,8 +19,12 @@ export default function CropModal(props: {
   onCancel: () => void;
   title?: string;
 }) {
+  const imgRef = useRef<HTMLImageElement>(null);
+
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [crop, setCrop] = useState({} as Crop);
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+
   const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
 
   function closeModal() {
@@ -62,11 +70,16 @@ export default function CropModal(props: {
   }, [props.file]);
 
   const handleDone = async () => {
-    if (!crop) {
+    if (!crop || !completedCrop) {
       return;
     }
-    const scaledWidth = (imageSize.width * crop.width) / 100;
-    const scaledHeight = (imageSize.height * crop.height) / 100;
+    const previewImage = imgRef.current;
+
+    const scaleX = imageSize.width / previewImage!.width;
+    const scaleY = imageSize.height / previewImage!.height;
+
+    const scaledWidth = completedCrop.width * scaleX;
+    const scaledHeight = completedCrop.height * scaleY;
 
     const canvas = document.createElement("canvas");
     canvas.width = scaledWidth;
@@ -80,10 +93,10 @@ export default function CropModal(props: {
 
     ctx!.drawImage(
       image,
-      crop.x,
-      crop.y,
-      crop.width,
-      crop.height,
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      scaledWidth,
+      scaledHeight,
       0,
       0,
       scaledWidth,
@@ -140,9 +153,10 @@ export default function CropModal(props: {
                     <ReactCrop
                       crop={crop} // error here
                       onChange={(c) => setCrop(c)}
+                      onComplete={(c) => setCompletedCrop(c)}
                       aspect={props.aspectRatio}
                     >
-                      <img src={imageSrc as unknown as string} />
+                      <img ref={imgRef} src={imageSrc as unknown as string} />
                     </ReactCrop>
                   )}
 
