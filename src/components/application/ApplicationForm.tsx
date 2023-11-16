@@ -11,6 +11,8 @@ import { useParams } from "next/navigation";
 import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import { useSwitchNetwork } from "wagmi";
+import CropModal from "../shared/CropModal";
+import ImageUpload from "../shared/ImageUpload";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -26,15 +28,12 @@ const schema = yup.object({
 
 export default function ApplicationForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
+  const [base64Image, setBase64Image] = useState<string>("");
+
   const params = useParams();
-  
+
   const chainId = params["chainId"];
   const poolId = params["poolId"];
-
-  // todo: wtf does it not work? maybe we also need to push it a few levels higher into /[chainId]
-  const network = useSwitchNetwork({
-    chainId: Number(chainId),
-  });
 
   const [isOpen, setIsOpen] = useState(false);
   const {
@@ -42,7 +41,7 @@ export default function ApplicationForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {
@@ -61,18 +60,22 @@ export default function ApplicationForm() {
       email: data.email,
       requestedAmount: data.requestedAmount,
       recipientAddress: data.recipientAddress,
-      imageUrl: data.imageUrl,
+      base64Image: base64Image,
       profileOwner: data.profileOwner,
       nonce: data.nonce,
     };
 
-    const recipientId = await createApplication(newApplicationData, Number(chainId), Number(poolId));
+    const recipientId = await createApplication(
+      newApplicationData,
+      Number(chainId),
+      Number(poolId),
+    );
+
     setTimeout(() => {
       setIsOpen(false);
       // TODO: redirect to the application page
       // window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
     }, 1000);
-
   };
 
   return (
@@ -209,10 +212,11 @@ export default function ApplicationForm() {
                 />
               </div>
               <div>
-                {errors.requestedAmount && <Error message={errors.requestedAmount?.message!} />}
+                {errors.requestedAmount && (
+                  <Error message={errors.requestedAmount?.message!} />
+                )}
               </div>
             </div>
-
 
             <div className="sm:col-span-full">
               <label
@@ -241,41 +245,7 @@ export default function ApplicationForm() {
               </div>
             </div>
 
-            <div className="col-span-full">
-              <label
-                htmlFor="cover-photo"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Cover photo
-              </label>
-              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                <div className="text-center">
-                  <PhotoIcon
-                    className="mx-auto h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                    <label
-                      htmlFor="imageUrl"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                    >
-                      <span>Upload a file</span>
-                      <input
-                        {...register("imageUrl")}
-                        id="imageUrl"
-                        name="imageUrl"
-                        type="file"
-                        className="sr-only"
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    PNG, JPG, SVG up to 5MB
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ImageUpload setBase64Image={setBase64Image} />
           </div>
         </div>
 

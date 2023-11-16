@@ -58,7 +58,7 @@ export type TNewApplication = {
   requestedAmount: number;
   email: string;
   recipientAddress: string;
-  imageUrl: string;
+  base64Image: string;
   profileOwner: string;
   nonce: number;
 };
@@ -69,7 +69,7 @@ export type TNewPool = {
   name: string;
   website: string;
   description: string;
-  imageUrl?: string;
+  base64Image?: string;
   // chain info
   tokenAddress: string;
   fundPoolAmount: string;
