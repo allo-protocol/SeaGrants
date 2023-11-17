@@ -56,6 +56,18 @@ export type TNewApplication = TApplicationMetadata & {
   nonce?: number;
 };
 
+export type TNewApplicationResponse = {
+  blockTimestamp: string;
+  isUsingRegistryAnchor: boolean;
+  metadataPointer: string;
+  recipientAddress: `0x${string}`;
+  recipientId: `0x${string}`;
+  requestedAmount: string;
+  status: ApplicationStatus;
+  metadata?: TApplicationMetadata;
+  applicationBanner?: string;
+};
+
 export type TPoolMetadata = {
   profileId: `0x${string}`;
   name: string;

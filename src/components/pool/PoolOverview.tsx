@@ -1,12 +1,13 @@
 "use client";
 
-import { TPoolData, TPoolMetadata } from "@/app/types";
+import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
 import { useEffect, useRef, useState } from "react";
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
 import { aspectRatio } from "@/utils/config";
 import { classNames, stringToColor } from "@/utils/common";
 import PoolDetail from "./PoolDetail";
+import ApplicationList from "../application/ApplicationList";
 
 export default function PoolOverview(props: {
   chainId: string;
@@ -14,6 +15,7 @@ export default function PoolOverview(props: {
   pool: TPoolData;
   metadata: TPoolMetadata;
   poolBanner: string | undefined;
+  applications: TNewApplicationResponse[];
 }) {
   const bannerRef = useRef<any>(null);
   const [bannerSize, setBannerSize] = useState({
@@ -142,9 +144,7 @@ export default function PoolOverview(props: {
             metadata={props.metadata}
           />
         ) : (
-          <div>
-            <h1>Applications</h1>
-          </div>
+          <ApplicationList applications={props.applications} />
         )}
       </div>
     </div>

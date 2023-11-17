@@ -1,4 +1,4 @@
-import { TPoolData, TPoolMetadata } from "@/app/types";
+import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
 import PoolOverview from "@/components/pool/PoolOverview";
 import Container from "@/components/shared/Container";
 import { getIPFSClient } from "@/services/ipfs";
@@ -30,9 +30,27 @@ export default async function Pool({
     }
   }
 
+  let applications: TNewApplicationResponse[] = [];
+
+  for (let i = 0; i < pool.microGrantRecipients.length; i++) {
+    const application = pool.microGrantRecipients[i];
+    if (application.metadataPointer !== "") {
+      const metadata = await getIPFSClient().fetchJson(
+        application.metadataPointer,
+      );
+      application.metadata = metadata;
+      if (metadata.base64Image) {
+        const image = await getIPFSClient().fetchJson(metadata.base64Image);
+        application.applicationBanner = image.data;
+      }
+    }
+    applications.push(application);
+  }
+
   return (
     <Container>
       <PoolOverview
+        applications={applications}
         poolBanner={poolBanner}
         chainId={params.chainId}
         poolId={params.poolId}
