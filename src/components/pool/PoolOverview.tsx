@@ -46,7 +46,7 @@ export default function PoolOverview(props: {
       tabs.map((tab) => ({
         ...tab,
         current: tab.name === tabName,
-      })),
+      }))
     );
   };
 
@@ -84,7 +84,9 @@ export default function PoolOverview(props: {
                 style={{
                   width: `${bannerSize.width}px`,
                   height: `${bannerSize.height}px`,
-                  backgroundColor: stringToColor(props.metadata.name),
+                  backgroundColor: stringToColor(
+                    props.metadata.name ?? (Math.random() * 10000).toString()
+                  ),
                 }}
               >
                 <span className="text-gray-400 text-3xl">
@@ -123,7 +125,7 @@ export default function PoolOverview(props: {
                     tab.current
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer",
+                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer"
                   )}
                   aria-current={tab.current ? "page" : undefined}
                 >
