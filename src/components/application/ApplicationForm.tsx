@@ -73,8 +73,7 @@ export default function ApplicationForm() {
 
     setTimeout(() => {
       setIsOpen(false);
-      // TODO: redirect to the application page
-      // window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
+      window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
     }, 1000);
   };
 
