@@ -12,8 +12,6 @@ export default function ApplicationDetail(props: {
   isError: boolean,
 }) {
 
-  console.log(props.application);  
-
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
 
@@ -29,7 +27,7 @@ export default function ApplicationDetail(props: {
   const application = {
     name: applicationName,
     status: microGrantRecipient.status,
-    amountRequested: `${formatEther(BigInt(amount))} ${token}`,
+    amountRequested: `${amount} ${token}`,
     href: "#",
     breadcrumbs: [
       { id: 1, name: "Home", href: "/" },
