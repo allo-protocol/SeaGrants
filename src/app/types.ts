@@ -55,13 +55,15 @@ export type TNewApplication = {
   nonce: number;
 };
 
-export type TNewPool = {
-  // pool metadata info
+export type TPoolMetadata = {
   profileId: `0x${string}`;
   name: string;
   website: string;
   description: string;
   base64Image?: string;
+};
+
+export type TNewPool = TPoolMetadata & {
   // chain info
   tokenAddress: `0x${string}`;
   fundPoolAmount: string;

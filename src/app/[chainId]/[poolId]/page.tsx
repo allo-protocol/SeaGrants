@@ -1,11 +1,8 @@
-import { TPoolData } from "@/app/types";
+import { TPoolData, TPoolMetadata } from "@/app/types";
 import PoolDetail from "@/components/pool/PoolDetail";
 import Container from "@/components/shared/Container";
-import {
-  graphqlEndpoint,
-  getMicroGrantsRecipientsQuery,
-  getMicroGrantsQuery,
-} from "@/utils/query";
+import { getIPFSClient } from "@/services/ipfs";
+import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
 import request from "graphql-request";
 
 export default async function Pool({
@@ -20,11 +17,13 @@ export default async function Pool({
   );
 
   const pool: TPoolData = response.microGrant;
+  const poolMetadata: TPoolMetadata = await getIPFSClient().fetchJson(
+    pool.pool.metadataPointer,
+  );
 
-  console.log("====response====", response);
   return (
     <Container>
-      <PoolDetail pool={pool} />
+      <PoolDetail pool={pool} metadata={poolMetadata} />
     </Container>
   );
 }

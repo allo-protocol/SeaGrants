@@ -1,11 +1,14 @@
 "use client";
 
-import { IApplication, TPoolData } from "@/app/types";
+import { IApplication, TPoolData, TPoolMetadata } from "@/app/types";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import ApplicationCard from "../application/ApplicationCard";
 
-export default function PoolDetail(props: { pool: TPoolData }) {
+export default function PoolDetail(props: {
+  pool: TPoolData;
+  metadata: TPoolMetadata;
+}) {
   const applications: IApplication[] = [
     {
       id: 1,
