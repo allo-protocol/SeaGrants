@@ -7,26 +7,16 @@ export type TApplication = {
   status: ApplicationStatus;
   imageUrl: string;
   // name: string;
-  recipientAddress: string;
+  recipientAddress: `0x${string}`;
   amountRequested: string;
 };
 
 export interface IApplication extends TApplication {
-  profileOwner: string;
+  profileOwner: `0x${string}`;
   nonce: number;
   createdAt: string;
   updatedAt?: string;
 }
-//   id: number;
-//   name: string;
-//   website: string;
-//   email: string;
-//   description?: string;
-//   imageUrl: string;
-//   recipientAddress: string;
-//   profileOwner: string;
-//   nonce: number;
-// }
 
 export type TPool = {
   id: number;
@@ -44,20 +34,12 @@ export type TPool = {
 
 export type TProfile = {
   recipientId: `0x${string}`;
-  recipientAddress: string;
+  recipientAddress: `0x${string}`;
   requestedAmount: string;
   metadataPointer: string;
   isUsingRegistryAnchor: boolean;
   status: string;
 };
-
-  // recipientId: '0xe7eb5d2b5b188777df902e89c54570e7ef4f59ce',
-  // recipientAddress: '0xe7eb5d2b5b188777df902e89c54570e7ef4f59ce',
-  // requestedAmount: '0',
-  // metadataPointer: 'bafkreiclsyxwbyhe7oqrtwaixxgc6f2je47t7blqevqfydhv3kchgol6ie',
-  // blockTimestamp: '2023-11-16T10:10:48-05:00',
-  // isUsingRegistryAnchor: true,
-  // status: 'Pending'
 
 // Application
 export type TNewApplication = {
@@ -66,24 +48,25 @@ export type TNewApplication = {
   description: string;
   requestedAmount: number;
   email: string;
-  recipientAddress: string;
   base64Image: string;
-  profileOwner: string;
+  recipientAddress: `0x${string}`;
+  imageUrl: string;
+  profileOwner: `0x${string}`;
   nonce: number;
 };
 
 export type TNewPool = {
   // pool metadata info
-  profileId: string;
+  profileId: `0x${string}`;
   name: string;
   website: string;
   description: string;
   base64Image?: string;
   // chain info
-  tokenAddress: string;
+  tokenAddress: `0x${string}`;
   fundPoolAmount: string;
   maxAmount: string;
-  managers: string[];
+  managers: `0x${string}`[];
   startDate: string;
   endDate: string;
   approvalThreshold: number;
@@ -91,35 +74,55 @@ export type TNewPool = {
 };
 
 export type TNewPoolResponse = {
-  address: string;
+  address: `0x${string}`;
   poolId: number;
 };
 
-
 export type TPoolData = {
-  poolId: string,
-  chainId: string,
-  strategy: string,
-  allocationStartTime: number,
-  allocationEndTime: number,
-  approvalThreshold: number,
-  maxRequestedAmount: string,
+  poolId: string;
+  chainId: string;
+  strategy: string;
+  allocationStartTime: number;
+  allocationEndTime: number;
+  approvalThreshold: number;
+  maxRequestedAmount: string;
   pool: {
     tokenMetadata: {
-      name?: string,
-      symbol?: string,
-      decimals?: number
-    }
-    token: string,
-    amount: string,
-    metadataPointer: string,
+      name?: string;
+      symbol?: string;
+      decimals?: number;
+    };
+    token: `0x${string}`;
+    amount: string;
+    metadataPointer: string;
     profile: {
-      profileId: string,
-      name: string
-    }
-  }
-}
+      profileId: `0x${string}`;
+      name: string;
+    };
+  };
+};
 
+export type TAllocatedData = {
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  sender: `0x${string}`;
+  contractAddress: `0x${string}`;
+  contractName: string;
+  chainId: string;
+  amount: string;
+  blockTimestamp: string;
+};
+
+export type TDistributedData = {
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  sender: `0x${string}`;
+  contractAddress: `0x${string}`;
+  contractName: string;
+  chainId: string;
+  amount: string;
+  blockTimestamp: string;
+};
 
 // Progress Modal
 
