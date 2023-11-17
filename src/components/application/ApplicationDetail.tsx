@@ -1,26 +1,37 @@
 "use client";
 
-import { classNames, statusColorsScheme } from "@/utils/common";
-import { useParams } from "next/navigation";
+import { classNames, humanReadableAmount, prettyTimestamp, statusColorsScheme } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
+import NotificationToast from "../shared/NotificationToast";
+import { TApplicationData } from "@/app/types";
+import { formatEther } from "viem";
 
-export default function Application() {
-  const params = useParams();
+export default function ApplicationDetail(props: {
+  application: TApplicationData,
+  isError: boolean,
+}) {
 
-  const chainId = params["chainId"];
-  const poolId = params["poolId"];
+  const microGrantRecipient = props.application;
+  const microGrant = microGrantRecipient.microGrant;
 
+  const tokenMetadata = microGrant.pool.tokenMetadata;
+  const amount = humanReadableAmount(microGrant.pool.amount, tokenMetadata.decimals);
+  const token = tokenMetadata.symbol ?? "ETH";
+
+  // TODO: Wire in name + description
+  // TODO: Wire in logo
+  // TODO: Wire in approvals/ rejection 
   const applicationName = "Papa Kush";
 
   const application = {
     name: applicationName,
-    status: "Pending", // "Accepted"
-    amountRequested: "$192",
+    status: microGrantRecipient.status,
+    amountRequested: `${amount} ${token}`,
     href: "#",
     breadcrumbs: [
       { id: 1, name: "Home", href: "/" },
-      { id: 2, name: `Pool ${poolId}`, href: `/${chainId}/${poolId}` },
+      { id: 2, name: `Pool ${microGrant.poolId}`, href: `/${microGrant.chainId}/${microGrant.poolId}` },
       { id: 3, name: applicationName, href: "#" },
     ],
     logo: {
@@ -41,27 +52,32 @@ export default function Application() {
 
   const overviews = [
     { description: "Amount", name: application.amountRequested },
-    { description: "Start Date", name: new Date().toLocaleString() },
-    { description: "End Date", name: new Date().toLocaleString() },
+    { description: "Start Date", name: prettyTimestamp(microGrant.allocationStartTime) },
+    { description: "End Date", name: prettyTimestamp(microGrant.allocationEndTime) },
     { description: "Approvals", name: "2", color: "text-green-700" },
     { description: "Rejections", name: "3", color: "text-red-700" },
   ];
 
   return (
     <div className="bg-white">
+
+      {props.isError && (
+        <NotificationToast success={false} title="Unable to fetch application" />
+      )}
+
       <div className="pt-6">
         <Breadcrumb breadcrumbs={application.breadcrumbs} />
 
         {/* Banner */}
         <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <Image
+            {/* <Image
               src={application.logo.src}
               alt={application.logo.alt}
               className="h-full w-full object-cover object-center"
               height={100}
               width={700}
-            />
+            /> */}
           </div>
         </div>
 
@@ -85,8 +101,10 @@ export default function Application() {
                   <dd className="mt-1 text-sm leading-6 text-gray-700 text-center sm:mt-0">
                     <div
                       className={classNames(
-                        statusColorsScheme[application.status as keyof typeof statusColorsScheme],
-                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                        statusColorsScheme[
+                          application.status as keyof typeof statusColorsScheme
+                        ],
+                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
                       )}
                     >
                       {application.status.toString()}
@@ -105,7 +123,7 @@ export default function Application() {
                     <dd
                       className={classNames(
                         overview.color ? overview.color : "",
-                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
+                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
                       )}
                     >
                       {overview.name}

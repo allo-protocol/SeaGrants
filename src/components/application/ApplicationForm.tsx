@@ -1,18 +1,15 @@
 "use client";
 
-import { PhotoIcon } from "@heroicons/react/20/solid";
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useParams } from "next/navigation";
 import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
-import { useSwitchNetwork } from "wagmi";
-import CropModal from "../shared/CropModal";
 import ImageUpload from "../shared/ImageUpload";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -41,7 +38,7 @@ export default function ApplicationForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {
@@ -73,8 +70,7 @@ export default function ApplicationForm() {
 
     setTimeout(() => {
       setIsOpen(false);
-      // TODO: redirect to the application page
-      // window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
+      window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
     }, 1000);
   };
 

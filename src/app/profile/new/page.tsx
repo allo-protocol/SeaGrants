@@ -1,3 +1,9 @@
+import ProfileForm from "@/components/profile/ProfileForm";
+
 export default function NewProfile() {
-  return <div>Create a Profile</div>;
+  return (
+    <div>
+      <ProfileForm />
+    </div>
+  );
 }

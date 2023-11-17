@@ -5,28 +5,18 @@ export type TApplication = {
   name: string;
   description?: string;
   status: ApplicationStatus;
-  imageUrl: string;
+  base64Image: string;
   // name: string;
-  recipientAddress: string;
+  recipientAddress: `0x${string}`;
   amountRequested: string;
 };
 
 export interface IApplication extends TApplication {
-  profileOwner: string;
+  profileOwner: `0x${string}`;
   nonce: number;
   createdAt: string;
   updatedAt?: string;
 }
-//   id: number;
-//   name: string;
-//   website: string;
-//   email: string;
-//   description?: string;
-//   imageUrl: string;
-//   recipientAddress: string;
-//   profileOwner: string;
-//   nonce: number;
-// }
 
 export type TPool = {
   id: number;
@@ -43,47 +33,136 @@ export type TPool = {
 };
 
 export type TProfile = {
-  id: `0x${string}`;
-  recipientAddress: string;
-  profileOwner: string;
-  nonce: number;
-  members: `0x${string}`[];
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  requestedAmount: string;
+  metadataPointer: string;
+  isUsingRegistryAnchor: boolean;
+  status: string;
 };
 
-// Application
-export type TNewApplication = {
+export type TApplicationMetadata = {
   name: string;
   website: string;
   description: string;
-  requestedAmount: number;
   email: string;
-  recipientAddress: string;
   base64Image: string;
-  profileOwner: string;
-  nonce: number;
+  profileOwner: `0x${string}`;
 };
 
-export type TNewPool = {
-  // pool metadata info
-  profileId: string;
+export type TNewApplication = TApplicationMetadata & {
+  requestedAmount: number;
+  recipientAddress: `0x${string}`;
+  nonce?: number;
+};
+
+export type TNewApplicationResponse = {
+  blockTimestamp: string;
+  isUsingRegistryAnchor: boolean;
+  metadataPointer: string;
+  recipientAddress: `0x${string}`;
+  recipientId: `0x${string}`;
+  requestedAmount: string;
+  status: ApplicationStatus;
+  metadata?: TApplicationMetadata;
+  applicationBanner?: string;
+};
+
+export type TPoolMetadata = {
+  profileId: `0x${string}`;
   name: string;
   website: string;
   description: string;
   base64Image?: string;
+};
+
+export type TNewPool = TPoolMetadata & {
   // chain info
-  tokenAddress: string;
+  tokenAddress: `0x${string}`;
   fundPoolAmount: string;
   maxAmount: string;
-  managers: string[];
+  managers: `0x${string}`[];
   startDate: string;
   endDate: string;
   approvalThreshold: number;
   useRegistryAnchor: boolean;
 };
 
-export type TPoolData = {
-  address: string;
+export type TNewPoolResponse = {
+  address: `0x${string}`;
   poolId: number;
+};
+
+export type TPoolData = {
+  poolId: string;
+  chainId: string;
+  strategy: string;
+  allocationStartTime: number;
+  allocationEndTime: number;
+  approvalThreshold: number;
+  maxRequestedAmount: string;
+  pool: {
+    tokenMetadata: {
+      name?: string;
+      symbol?: string;
+      decimals?: number;
+    };
+    token: `0x${string}`;
+    amount: string;
+    metadataPointer: string;
+    profile: {
+      profileId: `0x${string}`;
+      name: string;
+    };
+  };
+  microGrantRecipients: any[]; // todo: set type
+};
+
+export type TApplicationData = {
+  microGrant: {
+    chainId: string;
+    poolId: string;
+    allocationStartTime: number;
+    allocationEndTime: number;
+    pool: {
+      tokenMetadata: {
+        name?: string;
+        symbol?: string;
+        decimals?: number;
+      };
+      token: `0x${string}`;
+      amount: string;
+    };
+  };
+  recipientId: string;
+  recipientAddress: string;
+  requestedAmount: string;
+  metadataPointer: string;
+  blockTimestamp: string;
+  isUsingRegistryAnchor: boolean;
+  status: string;
+};
+
+export type TAllocatedData = {
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  sender: `0x${string}`;
+  contractAddress: `0x${string}`;
+  contractName: string;
+  chainId: string;
+  amount: string;
+  blockTimestamp: string;
+};
+
+export type TDistributedData = {
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  sender: `0x${string}`;
+  contractAddress: `0x${string}`;
+  contractName: string;
+  chainId: string;
+  amount: string;
+  blockTimestamp: string;
 };
 
 // Progress Modal
@@ -111,3 +190,9 @@ export type TProgressStep = {
   href?: string;
   status: EProgressStatus;
 };
+
+export enum EPoolStatus {
+  UPCOMING = "Upcoming",
+  ACTIVE = "Active",
+  ENDED = "Ended",
+}

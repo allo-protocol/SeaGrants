@@ -1,51 +1,74 @@
-import { IApplication } from "@/app/types";
-import { classNames, statusColorsScheme } from "@/utils/common";
+import { IApplication, TNewApplicationResponse } from "@/app/types";
+import { classNames, statusColorsScheme, stringToColor } from "@/utils/common";
 import Image from "next/image";
+import { useRef, useState } from "react";
 
-export default function ApplicationCard(props: { application: IApplication }) {
+export default function ApplicationCard(props: {
+  application: TNewApplicationResponse;
+}) {
+    const bannerRef = useRef<any>(null);
+    const [bannerSize, setBannerSize] = useState({
+      width: 0,
+      height: 0,
+    });
+    const application = props.application;
 
-  const application = props.application;
-
-  return (
-    <>
-      <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-        <Image
-          className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
-          src={application.imageUrl}
-          alt={application.name}
-          height={48}
-          width={48}
-        />
-        <div className="text-sm font-medium leading-6 text-gray-900">
-          {application.name}
-        </div>
-      </div>
-      <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-        <div className="flex justify-between gap-x-4 py-3">
-          <dt className="text-gray-500">Submitted On</dt>
-          <dd className="text-gray-700">
-            <time dateTime={application.createdAt}>
-              {application.createdAt}
-            </time>
-          </dd>
-        </div>
-        <div className="flex justify-between gap-x-4 py-3">
-          <dt className="text-gray-500">Amount</dt>
-          <dd className="flex items-start gap-x-2">
-            <div className="font-medium text-gray-900">
-              {application.amountRequested}
-            </div>
+    return (
+      <>
+        <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+          {props.application.applicationBanner ? (
+            <Image
+              src={props.application.applicationBanner}
+              alt="applicationBanner"
+              className="h-full w-full object-cover object-center"
+              layout="responsive"
+              width={bannerSize.width}
+              height={bannerSize.height}
+            />
+          ) : (
             <div
-              className={classNames(
-                statusColorsScheme[application.status],
-                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
-              )}
+              className="flex items-center justify-center"
+              style={{
+                width: `${bannerSize.width}px`,
+                height: `${bannerSize.height}px`,
+                backgroundColor: stringToColor(application.metadata!.name),
+              }}
             >
-              {application.status.toString()}
+              <span className="text-gray-400 text-3xl">
+                {application.metadata!.name}
+              </span>
             </div>
-          </dd>
+          )}
         </div>
-      </dl>
-    </>
-  );
+        <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+          <div className="text-sm font-medium leading-6 text-gray-900">
+            {application.metadata!.name}
+          </div>
+          <div className="flex justify-between gap-x-4 py-3">
+            <dt className="text-gray-500">Submitted On</dt>
+            <dd className="text-gray-700">
+              <time dateTime={application.blockTimestamp}>
+                {application.blockTimestamp}
+              </time>
+            </dd>
+          </div>
+          <div className="flex justify-between gap-x-4 py-3">
+            <dt className="text-gray-500">Amount</dt>
+            <dd className="flex items-start gap-x-2">
+              <div className="font-medium text-gray-900">
+                {application.requestedAmount}
+              </div>
+              <div
+                className={classNames(
+                  statusColorsScheme[application.status],
+                  "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
+                )}
+              >
+                {application.status.toString()}
+              </div>
+            </dd>
+          </div>
+        </dl>
+      </>
+    );
 }

@@ -5,18 +5,10 @@ export type Config = {
 };
 
 export const getIPFSClient = (): IPFSClient => {
-  console.log(
-    "=====================================================================",
-  );
+
   const jwt = process.env.NEXT_PUBLIC_PINATA_JWT;
   const readGateway = process.env.NEXT_PUBLIC_IPFS_READ_GATEWAY;
   const writeGateway = process.env.NEXT_PUBLIC_IPFS_WRITE_GATEWAY;
-
-  console.log("IPFS Config", {
-    jwt,
-    readGateway,
-    writeGateway,
-  });
 
   if (!jwt || !readGateway || !writeGateway) {
     throw new Error("Missing IPFS configuration");
@@ -50,7 +42,7 @@ export default class IPFSClient {
   }
 
   fileUrl(cid: string) {
-    return `${this.readGateway}/ipfs/${cid}`;
+    return `${this.readGateway}ipfs/${cid}`;
   }
 
   fetchText(cid: string) {

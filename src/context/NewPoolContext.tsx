@@ -7,7 +7,7 @@ import {
   EProgressStatus,
   ETarget,
   TNewPool,
-  TPoolData,
+  TNewPoolResponse,
   TProgressStep,
 } from "@/app/types";
 import {
@@ -19,7 +19,7 @@ import { getChain, wagmiConfigData } from "@/services/wagmi";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
-  createNewPool: (data: TNewPool, chain: number) => Promise<TPoolData>;
+  createNewPool: (data: TNewPool, chain: number) => Promise<TNewPoolResponse>;
 }
 
 const initialSteps: TProgressStep[] = [
@@ -35,7 +35,7 @@ const initialSteps: TProgressStep[] = [
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
-    status: EProgressStatus.IN_PROGRESS,
+    status: EProgressStatus.NOT_STARTED,
   },
   {
     id: 2,
@@ -88,15 +88,15 @@ export const NewPoolContextProvider = (props: {
 
   const createNewPool = async (
     data: TNewPool,
-    chain: number,
-  ): Promise<TPoolData> => {
+    chain: number
+  ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
 
     // return values
     let strategyAddress: string = "0x";
     let poolId: number = -1;
 
-    updateStepTarget(1, `${chainInfo.name}`);
+    updateStepTarget(2, `${chainInfo.name}`);
 
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
@@ -163,7 +163,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(2, `${chainInfo.name}`);
       updateStepHref(
         2,
-        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
+        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress
       );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
     } catch (e) {
@@ -172,15 +172,14 @@ export const NewPoolContextProvider = (props: {
     }
 
     const startDateInSeconds = Math.floor(
-      new Date(data.startDate).getTime() / 1000,
+      new Date(data.startDate).getTime() / 1000
     );
 
     const endDateInSeconds = Math.floor(
-      new Date(data.endDate).getTime() / 1000,
+      new Date(data.endDate).getTime() / 1000
     );
 
     // create new pool
-
     const initStrategyData = await strategy.getInitializeData({
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
@@ -202,12 +201,15 @@ export const NewPoolContextProvider = (props: {
       managers: data.managers,
     };
 
+    console.log("initStrategyData", initStrategyData);
+    console.log("poolCreationData", poolCreationData);
+
     const allo = new Allo({
       chain: chain,
     });
 
     const createPoolData = await allo.createPoolWithCustomStrategy(
-      poolCreationData,
+      poolCreationData
     );
 
     try {
@@ -228,7 +230,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(3, `${chainInfo.name}`);
       updateStepHref(
         3,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
       updateStepStatus(3, EProgressStatus.IS_SUCCESS);
     } catch (e) {
@@ -237,7 +239,7 @@ export const NewPoolContextProvider = (props: {
     }
 
     return {
-      address: strategyAddress,
+      address: strategyAddress as `0x${string}`,
       poolId: poolId,
     };
   };
