@@ -1,5 +1,4 @@
 import { TAllocatedData, TDistributedData, TProfile } from "@/app/types";
-import ProfileDetail from "@/components/profile/ProfileDetail";
 import {
   getMicroGrantsAllQuery,
   getMicroGrantRecipientQuery,
