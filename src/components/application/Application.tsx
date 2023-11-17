@@ -24,7 +24,7 @@ export default function Application() {
       { id: 3, name: applicationName, href: "#" },
     ],
     logo: {
-      src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
+      src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpunk-1.jpg",
       alt: "Two each of gray, white, and black shirts laying flat.",
     },
     description:
