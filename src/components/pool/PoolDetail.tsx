@@ -1,14 +1,11 @@
 "use client";
 
-import { IApplication } from "@/app/types";
-import { graphqlEndpoint, getMicroGrantsRecipientsQuery, getMicroGrantsQuery } from "@/utils/query";
-import request from "graphql-request";
+import { IApplication, TPoolData } from "@/app/types";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ApplicationCard from "../application/ApplicationCard";
 
-export default function PoolDetail() {
-  const params = useParams();
+export default function PoolDetail(props: { pool: TPoolData }) {
   const applications: IApplication[] = [
     {
       id: 1,
@@ -50,29 +47,7 @@ export default function PoolDetail() {
   const [pools, setPools] = useState([]);
   const [erroe, setError] = useState(false);
 
-  useEffect(() => {
-    const fetchPools = async () => {
-      try {
-        console.log("HII");
-
-
-        const response: any = await request(
-          graphqlEndpoint,
-          getMicroGrantsRecipientsQuery,
-          { chainId: params.chainId, poolId: params.poolId },
-        );
-
-        console.log("response ================", response);
-
-        setPools(response["microGrantsRecipients"]);
-      } catch (e) {
-        setError(true);
-        console.log(e);
-      }
-    };
-
-    fetchPools();
-  }, []);
+  console.log("====pool====", props.pool);
 
   return (
     <div className="flex flex-col">
