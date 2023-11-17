@@ -1,6 +1,6 @@
 "use client";
 
-import { classNames, humanReadableAmount, statusColorsScheme } from "@/utils/common";
+import { classNames, humanReadableAmount, prettyTimestamp, statusColorsScheme } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
 import NotificationToast from "../shared/NotificationToast";
@@ -21,7 +21,9 @@ export default function ApplicationDetail(props: {
   const amount = humanReadableAmount(microGrant.pool.amount, tokenMetadata.decimals);
   const token = tokenMetadata.symbol ?? "ETH";
 
-  // TODO: wire in name + description 
+  // TODO: Wire in name + description
+  // TODO: Wire in logo
+  // TODO: Wire in approvals/ rejection 
   const applicationName = "Papa Kush";
 
   const application = {
@@ -52,8 +54,8 @@ export default function ApplicationDetail(props: {
 
   const overviews = [
     { description: "Amount", name: application.amountRequested },
-    { description: "Start Date", name: new Date().toLocaleString() },
-    { description: "End Date", name: new Date().toLocaleString() },
+    { description: "Start Date", name: prettyTimestamp(microGrant.allocationStartTime) },
+    { description: "End Date", name: prettyTimestamp(microGrant.allocationEndTime) },
     { description: "Approvals", name: "2", color: "text-green-700" },
     { description: "Rejections", name: "3", color: "text-red-700" },
   ];

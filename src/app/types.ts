@@ -41,17 +41,19 @@ export type TProfile = {
   status: string;
 };
 
-// Application
-export type TNewApplication = {
+export type TApplicationMetadata = {
   name: string;
   website: string;
   description: string;
-  requestedAmount: number;
   email: string;
-  recipientAddress: `0x${string}`;
   base64Image: string;
   profileOwner: `0x${string}`;
-  nonce: number;
+};
+
+export type TNewApplication = TApplicationMetadata & {
+  requestedAmount: number;
+  recipientAddress: `0x${string}`;
+  nonce?: number;
 };
 
 export type TPoolMetadata = {
