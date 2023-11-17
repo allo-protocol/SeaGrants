@@ -55,7 +55,6 @@ export default function PoolForm() {
   };
 
   const onHandleSubmit = async (data: any) => {
-    console.log("submit this shit");
     setIsOpen(true);
 
     const newPoolData: TNewPool = {

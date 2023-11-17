@@ -1,5 +1,5 @@
 import { TPoolData, TPoolMetadata } from "@/app/types";
-import PoolDetail from "@/components/pool/PoolDetail";
+import PoolOverview from "@/components/pool/PoolOverview";
 import Container from "@/components/shared/Container";
 import { getIPFSClient } from "@/services/ipfs";
 import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
@@ -32,7 +32,7 @@ export default async function Pool({
 
   return (
     <Container>
-      <PoolDetail
+      <PoolOverview
         poolBanner={poolBanner}
         chainId={params.chainId}
         poolId={params.poolId}
