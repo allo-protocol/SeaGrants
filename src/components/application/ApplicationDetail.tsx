@@ -1,30 +1,41 @@
 "use client";
 
-import { classNames, statusColorsScheme } from "@/utils/common";
-import { useParams } from "next/navigation";
+import { classNames, humanReadableAmount, statusColorsScheme } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
+import NotificationToast from "../shared/NotificationToast";
+import { TApplicationData } from "@/app/types";
+import { formatEther } from "viem";
 
-export default function Application() {
-  const params = useParams();
+export default function ApplicationDetail(props: {
+  application: TApplicationData,
+  isError: boolean,
+}) {
 
-  const chainId = params["chainId"];
-  const poolId = params["poolId"];
+  console.log(props.application);  
 
+  const microGrantRecipient = props.application;
+  const microGrant = microGrantRecipient.microGrant;
+
+  const tokenMetadata = microGrant.pool.tokenMetadata;
+  const amount = humanReadableAmount(microGrant.pool.amount, tokenMetadata.decimals);
+  const token = tokenMetadata.symbol ?? "ETH";
+
+  // TODO: wire in name + description 
   const applicationName = "Papa Kush";
 
   const application = {
     name: applicationName,
-    status: "Pending", // "Accepted"
-    amountRequested: "$192",
+    status: microGrantRecipient.status,
+    amountRequested: `${formatEther(BigInt(amount))} ${token}`,
     href: "#",
     breadcrumbs: [
       { id: 1, name: "Home", href: "/" },
-      { id: 2, name: `Pool ${poolId}`, href: `/${chainId}/${poolId}` },
+      { id: 2, name: `Pool ${microGrant.poolId}`, href: `/${microGrant.chainId}/${microGrant.poolId}` },
       { id: 3, name: applicationName, href: "#" },
     ],
     logo: {
-      src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpunk-1.jpg",
+      src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
       alt: "Two each of gray, white, and black shirts laying flat.",
     },
     description:
@@ -49,6 +60,11 @@ export default function Application() {
 
   return (
     <div className="bg-white">
+
+      {props.isError && (
+        <NotificationToast success={false} title="Unable to fetch application" />
+      )}
+
       <div className="pt-6">
         <Breadcrumb breadcrumbs={application.breadcrumbs} />
 

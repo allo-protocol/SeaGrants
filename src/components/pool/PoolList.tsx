@@ -14,7 +14,6 @@ const PoolList = async () => {
       getMicroGrantsQuery,
       {},
     );
-    console.log("response ================", response);
     pools = response["microGrants"];
   } catch (e) {
     isError = true;

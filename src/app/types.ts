@@ -103,6 +103,31 @@ export type TPoolData = {
   };
 };
 
+export type TApplicationData = {
+  microGrant: {
+    chainId: string;
+    poolId: string;
+    allocationStartTime: number;
+    allocationEndTime: number;
+    pool: {
+      tokenMetadata: {
+        name?: string;
+        symbol?: string;
+        decimals?: number;
+      };
+      token: `0x${string}`;
+      amount: string;
+    };
+  };
+  recipientId: string;
+  recipientAddress: string;
+  requestedAmount: string;
+  metadataPointer: string;
+  blockTimestamp: string;
+  isUsingRegistryAnchor: boolean;
+  status: string;
+};
+
 export type TAllocatedData = {
   recipientId: `0x${string}`;
   recipientAddress: `0x${string}`;

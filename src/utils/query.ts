@@ -73,6 +73,17 @@ export const getMicroGrantRecipientQuery = gql`
       poolId: $poolId
       recipientId: $recipientId
     ) {
+      microGrant {
+        poolId
+        chainId
+        allocationStartTime
+        allocationEndTime
+        pool {
+          tokenMetadata
+          token
+          amount
+        }
+      }
       recipientId
       recipientAddress
       requestedAmount
