@@ -1,8 +1,7 @@
 import { TAllocatedData, TDistributedData, TProfile } from "@/app/types";
 import ProfileDetail from "@/components/profile/ProfileDetail";
 import {
-  getMicroGrantAllocationsQuery,
-  getMicroGrantDistributionQuery,
+  getMicroGrantsAllQuery,
   getMicroGrantRecipientQuery,
   graphqlEndpoint,
 } from "@/utils/query";
@@ -32,8 +31,8 @@ export default async function Profile({
 
   const allocationData: TAllocatedData[] = await request(
     graphqlEndpoint,
-    getMicroGrantAllocationsQuery,
-    {}
+    getMicroGrantsAllQuery,
+    { chainId: "5", poolId: "24" }
   );
 
   // const allocatedToMe = allocationData.filter(
@@ -42,8 +41,8 @@ export default async function Profile({
 
   const distributionData: TDistributedData[] = await request(
     graphqlEndpoint,
-    getMicroGrantDistributionQuery,
-    {}
+    getMicroGrantsAllQuery,
+    { chainId: "5", poolId: "24" }
   );
 
   console.log("distributionData ================", distributionData);
@@ -51,7 +50,7 @@ export default async function Profile({
 
   return (
     <div>
-      <ProfileDetail
+      {/* <ProfileDetail
         profile={{
           profileData: profileData.microGrantRecipient as TProfile,
           isLoading: false,
@@ -64,7 +63,7 @@ export default async function Profile({
           distributionData: distributionData as TDistributedData[],
           isLoading: false,
         }}
-      />
+      /> */}
     </div>
   );
 }

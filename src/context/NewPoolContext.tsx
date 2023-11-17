@@ -88,7 +88,7 @@ export const NewPoolContextProvider = (props: {
 
   const createNewPool = async (
     data: TNewPool,
-    chain: number,
+    chain: number
   ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
 
@@ -163,7 +163,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(2, `${chainInfo.name}`);
       updateStepHref(
         2,
-        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
+        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress
       );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
     } catch (e) {
@@ -172,11 +172,11 @@ export const NewPoolContextProvider = (props: {
     }
 
     const startDateInSeconds = Math.floor(
-      new Date(data.startDate).getTime() / 1000,
+      new Date(data.startDate).getTime() / 1000
     );
 
     const endDateInSeconds = Math.floor(
-      new Date(data.endDate).getTime() / 1000,
+      new Date(data.endDate).getTime() / 1000
     );
 
     // create new pool
@@ -209,7 +209,7 @@ export const NewPoolContextProvider = (props: {
     });
 
     const createPoolData = await allo.createPoolWithCustomStrategy(
-      poolCreationData,
+      poolCreationData
     );
 
     try {
@@ -230,7 +230,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(3, `${chainInfo.name}`);
       updateStepHref(
         3,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
       updateStepStatus(3, EProgressStatus.IS_SUCCESS);
     } catch (e) {
@@ -239,7 +239,7 @@ export const NewPoolContextProvider = (props: {
     }
 
     return {
-      address: strategyAddress,
+      address: strategyAddress as `0x${string}`,
       poolId: poolId,
     };
   };

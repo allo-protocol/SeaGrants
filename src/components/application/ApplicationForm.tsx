@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import ImageUpload from "../shared/ImageUpload";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -37,7 +38,7 @@ export default function ApplicationForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {
