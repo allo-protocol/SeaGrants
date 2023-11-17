@@ -101,6 +101,7 @@ export type TPoolData = {
       name: string;
     };
   };
+  microGrantRecipients: any[]; // todo: set type
 };
 
 export type TApplicationData = {
@@ -175,3 +176,9 @@ export type TProgressStep = {
   href?: string;
   status: EProgressStatus;
 };
+
+export enum EPoolStatus {
+  UPCOMING = "Upcoming",
+  ACTIVE = "Active",
+  ENDED = "Ended",
+}

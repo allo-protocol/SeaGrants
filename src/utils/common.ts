@@ -53,13 +53,13 @@ function toTwoDigits(n: number) {
   return hexString.length === 1 ? `${hexString}${hexString}` : hexString;
 }
 
-export function humanReadableAmount(amount: string, decimals: number = 18) {
-  return formatUnits(BigInt(amount), decimals);
+export function humanReadableAmount(amount: string, decimals?: number) {
+  return Number(formatUnits(BigInt(amount), decimals || 18)).toFixed(5);
 }
 
 export function isPoolActive(
   allocationStartTime: number,
-  allocationEndTime: number
+  allocationEndTime: number,
 ) {
   const now = Date.now() / 1000;
   return now >= allocationStartTime && now <= allocationEndTime;

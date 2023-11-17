@@ -1,17 +1,13 @@
 "use client";
 
-import { PhotoIcon } from "@heroicons/react/20/solid";
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useParams } from "next/navigation";
 import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
-import { useSwitchNetwork } from "wagmi";
-import CropModal from "../shared/CropModal";
 import ImageUpload from "../shared/ImageUpload";
 
 const schema = yup.object({

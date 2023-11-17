@@ -180,11 +180,6 @@ export const NewPoolContextProvider = (props: {
     );
 
     // create new pool
-
-    console.log("data", data);
-    console.log("startDateInSeconds", startDateInSeconds);
-    console.log("endDateInSeconds", endDateInSeconds);
-
     const initStrategyData = await strategy.getInitializeData({
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
