@@ -67,7 +67,7 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
           <dt className="text-gray-500">Pool Amount</dt>
           <dd className="flex items-start gap-x-2">
             <div className="font-medium text-gray-900">
-              {formatEther(BigInt(amount))} {tokenMetadata.symbol ?? "ETH"}
+              {amount} {tokenMetadata.symbol ?? "ETH"}
             </div>
           </dd>
         </div>
