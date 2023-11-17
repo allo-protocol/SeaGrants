@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
 
-export const graphqlEndpoint = process.env.GRAPHQL_URL || "";
+export const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_URL || "";
 
 /** Returns all the MicroGrants pools */
 export const getMicroGrantsQuery = gql`

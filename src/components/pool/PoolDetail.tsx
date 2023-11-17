@@ -55,17 +55,12 @@ export default function PoolDetail() {
       try {
         console.log("HII");
 
+
         const response: any = await request(
           graphqlEndpoint,
-          getMicroGrantsQuery,
-          {},
+          getMicroGrantsRecipientsQuery,
+          { chainId: params.chainId, poolId: params.poolId },
         );
-
-        // const response: any = await request(
-        //   graphqlEndpoint,
-        //   getMicroGrantsRecipientsQuery,
-        //   {chainId: params.chainId, poolId: params.poolId}
-        // );
 
         console.log("response ================", response);
 
