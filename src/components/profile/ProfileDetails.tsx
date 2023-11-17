@@ -18,26 +18,26 @@ const ProfileDetails = ({
           Profile Details
         </h2>
         <span className="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-inset ring-yellow-600/20">
-          {profile.status}
+          {profile.profileData.status}
         </span>
       </div>
       <dl className="mt-6 grid grid-cols-1 text-sm leading-6 sm:grid-cols-2">
         <div className="sm:pr-4">
           <dt className="inline text-gray-500">Recipient ID:</dt>{" "}
           <dd className="inline text-gray-700">
-            <span className="text-xs">{profile.recipientId}</span>
+            <span className="text-xs">{profile.profileData.recipientId}</span>
           </dd>
         </div>
         <div className="mt-2 sm:mt-0 sm:pl-4">
           <dt className="inline text-gray-500">Recipient Address:</dt>{" "}
           <dd className="inline text-gray-700">
-            <span className="text-xs">{profile.recipientAddress}</span>
+            <span className="text-xs">{profile.profileData.recipientAddress}</span>
           </dd>
         </div>
         <div className="sm:pr-4">
           <dt className="inline text-gray-500">Requested Amount:</dt>{" "}
           <dd className="inline text-gray-700">
-            <span>{profile.requestedAmount}</span>
+            <span>{profile.profileData.requestedAmount}</span>
           </dd>
         </div>
       </dl>
