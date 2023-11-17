@@ -75,7 +75,7 @@ const ProfileDetail = ({
   return (
     <>
       <main>
-        <header className="relative isolate pt-16">
+        <header className="relative isolate">
           <div
             className="absolute inset-0 -z-10 overflow-hidden"
             aria-hidden="true"

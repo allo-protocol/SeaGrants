@@ -1,4 +1,4 @@
-import PoolDetail from "@/components/application/PoolDetail";
+import PoolDetail from "@/components/pool/PoolDetail";
 import Container from "@/components/shared/Container";
 
 export default function Pool() {
