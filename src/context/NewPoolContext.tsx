@@ -35,7 +35,7 @@ const initialSteps: TProgressStep[] = [
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
-    status: EProgressStatus.IN_PROGRESS,
+    status: EProgressStatus.NOT_STARTED,
   },
   {
     id: 2,
@@ -96,7 +96,7 @@ export const NewPoolContextProvider = (props: {
     let strategyAddress: string = "0x";
     let poolId: number = -1;
 
-    updateStepTarget(1, `${chainInfo.name}`);
+    updateStepTarget(2, `${chainInfo.name}`);
 
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
@@ -181,6 +181,10 @@ export const NewPoolContextProvider = (props: {
 
     // create new pool
 
+    console.log("data", data);
+    console.log("startDateInSeconds", startDateInSeconds);
+    console.log("endDateInSeconds", endDateInSeconds);
+
     const initStrategyData = await strategy.getInitializeData({
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
@@ -201,6 +205,9 @@ export const NewPoolContextProvider = (props: {
       },
       managers: data.managers,
     };
+
+    console.log("initStrategyData", initStrategyData);
+    console.log("poolCreationData", poolCreationData);
 
     const allo = new Allo({
       chain: chain,

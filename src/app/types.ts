@@ -5,7 +5,7 @@ export type TApplication = {
   name: string;
   description?: string;
   status: ApplicationStatus;
-  imageUrl: string;
+  base64Image: string;
   // name: string;
   recipientAddress: `0x${string}`;
   amountRequested: string;
@@ -48,9 +48,8 @@ export type TNewApplication = {
   description: string;
   requestedAmount: number;
   email: string;
-  base64Image: string;
   recipientAddress: `0x${string}`;
-  imageUrl: string;
+  base64Image: string;
   profileOwner: `0x${string}`;
   nonce: number;
 };

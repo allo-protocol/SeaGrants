@@ -55,13 +55,13 @@ export default function Application() {
         {/* Banner */}
         <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <Image
+            {/* <Image
               src={application.logo.src}
               alt={application.logo.alt}
               className="h-full w-full object-cover object-center"
               height={100}
               width={700}
-            />
+            /> */}
           </div>
         </div>
 
@@ -85,8 +85,10 @@ export default function Application() {
                   <dd className="mt-1 text-sm leading-6 text-gray-700 text-center sm:mt-0">
                     <div
                       className={classNames(
-                        statusColorsScheme[application.status as keyof typeof statusColorsScheme],
-                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                        statusColorsScheme[
+                          application.status as keyof typeof statusColorsScheme
+                        ],
+                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
                       )}
                     >
                       {application.status.toString()}
@@ -105,7 +107,7 @@ export default function Application() {
                     <dd
                       className={classNames(
                         overview.color ? overview.color : "",
-                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
+                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
                       )}
                     >
                       {overview.name}

@@ -20,10 +20,10 @@ const schema = yup.object({
   fundPoolAmount: yup.number().required("fund pool amount is required"),
   maxAmount: yup.number().required("max amount is required"),
   approvalThreshold: yup.number().required("approval threshold is required"),
-  imageUrl: yup.string().required().url("Must be a valid image url"),
+  base64Image: yup.string().required().url("Must be a valid image url"),
   startDate: yup.date().required("Start time is required"),
   endDate: yup.date().required("End time is required"),
-  tokenAddress: yup.string().required("Token address is required"),
+  // tokenAddress: yup.string().required("Token address is required"),
   useRegistryAnchor: yup.boolean().required("Registry anchor is required"),
 });
 

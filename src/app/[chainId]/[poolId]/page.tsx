@@ -21,9 +21,21 @@ export default async function Pool({
     pool.pool.metadataPointer,
   );
 
+  let poolBanner: string | undefined = undefined;
+
+  if (poolMetadata.base64Image) {
+    poolBanner = await getIPFSClient().fetchText(poolMetadata.base64Image);
+  }
+
   return (
     <Container>
-      <PoolDetail pool={pool} metadata={poolMetadata} />
+      <PoolDetail
+        poolBanner={poolBanner}
+        chainId={params.chainId}
+        poolId={params.poolId}
+        pool={pool}
+        metadata={poolMetadata}
+      />
     </Container>
   );
 }

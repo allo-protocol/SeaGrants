@@ -1,6 +1,7 @@
 import { PhotoIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import CropModal from "./CropModal";
+import { aspectRatio } from "@/utils/config";
 
 const ImageUpload = (props: {
   setBase64Image: (base64Image: string) => void;
@@ -79,7 +80,7 @@ const ImageUpload = (props: {
         </div>
       </div>
       <CropModal
-        aspectRatio={props.aspectRatio || 16 / 9}
+        aspectRatio={props.aspectRatio || aspectRatio}
         file={imageFile}
         title={"Crop Image"}
         isOpen={openCropModal}
