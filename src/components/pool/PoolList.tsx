@@ -12,7 +12,7 @@ const PoolList = async () => {
     const response: any = await request(
       graphqlEndpoint,
       getMicroGrantsQuery,
-      {}
+      {},
     );
     console.log("response ================", response);
     pools = response["microGrants"];

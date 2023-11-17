@@ -18,14 +18,13 @@ export default function Home() {
             !MicroGrants
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Micro-grant programs, common in web3 communities like Gitcoin,
-            Celo, and ENS to engage members and empower project contributions
-            aligned with their mission, often present challenges in
-            accessibility.
+            Micro-grant programs, common in web3 communities like Gitcoin, Celo,
+            and ENS to engage members and empower project contributions aligned
+            with their mission, often present challenges in accessibility.
           </p>
         </div>
       </div>
-      <PoolList />;
+      <PoolList />
     </main>
   );
 }

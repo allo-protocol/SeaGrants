@@ -51,26 +51,26 @@ export default function PoolDetail() {
   let isError = false;
   const [pools, setPools] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchPools = async () => {
-  //     try {
-  //       const response: any = await request(
-  //         graphqlEndpoint,
-  //         getMicroGrantsRecipientsQuery,
-  //         {}
-  //       );
+  useEffect(() => {
+    const fetchPools = async () => {
+      try {
+        const response: any = await request(
+          graphqlEndpoint,
+          getMicroGrantsRecipientsQuery,
+          { chainId: params.chainId, poolId: params.poolId }
+        );
 
-  //       console.log("response ================", response);
+        console.log("response ================", response);
 
-  //       setPools(response["microGrantsRecipients"]);
-  //     } catch (e) {
-  //       isError = true;
-  //       console.log(e);
-  //     }
-  //   };
+        setPools(response["microGrantsRecipients"]);
+      } catch (e) {
+        isError = true;
+        console.log(e);
+      }
+    };
 
-  //   fetchPools();
-  // }, []);
+    fetchPools();
+  }, []);
 
   return (
     <div className="flex flex-col">

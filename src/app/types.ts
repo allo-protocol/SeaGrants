@@ -43,12 +43,21 @@ export type TPool = {
 };
 
 export type TProfile = {
-  id: `0x${string}`;
+  recipientId: `0x${string}`;
   recipientAddress: string;
-  profileOwner: string;
-  nonce: number;
-  members: `0x${string}`[];
+  requestedAmount: string;
+  metadataPointer: string;
+  isUsingRegistryAnchor: boolean;
+  status: string;
 };
+
+  // recipientId: '0xe7eb5d2b5b188777df902e89c54570e7ef4f59ce',
+  // recipientAddress: '0xe7eb5d2b5b188777df902e89c54570e7ef4f59ce',
+  // requestedAmount: '0',
+  // metadataPointer: 'bafkreiclsyxwbyhe7oqrtwaixxgc6f2je47t7blqevqfydhv3kchgol6ie',
+  // blockTimestamp: '2023-11-16T10:10:48-05:00',
+  // isUsingRegistryAnchor: true,
+  // status: 'Pending'
 
 // Application
 export type TNewApplication = {
