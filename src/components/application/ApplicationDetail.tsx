@@ -9,19 +9,32 @@ import {
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
 import NotificationToast from "../shared/NotificationToast";
-import { TApplicationData } from "@/app/types";
-import { formatEther } from "viem";
+import { TAllocatedData, TApplicationData } from "@/app/types";
 import { useEffect, useState } from "react";
 import { getIPFSClient } from "@/services/ipfs";
+import { InboxIcon } from "@heroicons/react/24/outline";
+import LoadingHistorySkeleton from "../shared/LoadingHistorySkeleton";
+
+// TODO: Approvals and Rejections should be fetched from the backend
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
   isError: boolean;
 }) {
   const [metadata, setMetadata] = useState<any>();
+  const [bannerImage, setBannerImage] = useState<any>();
   console.log("====application====", props.application);
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
+  const allocatedData: {
+    allocateds: TAllocatedData[];
+    isError: boolean;
+    isLoading: boolean;
+  } = {
+    allocateds: [],
+    isError: false,
+    isLoading: true,
+  };
   const tokenMetadata = microGrant.pool.tokenMetadata;
   const amount = humanReadableAmount(
     microGrant.pool.amount,
@@ -29,18 +42,34 @@ export default function ApplicationDetail(props: {
   );
   const token = tokenMetadata.symbol ?? "ETH";
 
+  let isError = false;
+
   useEffect(() => {
     const fetchMetadata = async () => {
       const ipfsClient = getIPFSClient();
       const DEFAULT_NAME = `Pool ${microGrant.poolId}`;
-      let metadata = { name: DEFAULT_NAME };
+      let metadata = {
+        name: DEFAULT_NAME,
+        base64Image: "",
+      };
       try {
         metadata = await ipfsClient.fetchJson(
           microGrantRecipient.metadataPointer
         );
 
-        console.log("====metadata====", metadata);
+        let bannerImage: { data: string } = {
+          data: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
+        };
+        try {
+          bannerImage = await ipfsClient.fetchJson(metadata.base64Image);
+
+          setBannerImage(bannerImage.data);
+        } catch (error) {
+          isError = true;
+          console.error(error);
+        }
       } catch {
+        isError = true;
         console.log("IPFS", "Unable to fetch metadata");
       }
       if (metadata.name === undefined) metadata.name = DEFAULT_NAME;
@@ -48,11 +77,7 @@ export default function ApplicationDetail(props: {
     };
 
     fetchMetadata();
-  }, [microGrantRecipient]);
-
-  // TODO: Wire in name + description
-  // TODO: Wire in approvals/ rejection
-  // const applicationName = "Papa Kush";
+  }, [microGrantRecipient.metadataPointer]);
 
   const application = {
     name: metadata?.name,
@@ -69,19 +94,10 @@ export default function ApplicationDetail(props: {
       { id: 3, name: metadata?.name, href: "#" },
     ],
     logo: {
-      src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
-      alt: "Two each of gray, white, and black shirts laying flat.",
+      src: bannerImage,
+      alt: metadata?.name,
     },
-    description:
-      'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
-    highlights: [
-      "Hand cut and sewn locally",
-      "Dyed with our proprietary colors",
-      "Pre-washed & pre-shrunk",
-      "Ultra-soft 100% cotton",
-    ],
-    details:
-      'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
+    description: metadata?.description,
   };
 
   const overviews = [
@@ -204,24 +220,62 @@ export default function ApplicationDetail(props: {
             </div>
 
             <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900">Highlights</h3>
+              <h3 className="text-sm font-medium text-gray-900">Allocations</h3>
 
               <div className="mt-4">
-                <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  {application.highlights.map((highlight) => (
-                    <li key={highlight} className="text-gray-400">
-                      <span className="text-gray-600">{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-              <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600">{application.details}</p>
+                {/* Allocations */}
+                {!allocatedData.isLoading && !allocatedData.isError ? (
+                  allocatedData.allocateds ? (
+                    <table className="mt-16 w-full whitespace-nowrap text-left text-sm leading-6">
+                      <colgroup>
+                        <col className="w-full" />
+                        <col />
+                      </colgroup>
+                      <thead className="border-b border-gray-200 text-gray-900">
+                        <tr>
+                          <th scope="col" className="px-0 py-3 font-semibold">
+                            Projects
+                          </th>
+                          <th
+                            scope="col"
+                            className="py-3 pl-8 pr-0 text-right font-semibold"
+                          >
+                            Funded
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allocatedData.allocateds.map((item: any) => (
+                          <tr
+                            key={`${item.recipientId} + ${item.chainId}`}
+                            className="border-b border-gray-100"
+                          >
+                            <td className="max-w-0 px-0 py-5 align-top">
+                              <div className="truncate font-medium text-gray-900">
+                                {item.chainId}
+                              </div>
+                              <div className="truncate text-gray-500">
+                                {item.sender}
+                              </div>
+                            </td>
+                            <td className="py-5 pl-8 pr-0 text-right align-top tabular-nums text-gray-700">
+                              {item.amount}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <LoadingHistorySkeleton />
+                  )
+                ) : (
+                  <div className="flex flex-col items-center mt-16 w-full text-center border-t pt-2">
+                    <div>
+                      <InboxIcon className="w-8 h-8" />
+                    </div>
+                    No Allocation History
+                  </div>
+                )}
               </div>
             </div>
           </div>

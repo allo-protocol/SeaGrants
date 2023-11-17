@@ -133,7 +133,9 @@ export type TApplicationData = {
       token: `0x${string}`;
       amount: string;
     };
+    allocateds: TAllocatedData[];
   };
+  sender: string;
   recipientId: string;
   recipientAddress: string;
   requestedAmount: string;

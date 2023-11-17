@@ -22,6 +22,7 @@ export default async function Application({
       }
     );
     recipient = response?.microGrantRecipient;
+    // console.log("recipient", recipient);
   } catch (error) {
     isError = true;
     console.error(error);
