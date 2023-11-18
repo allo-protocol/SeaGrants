@@ -70,6 +70,9 @@ export const MarkdownView = (props: { text: string }) => {
   return (
     <>
       <Preview
+        minHeight={200}
+        heightUnits="px"
+        markdown=""
         generateMarkdownPreview={() =>
           Promise.resolve(<ReactMarkdown>{props.text}</ReactMarkdown>)
         }

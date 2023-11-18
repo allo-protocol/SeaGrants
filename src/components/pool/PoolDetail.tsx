@@ -162,9 +162,6 @@ export const PoolDetail = (props: {
 
           <div>
             <MarkdownView text={props.metadata.description} />
-            {/* <p className="text-base text-gray-900">
-              {props.metadata.description}
-            </p> */}
           </div>
         </div>
       </div>
