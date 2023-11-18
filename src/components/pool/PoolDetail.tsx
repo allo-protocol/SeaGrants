@@ -5,6 +5,7 @@ import {
   statusColorsScheme,
 } from "@/utils/common";
 import { useRouter } from "next/navigation";
+import { MarkdownView } from "../shared/Markdown";
 
 export const PoolDetail = (props: {
   chainId: string;
@@ -159,10 +160,11 @@ export const PoolDetail = (props: {
         <div>
           <h3 className="sr-only">Description</h3>
 
-          <div className="space-y-6">
-            <p className="text-base text-gray-900">
+          <div>
+            <MarkdownView text={props.metadata.description} />
+            {/* <p className="text-base text-gray-900">
               {props.metadata.description}
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

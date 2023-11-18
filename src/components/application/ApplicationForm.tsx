@@ -10,6 +10,7 @@ import { TNewApplication } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import ImageUpload from "../shared/ImageUpload";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { MarkdownEditor } from "../shared/Markdown";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -18,7 +19,6 @@ const schema = yup.object({
   email: yup.string().required().min(3).email("Must be a valid email address"),
   requestedAmount: yup.number().required("Requested amount is required"),
   recipientAddress: yup.string().required("Recipient address is required"),
-  imageUrl: yup.string().required().url("Must be a valid image url"),
   profileOwner: yup.string().required("A profile owner is required"),
   nonce: yup.number().required("A nonce is required").min(1),
 });
@@ -36,6 +36,7 @@ export default function ApplicationForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -72,6 +73,10 @@ export default function ApplicationForm() {
       setIsOpen(false);
       window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
     }, 1000);
+  };
+
+  const setText = (text: string) => {
+    setValue("description", text);
   };
 
   return (
@@ -143,30 +148,26 @@ export default function ApplicationForm() {
 
             <div className="col-span-full">
               <label
-                htmlFor="about"
+                htmlFor="description"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
                 Description
               </label>
-              <div className="mt-2">
-                <textarea
-                  {...register("description")}
-                  id="description"
-                  name="description"
-                  rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={""}
-                />
-              </div>
+              <MarkdownEditor setText={setText} />
+              {/* Register the "description" field */}
+              <input
+                {...register("description")}
+                type="hidden" // Hidden because MarkdownEditor handles the input
+              />
+              <p className="text-xs leading-5 text-gray-600 mt-2">
+                Write a brief description about the project and why it&apos;s
+                applying to the round
+              </p>
               <div>
                 {errors.description && (
                   <Error message={errors.description?.message!} />
                 )}
               </div>
-              <p className="text-xs leading-5 text-gray-600 mt-2">
-                Write a brief description about the project and why it&apos;s
-                applying to the round
-              </p>
             </div>
 
             <div className="sm:col-span-4">
