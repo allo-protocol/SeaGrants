@@ -1,5 +1,7 @@
 import { EPoolStatus } from "@/app/types";
 import { formatUnits } from "viem";
+import { graphqlEndpoint } from "./query";
+import request from "graphql-request";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -8,7 +10,7 @@ export function classNames(...classes: string[]) {
 export const statusColorsScheme = {
   Accepted: "text-green-700 bg-green-50 ring-green-600/20",
   Active: "text-green-700 bg-green-50 ring-green-600/20",
-  
+
   Upcoming: "text-blue-700 bg-blue-50 ring-blue-600/20",
   Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
 
@@ -24,9 +26,9 @@ export function stringToColor(text: string) {
   for (let i = 0; i < str.length / 2; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const r = Math.floor(200 + (Math.abs(Math.sin(hash + 0)) * 56) % 56);
-  const g = Math.floor(200 + (Math.abs(Math.sin(hash + 1)) * 56) % 56);
-  const b = Math.floor(200 + (Math.abs(Math.sin(hash + 2)) * 56) % 56);
+  const r = Math.floor(200 + ((Math.abs(Math.sin(hash + 0)) * 56) % 56));
+  const g = Math.floor(200 + ((Math.abs(Math.sin(hash + 1)) * 56) % 56));
+  const b = Math.floor(200 + ((Math.abs(Math.sin(hash + 2)) * 56) % 56));
 
   // modulo function on str.length to choose between aa, bb, cc, dd
   const append = ["88", "aa", "66", "99"][str.length % 4];
@@ -52,7 +54,7 @@ export function humanReadableAmount(amount: string, decimals?: number) {
 
 export function isPoolActive(
   allocationStartTime: number,
-  allocationEndTime: number,
+  allocationEndTime: number
 ) {
   const now = Date.now() / 1000;
   return now >= allocationStartTime && now <= allocationEndTime;
@@ -78,4 +80,34 @@ export const getPoolStatus = (startDate: number, endDate: number): EPoolStatus =
   } else {
     return EPoolStatus.ACTIVE;
   }
+};
+
+export const pollUntilDataIsIndexed = async (
+  QUERY_ENDPOINT: any,
+  data: any,
+  propToCheck: string
+) => {
+  let counter = 0;
+  const fetchData: any = async () => {
+    const response: any = await request(graphqlEndpoint, QUERY_ENDPOINT, data);
+
+    console.log("response", response);
+
+    if (response && response[propToCheck] !== null) {
+      // Data is found, return true
+      return true;
+    } else {
+      counter++;
+
+      if (counter > 20) return false;
+
+      // If the data is not indexed, schedule the next fetch after 2 seconds
+      return new Promise((resolve) => setTimeout(resolve, 2000)).then(
+        fetchData
+      );
+    }
+  };
+
+  // Initial fetch
+  return await fetchData();
 };

@@ -51,8 +51,6 @@ export default function PoolForm() {
 
   const handleCancel = () => {
     setIsOpen(false);
-
-    // window.location.assign(`/${poolId}`);
   };
 
   const onHandleSubmit = async (data: any) => {
