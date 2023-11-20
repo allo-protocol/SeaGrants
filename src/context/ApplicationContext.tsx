@@ -28,27 +28,20 @@ export interface IApplicationContextProps {
 const initialSteps: TProgressStep[] = [
   {
     id: 0,
-    content: "Saving your banner image to ",
+    content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
     id: 1,
-    content: "Saving your application to ",
-    target: ETarget.IPFS,
-    href: "",
-    status: EProgressStatus.NOT_STARTED,
-  },
-  {
-    id: 2,
     content: "Registering your application on ",
     target: ETarget.POOL,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 3,
+    id: 2,
     content: "Indexing your application",
     target: "",
     href: "",
@@ -110,32 +103,21 @@ export const ApplicationContextProvider = (props: {
     let imagePointer;
     let pointer;
 
-    if (!metadata.base64Image || !metadata.base64Image.includes("base64")) {
-      const newSteps = [...steps];
-      newSteps.shift();
-      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
-      setSteps(newSteps);
-    }
-
     try {
       if (metadata.base64Image.includes("base64")) {
         imagePointer = await ipfsClient.pinJSON({
           data: metadata.base64Image,
         });
         metadata.base64Image = imagePointer.IpfsHash;
-        updateStepHref(0, "https://ipfs.io/ipfs/" + imagePointer.IpfsHash);
-        updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-        updateStepStatus(1, EProgressStatus.IN_PROGRESS);
       }
 
       pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(1, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
-      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
+      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       console.log("IPFS", e);
-      updateStepStatus(1, EProgressStatus.IS_ERROR);
+      updateStepStatus(0, EProgressStatus.IS_ERROR);
     }
 
     // 2. Create profile on registry
@@ -183,12 +165,12 @@ export const ApplicationContextProvider = (props: {
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
-      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(3, EProgressStatus.IN_PROGRESS);
+      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
 
     } catch (e) {
       console.log("Registering Application", e);
-      updateStepStatus(2, EProgressStatus.IS_ERROR);
+      updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
 
     // 4. Poll indexer for recipientId
@@ -199,10 +181,10 @@ export const ApplicationContextProvider = (props: {
         recipientId: recipientId,
       }
       await pollUntilDataIsIndexed(checkIfRecipientIsIndexedQuery, pollingData, "microGrantRecipient");
-      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
     } catch (e) {
       console.log("Polling", e);
-      updateStepStatus(3, EProgressStatus.IS_ERROR);
+      updateStepStatus(2, EProgressStatus.IS_ERROR);
     }
 
     return recipientId;

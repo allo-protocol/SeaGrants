@@ -11,6 +11,7 @@ import { ApplicationContext } from "@/context/ApplicationContext";
 import ImageUpload from "../shared/ImageUpload";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { MarkdownEditor } from "../shared/Markdown";
+import { parseUnits } from "viem";
 
 const schema = yup.object({
   name: yup.string().required().min(6, "Must be at least 6 characters"),
@@ -60,7 +61,7 @@ export default function ApplicationForm() {
       website: data.website,
       description: data.description,
       email: data.email,
-      requestedAmount: BigInt(Number(data.requestedAmount) * 10 ** 18),
+      requestedAmount: parseUnits(data.requestedAmount, 18), // TODO: wire in actual decimal
       recipientAddress: data.recipientAddress,
       base64Image: base64Image,
       profileOwner: data.profileOwner,

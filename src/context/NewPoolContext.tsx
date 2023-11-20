@@ -27,34 +27,27 @@ export interface INewPoolContextProps {
 const initialSteps: TProgressStep[] = [
   {
     id: 0,
-    content: "Saving your banner image to ",
-    target: ETarget.IPFS,
-    href: "",
-    status: EProgressStatus.IN_PROGRESS,
-  },
-  {
-    id: 1,
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 2,
+    id: 1,
     content: "Deploying new pool strategy to ",
     target: ETarget.CHAIN,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 3,
+    id: 2,
     content: "Creating new pool on ",
     target: ETarget.ALLO,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 4,
+    id: 3,
     content: "Indexing your pool",
     target: "",
     href: "",
@@ -121,32 +114,21 @@ export const NewPoolContextProvider = (props: {
     let imagePointer;
     let pointer;
 
-    if (!metadata.base64Image || !metadata.base64Image.includes("base64")) {
-      const newSteps = [...steps];
-      newSteps.shift();
-      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
-      setSteps(newSteps);
-    }
-
     try {
       if (metadata.base64Image && metadata.base64Image.includes("base64")) {
         imagePointer = await ipfsClient.pinJSON({
           data: metadata.base64Image,
         });
         metadata.base64Image = imagePointer.IpfsHash;
-        updateStepHref(0, "https://ipfs.io/ipfs/" + imagePointer.IpfsHash);
-        updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-        updateStepStatus(1, EProgressStatus.IN_PROGRESS);
       }
 
       pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(1, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
-      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
+      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       console.log("IPFS", e);
-      updateStepStatus(1, EProgressStatus.IS_ERROR);
+      updateStepStatus(0, EProgressStatus.IS_ERROR);
     }
 
     // 2. Deploy new pool strategy
@@ -174,10 +156,10 @@ export const NewPoolContextProvider = (props: {
         2,
         `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress
       );
-      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
     } catch (e) {
       console.log("Deploying Strategy", e);
-      updateStepStatus(2, EProgressStatus.IS_ERROR);
+      updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
 
     const startDateInSeconds = Math.floor(
@@ -241,10 +223,10 @@ export const NewPoolContextProvider = (props: {
         3,
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
-      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(4, EProgressStatus.IN_PROGRESS);
+      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(3, EProgressStatus.IN_PROGRESS);
     } catch (e) {
-      updateStepStatus(3, EProgressStatus.IS_ERROR);
+      updateStepStatus(2, EProgressStatus.IS_ERROR);
       console.log("Creating Pool", e);
     }
 
@@ -255,10 +237,10 @@ export const NewPoolContextProvider = (props: {
         poolId: poolId,
       };
       await pollUntilDataIsIndexed(checkIfPoolIsIndexedQuery, pollingData, "microGrant");
-      updateStepStatus(4, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
     } catch (e) {
       console.log("Polling", e);
-      updateStepStatus(4, EProgressStatus.IS_ERROR);
+      updateStepStatus(3, EProgressStatus.IS_ERROR);
     }
 
     return {
