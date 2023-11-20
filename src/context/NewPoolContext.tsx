@@ -16,6 +16,8 @@ import {
   waitForTransaction,
 } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
+import { pollUntilDataIsIndexed } from "@/utils/common";
+import { checkIfPoolIsIndexedQuery } from "@/utils/query";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -49,6 +51,13 @@ const initialSteps: TProgressStep[] = [
     content: "Creating new pool on ",
     target: ETarget.ALLO,
     href: "#",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    id: 4,
+    content: "Indexing your pool",
+    target: "",
+    href: "",
     status: EProgressStatus.NOT_STARTED,
   },
 ];
@@ -233,9 +242,23 @@ export const NewPoolContextProvider = (props: {
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
       updateStepStatus(3, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(4, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       updateStepStatus(3, EProgressStatus.IS_ERROR);
       console.log("Creating Pool", e);
+    }
+
+    // 4. Index Pool
+    try {
+      const pollingData: any = {
+        chainId: chain,
+        poolId: poolId,
+      };
+      await pollUntilDataIsIndexed(checkIfPoolIsIndexedQuery, pollingData, "microGrant");
+      updateStepStatus(4, EProgressStatus.IS_SUCCESS);
+    } catch (e) {
+      console.log("Polling", e);
+      updateStepStatus(4, EProgressStatus.IS_ERROR);
     }
 
     return {

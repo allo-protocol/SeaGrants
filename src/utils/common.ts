@@ -1,5 +1,7 @@
 import { EPoolStatus } from "@/app/types";
 import { formatUnits } from "viem";
+import { graphqlEndpoint } from "./query";
+import request from "graphql-request";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -76,4 +78,27 @@ export const getPoolStatus = (startDate: number, endDate: number): EPoolStatus =
   } else {
     return EPoolStatus.ACTIVE;
   }
+};
+
+
+export const pollUntilDataIsIndexed = async (QUERY_ENDPOINT: any, data: any, propToCheck: string) => {
+
+  const fetchData: any = async () => {
+    const response: { data: any } = await request(
+      graphqlEndpoint,
+      QUERY_ENDPOINT,
+      data,
+    );
+
+    if (response.data && response.data[propToCheck] !== null) {
+      // Data is found, return true
+      return true;
+    } else {
+      // If the data is not indexed, schedule the next fetch after 2 seconds
+      return new Promise(resolve => setTimeout(resolve, 2000)).then(fetchData);
+    }
+  };
+
+  // Initial fetch
+  return await fetchData();
 };

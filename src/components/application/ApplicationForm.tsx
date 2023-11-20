@@ -17,7 +17,11 @@ const schema = yup.object({
   website: yup.string().required().url("Must be a valid website address"),
   description: yup.string().required().min(10, "Must be at least 150 words"),
   email: yup.string().required().min(3).email("Must be a valid email address"),
-  requestedAmount: yup.number().required("Requested amount is required"),
+  requestedAmount: yup.string().test(
+    'is-number',
+    'Requested amount is required',
+    value => !isNaN(Number(value))
+  ),
   recipientAddress: yup.string().required("Recipient address is required"),
   profileOwner: yup.string().required("A profile owner is required"),
   nonce: yup.number().required("A nonce is required").min(1),
@@ -56,7 +60,7 @@ export default function ApplicationForm() {
       website: data.website,
       description: data.description,
       email: data.email,
-      requestedAmount: data.requestedAmount,
+      requestedAmount: BigInt(Number(data.requestedAmount) * 10 ** 18),
       recipientAddress: data.recipientAddress,
       base64Image: base64Image,
       profileOwner: data.profileOwner,
@@ -204,7 +208,7 @@ export default function ApplicationForm() {
                   {...register("requestedAmount")}
                   id="requestedAmount"
                   name="requestedAmount"
-                  type="number"
+                  type="text"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>

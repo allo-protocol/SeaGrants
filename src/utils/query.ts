@@ -2,7 +2,22 @@ import { gql } from "graphql-request";
 
 export const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_URL || "";
 
-/** Returns all the MicroGrants pools */
+export const checkIfRecipientIsIndexedQuery = gql`
+  query checkIfRecipientIsIndexedQuery($chainId: String!, $poolId: String!, $recipientId: String!) {
+    microGrantRecipient(chainId: $chainId, poolId: $poolId, recipientId: $recipientId) {
+      recipientId
+    }
+  }
+`;
+
+export const checkIfPoolIsIndexedQuery = gql`
+  query checkIfPoolIsIndexedQuery($chainId: String!, $poolId: String!) {
+    microGrant(chainId: $chainId, poolId: $poolId) {
+      poolId
+    }
+  }
+`;
+
 export const getMicroGrantsQuery = gql`
   {
     microGrants(orderBy: BLOCK_TIMESTAMP_DESC) {
@@ -27,7 +42,6 @@ export const getMicroGrantsQuery = gql`
   }
 `;
 
-/** Returns the recipient information for micro grant strategy */
 export const getMicroGrantsRecipientsQuery = gql`
   query getMicroGrantsRecipientsQuery($chainId: String!, $poolId: String!) {
     microGrant(chainId: $chainId, poolId: $poolId) {

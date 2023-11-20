@@ -13,6 +13,8 @@ import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { decodeEventLog } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
+import { pollUntilDataIsIndexed } from "@/utils/common";
+import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -43,6 +45,13 @@ const initialSteps: TProgressStep[] = [
     content: "Registering your application on ",
     target: ETarget.POOL,
     href: "#",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    id: 3,
+    content: "Indexing your application",
+    target: "",
+    href: "",
     status: EProgressStatus.NOT_STARTED,
   },
 ];
@@ -139,7 +148,7 @@ export const ApplicationContextProvider = (props: {
 
     const registerRecipientData = strategy.getRegisterRecipientData({
       recipientAddress: data.recipientAddress as `0x${string}`,
-      requestedAmount: BigInt(data.requestedAmount),
+      requestedAmount: data.requestedAmount,
       metadata: {
         protocol: BigInt(1),
         pointer: pointer.IpfsHash,
@@ -174,10 +183,26 @@ export const ApplicationContextProvider = (props: {
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
-      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(3, EProgressStatus.IN_PROGRESS);
+
     } catch (e) {
       console.log("Registering Application", e);
       updateStepStatus(2, EProgressStatus.IS_ERROR);
+    }
+
+    // 4. Poll indexer for recipientId
+    try {
+      const pollingData: any = {
+        chainId: chain,
+        poolId: poolId,
+        recipientId: recipientId,
+      }
+      await pollUntilDataIsIndexed(checkIfRecipientIsIndexedQuery, pollingData, "microGrantRecipient");
+      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
+    } catch (e) {
+      console.log("Polling", e);
+      updateStepStatus(3, EProgressStatus.IS_ERROR);
     }
 
     return recipientId;
