@@ -14,7 +14,7 @@ export const statusColorsScheme = {
   Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600/20",
   Rejected: "text-red-700 bg-red-50 ring-red-600/10",
 
-  Closed: "text-gray-600 bg-gray-50 ring-gray-500/10",
+  Ended: "text-gray-600 bg-gray-50 ring-gray-500/10",
 };
 
 export function stringToColor(text: string) {

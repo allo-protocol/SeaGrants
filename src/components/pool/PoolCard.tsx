@@ -54,12 +54,12 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
             statusColorsScheme[
               isActive
                 ? ("Active" as keyof typeof statusColorsScheme)
-                : ("Closed" as keyof typeof statusColorsScheme)
+                : ("Ended" as keyof typeof statusColorsScheme)
             ],
             "flex rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
           )}
         >
-          {isActive ? "Active" : "Closed"}
+          {isActive ? "Active" : "Ended"}
         </div>
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
