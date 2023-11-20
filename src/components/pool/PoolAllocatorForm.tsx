@@ -259,7 +259,8 @@ export default function PoolAllocatorForm() {
                   setValue("allocators", [{ address: "", action: "true" }]);
                 }}
               >
-                <span className="font-bold">&#x2298;</span>&nbsp;Clear
+                <span className="font-bold text-base">&#x2298;</span>
+                &nbsp;Clear
               </button>
               <div className="w-full mt-6 flex items-center justify-end gap-x-6 px-6">
                 <button
