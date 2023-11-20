@@ -5,19 +5,45 @@ import {
   humanReadableAmount,
   prettyTimestamp,
   statusColorsScheme,
+  stringToColor,
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import NotificationToast from "../shared/NotificationToast";
-import { TApplicationData } from "@/app/types";
+import {
+  TAllocatedData,
+  TApplicationData,
+  TApplicationMetadata,
+} from "@/app/types";
+import { useEffect, useRef, useState } from "react";
+import { InboxIcon } from "@heroicons/react/24/outline";
+import LoadingHistorySkeleton from "../shared/LoadingHistorySkeleton";
+import { aspectRatio } from "@/utils/config";
 import { MarkdownView } from "../shared/Markdown";
+import Image from "next/image";
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
+  metadata: TApplicationMetadata;
+  bannerImage: string;
   isError: boolean;
 }) {
+  const bannerRef = useRef<any>(null);
+  const [bannerSize, setBannerSize] = useState({
+    width: 0,
+    height: 0,
+  });
+
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
-
+  const allocatedData: {
+    allocateds: TAllocatedData[];
+    isError: boolean;
+    isLoading: boolean;
+  } = {
+    allocateds: [],
+    isError: false,
+    isLoading: true,
+  };
   const tokenMetadata = microGrant.pool.tokenMetadata;
   const amount = humanReadableAmount(
     microGrant.pool.amount,
@@ -25,13 +51,17 @@ export default function ApplicationDetail(props: {
   );
   const token = tokenMetadata.symbol ?? "ETH";
 
-  // TODO: Wire in name + description
-  // TODO: Wire in logo
-  // TODO: Wire in approvals/ rejection
-  const applicationName = "Papa Kush";
+  useEffect(() => {
+    if (bannerRef.current) {
+      setBannerSize({
+        width: bannerRef.current.offsetWidth,
+        height: Math.ceil(bannerRef.current.offsetWidth / aspectRatio),
+      });
+    }
+  }, [bannerRef]);
 
   const application = {
-    name: applicationName,
+    name: props.metadata?.name,
     status: microGrantRecipient.status,
     amountRequested: `${amount} ${token}`,
     href: "#",
@@ -42,22 +72,13 @@ export default function ApplicationDetail(props: {
         name: `Pool ${microGrant.poolId}`,
         href: `/${microGrant.chainId}/${microGrant.poolId}`,
       },
-      { id: 3, name: applicationName, href: "#" },
+      { id: 3, name: props.metadata?.name, href: "#" },
     ],
     logo: {
-      src: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
-      alt: "Two each of gray, white, and black shirts laying flat.",
+      src: props.bannerImage,
+      alt: props.metadata.name,
     },
-    description:
-      'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
-    highlights: [
-      "Hand cut and sewn locally",
-      "Dyed with our proprietary colors",
-      "Pre-washed & pre-shrunk",
-      "Ultra-soft 100% cotton",
-    ],
-    details:
-      'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
+    description: props.metadata.description,
   };
 
   const overviews = [
@@ -89,13 +110,30 @@ export default function ApplicationDetail(props: {
         {/* Banner */}
         <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            {/* <Image
-              src={application.logo.src}
-              alt={application.logo.alt}
-              className="h-full w-full object-cover object-center"
-              height={100}
-              width={700}
-            /> */}
+            {application.logo.src !== "" ? (
+              <Image
+                src={application.logo.src}
+                alt={application.logo.alt}
+                className="h-full w-full object-cover object-center"
+                width={bannerSize.width}
+                height={bannerSize.height}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: `${bannerSize.width}px`,
+                  height: `${bannerSize.height}px`,
+                  backgroundColor: stringToColor(
+                    props.metadata.name ?? (Math.random() * 10000).toString(),
+                  ),
+                }}
+              >
+                <span className="text-gray-400 text-3xl">
+                  {props.metadata.name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -171,31 +209,66 @@ export default function ApplicationDetail(props: {
             {/* Description and details */}
             <div>
               <h3 className="sr-only">Description</h3>
-
-              <div>
-                <MarkdownView text={application.description} />
-              </div>
+              <MarkdownView text={application.description} />
             </div>
 
             <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900">Highlights</h3>
+              <h3 className="text-sm font-medium text-gray-900">Allocations</h3>
 
               <div className="mt-4">
-                <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  {application.highlights.map((highlight) => (
-                    <li key={highlight} className="text-gray-400">
-                      <span className="text-gray-600">{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-              <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600">{application.details}</p>
+                {/* Allocations */}
+                {!allocatedData.isLoading && !allocatedData.isError ? (
+                  allocatedData.allocateds ? (
+                    <table className="mt-16 w-full whitespace-nowrap text-left text-sm leading-6">
+                      <colgroup>
+                        <col className="w-full" />
+                        <col />
+                      </colgroup>
+                      <thead className="border-b border-gray-200 text-gray-900">
+                        <tr>
+                          <th scope="col" className="px-0 py-3 font-semibold">
+                            Projects
+                          </th>
+                          <th
+                            scope="col"
+                            className="py-3 pl-8 pr-0 text-right font-semibold"
+                          >
+                            Funded
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allocatedData.allocateds.map((item: any) => (
+                          <tr
+                            key={`${item.recipientId} + ${item.chainId}`}
+                            className="border-b border-gray-100"
+                          >
+                            <td className="max-w-0 px-0 py-5 align-top">
+                              <div className="truncate font-medium text-gray-900">
+                                {item.chainId}
+                              </div>
+                              <div className="truncate text-gray-500">
+                                {item.sender}
+                              </div>
+                            </td>
+                            <td className="py-5 pl-8 pr-0 text-right align-top tabular-nums text-gray-700">
+                              {item.amount}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <LoadingHistorySkeleton />
+                  )
+                ) : (
+                  <div className="flex flex-col items-center mt-16 w-full text-center border-t pt-2">
+                    <div>
+                      <InboxIcon className="w-8 h-8" />
+                    </div>
+                    No Allocation History
+                  </div>
+                )}
               </div>
             </div>
           </div>

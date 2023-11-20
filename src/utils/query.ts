@@ -62,58 +62,6 @@ export const getMicroGrantsRecipientsQuery = gql`
   }
 `;
 
-export const getMicroGrantsAllQuery = gql`
-  query getMicroGrantsAllQuery($chainId: String!, $poolId: String!) {
-    microGrant(chainId: $chainId, poolId: $poolId) {
-      poolId
-      chainId
-      strategy
-      allocationStartTime
-      allocationEndTime
-      approvalThreshold
-      maxRequestedAmount
-      pool {
-        tokenMetadata
-        token
-        amount
-        metadataPointer
-        profile {
-          profileId
-          name
-        }
-      }
-      microGrantRecipients {
-        recipientId
-        recipientAddress
-        recipientAddress
-        requestedAmount
-        metadataPointer
-        blockTimestamp
-        isUsingRegistryAnchor
-        status
-      }
-      allocateds {
-        recipientId
-        sender
-        contractAddress
-        contractName
-        chainId
-        amount
-        blockTimestamp
-      }
-      distributeds {
-        recipientId
-        sender
-        contractAddress
-        contractName
-        chainId
-        amount
-        blockTimestamp
-      }
-    }
-  }
-`;
-
 export const getMicroGrantRecipientQuery = gql`
   query getMicroGrantRecipientQuery(
     $chainId: String!
@@ -135,7 +83,17 @@ export const getMicroGrantRecipientQuery = gql`
           token
           amount
         }
+        allocateds {
+          recipientId
+          sender
+          contractAddress
+          contractName
+          chainId
+          amount
+          blockTimestamp
+        }
       }
+      sender
       recipientId
       recipientAddress
       requestedAmount
@@ -143,20 +101,6 @@ export const getMicroGrantRecipientQuery = gql`
       blockTimestamp
       isUsingRegistryAnchor
       status
-    }
-  }
-`;
-
-export const getMicroGrantAllocationsQuery = gql`
-  {
-    allocateds(orderBy: BLOCK_TIMESTAMP_DESC) {
-      recipientId
-      sender
-      contractAddress
-      contractName
-      chainId
-      amount
-      blockTimestamp
     }
   }
 `;
