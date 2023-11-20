@@ -4,10 +4,9 @@ import ApplicationCard from "./ApplicationCard";
 const ApplicationList = (props: {
   applications: TNewApplicationResponse[];
 }) => {
-  console.log("====applications====", props.applications[0]);
 
   return (
-    <div className="flex flex-col pt-10">
+    <div className="flex flex-col pt-10 px-8">
       {props.applications.length > 0 ? (
         <div>
           <ul
@@ -19,7 +18,7 @@ const ApplicationList = (props: {
                 key={application.recipientId}
                 className="overflow-hidden rounded-xl border border-gray-200"
               >
-                <ApplicationCard application={application} />
+                <ApplicationCard application={application}/>
               </li>
             ))}
           </ul>

@@ -110,7 +110,6 @@ export default function PoolOverview(props: {
           <label htmlFor="tabs" className="sr-only">
             Select a tab
           </label>
-          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
           <select
             id="tabs"
             name="tabs"
@@ -135,7 +134,7 @@ export default function PoolOverview(props: {
                     tab.current
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer",
+                    "whitespace-nowrap border-b-2 py-4 px-0.5 text-sm font-medium cursor-pointer"
                   )}
                   aria-current={tab.current ? "page" : undefined}
                 >

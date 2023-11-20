@@ -19,7 +19,7 @@ export default function ApplicationCard(props: {
 
   return (
     <Link href={navLink}>
-      <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+      <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50">
         {props.application.applicationBanner ? (
           <Image
             src={props.application.applicationBanner}
@@ -44,7 +44,7 @@ export default function ApplicationCard(props: {
         )}
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-        <div className="text-sm font-medium leading-6 text-gray-900">
+        <div className="text-sm font-medium leading-6 text-gray-900 py-3">
           {application.metadata!.name}
         </div>
         <div className="flex justify-between gap-x-4 py-3">
@@ -61,6 +61,11 @@ export default function ApplicationCard(props: {
             <div className="font-medium text-gray-900">
               {application.requestedAmount}
             </div>
+          </dd>
+        </div>
+        <div className="flex justify-between gap-x-4 py-3">
+          <dt className="text-gray-500">Status</dt>
+          <dd className="flex items-start gap-x-2">
             <div
               className={classNames(
                 statusColorsScheme[application.status],
