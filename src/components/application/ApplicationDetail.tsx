@@ -8,7 +8,6 @@ import {
   stringToColor,
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
-import Image from "next/image";
 import NotificationToast from "../shared/NotificationToast";
 import { TAllocatedData, TApplicationData } from "@/app/types";
 import { useEffect, useRef, useState } from "react";
@@ -16,8 +15,8 @@ import { getIPFSClient } from "@/services/ipfs";
 import { InboxIcon } from "@heroicons/react/24/outline";
 import LoadingHistorySkeleton from "../shared/LoadingHistorySkeleton";
 import { aspectRatio } from "@/utils/config";
-
-// TODO: Approvals and Rejections should be fetched from the backend
+import { TApplicationData } from "@/app/types";
+import { MarkdownView } from "../shared/Markdown";
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
@@ -244,10 +243,8 @@ export default function ApplicationDetail(props: {
             <div>
               <h3 className="sr-only">Description</h3>
 
-              <div className="space-y-6">
-                <p className="text-base text-gray-900">
-                  {application.description}
-                </p>
+              <div>
+                <MarkdownView text={application.description} />
               </div>
             </div>
 
