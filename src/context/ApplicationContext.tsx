@@ -13,46 +13,50 @@ import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { decodeEventLog } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
+import { pollUntilDataIsIndexed } from "@/utils/common";
+import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
   createApplication: (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ) => Promise<string>;
 }
 
 const initialSteps: TProgressStep[] = [
   {
     id: 0,
-    content: "Saving your banner image to ",
+    content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
     id: 1,
-    content: "Saving your application to ",
-    target: ETarget.IPFS,
-    href: "",
-    status: EProgressStatus.NOT_STARTED,
-  },
-  {
-    id: 2,
     content: "Registering your application on ",
     target: ETarget.POOL,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
+  {
+    id: 2,
+    content: "Indexing your application",
+    target: "",
+    href: "",
+    status: EProgressStatus.NOT_STARTED,
+  },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>({
-  steps: initialSteps,
-  createApplication: async () => {
-    return "";
-  },
-});
+export const ApplicationContext = React.createContext<IApplicationContextProps>(
+  {
+    steps: initialSteps,
+    createApplication: async () => {
+      return "";
+    },
+  }
+);
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
@@ -80,7 +84,7 @@ export const ApplicationContextProvider = (props: {
   const createApplication = async (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ): Promise<string> => {
     const chainInfo = getChain(chain);
 
@@ -101,32 +105,21 @@ export const ApplicationContextProvider = (props: {
     let imagePointer;
     let pointer;
 
-    if (!metadata.base64Image || !metadata.base64Image.includes("base64")) {
-      const newSteps = [...steps];
-      newSteps.shift();
-      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
-      setSteps(newSteps);
-    }
-
     try {
       if (metadata.base64Image.includes("base64")) {
         imagePointer = await ipfsClient.pinJSON({
           data: metadata.base64Image,
         });
         metadata.base64Image = imagePointer.IpfsHash;
-        updateStepHref(0, "https://ipfs.io/ipfs/" + imagePointer.IpfsHash);
-        updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-        updateStepStatus(1, EProgressStatus.IN_PROGRESS);
       }
 
       pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(1, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
-      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
+      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       console.log("IPFS", e);
-      updateStepStatus(1, EProgressStatus.IS_ERROR);
+      updateStepStatus(0, EProgressStatus.IS_ERROR);
     }
 
     // 2. Create profile on registry
@@ -139,7 +132,7 @@ export const ApplicationContextProvider = (props: {
 
     const registerRecipientData = strategy.getRegisterRecipientData({
       recipientAddress: data.recipientAddress as `0x${string}`,
-      requestedAmount: BigInt(data.requestedAmount),
+      requestedAmount: data.requestedAmount,
       metadata: {
         protocol: BigInt(1),
         pointer: pointer.IpfsHash,
@@ -160,7 +153,7 @@ export const ApplicationContextProvider = (props: {
 
       const { logs } = reciept;
       const decodedLogs = logs.map((log) =>
-        decodeEventLog({ ...log, abi: MicroGrantsABI }),
+        decodeEventLog({ ...log, abi: MicroGrantsABI })
       );
 
       recipientId = (decodedLogs[0].args as any)["recipientId"];
@@ -171,12 +164,31 @@ export const ApplicationContextProvider = (props: {
       updateStepTarget(2, `${chainInfo.name} at ${tx.hash}`);
       updateStepHref(
         2,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
 
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       console.log("Registering Application", e);
+      updateStepStatus(1, EProgressStatus.IS_ERROR);
+    }
+
+    // 4. Poll indexer for recipientId
+    try {
+      const pollingData: any = {
+        chainId: chain,
+        poolId: poolId,
+        recipientId: recipientId,
+      };
+      await pollUntilDataIsIndexed(
+        checkIfRecipientIsIndexedQuery,
+        pollingData,
+        "microGrantRecipient"
+      );
+      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
+    } catch (e) {
+      console.log("Polling", e);
       updateStepStatus(2, EProgressStatus.IS_ERROR);
     }
 

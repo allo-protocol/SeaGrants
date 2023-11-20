@@ -51,7 +51,7 @@ export type TApplicationMetadata = {
 };
 
 export type TNewApplication = TApplicationMetadata & {
-  requestedAmount: number;
+  requestedAmount: bigint;
   recipientAddress: `0x${string}`;
   nonce?: number;
 };

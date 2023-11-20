@@ -68,7 +68,7 @@ const ImageUpload = (props: {
                 className="sr-only"
                 onChange={handleFileChange}
               />
-            <span className="pl-1 text-black font-normal">or drag and drop</span>
+              <span className="pl-1 text-black font-normal">or drag and drop</span>
             </label>
           </div>
           <p className="text-xs leading-5 text-gray-600 mt-2">
