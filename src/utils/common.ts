@@ -5,32 +5,17 @@ export function classNames(...classes: string[]) {
 }
 
 export const statusColorsScheme = {
-  Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
   Accepted: "text-green-700 bg-green-50 ring-green-600/20",
+  Active: "text-green-700 bg-green-50 ring-green-600/20",
+  
+  Upcoming: "text-blue-700 bg-blue-50 ring-blue-600/20",
+  Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
+
   Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600/20",
   Rejected: "text-red-700 bg-red-50 ring-red-600/10",
-  Active: "text-green-700 bg-green-50 ring-green-600/20",
-  Closed: "text-red-700 bg-red-50 ring-red-600/10",
+
+  Closed: "text-gray-600 bg-gray-50 ring-gray-500/10",
 };
-
-export function stringToColor2(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let finalHash = hash;
-  for (let i = 0; i < str.length / 2; i++) {
-    finalHash = str.charCodeAt(i) + ((finalHash << 3) - finalHash);
-  }
-  for (let i = 0; i < str.length; i++) {
-    finalHash = str.charCodeAt(i) + ((finalHash << 5) - finalHash);
-  }
-
-  const hue = finalHash % 360;
-  const saturation = 50 + (finalHash % 10);
-  const lightness = 70 + (finalHash % 20); // Adjusted the lightness value
-  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-}
 
 export function stringToColor(text: string) {
   let str = text;
@@ -38,19 +23,18 @@ export function stringToColor(text: string) {
   for (let i = 0; i < str.length / 2; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const r = Math.floor((Math.abs(Math.sin(hash + 0)) * 256) % 256);
-  const g = Math.floor((Math.abs(Math.sin(hash + 1)) * 256) % 256);
-  const b = Math.floor((Math.abs(Math.sin(hash + 2)) * 256) % 256);
+  const r = Math.floor(200 + (Math.abs(Math.sin(hash + 0)) * 56) % 56);
+  const g = Math.floor(200 + (Math.abs(Math.sin(hash + 1)) * 56) % 56);
+  const b = Math.floor(200 + (Math.abs(Math.sin(hash + 2)) * 56) % 56);
 
-  // modulo function on str.length to chose between aa, bb, cc, dd
+  // modulo function on str.length to choose between aa, bb, cc, dd
   const append = ["88", "aa", "66", "99"][str.length % 4];
-  // return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}${append}`;
   return `#${toTwoDigits(r)}${toTwoDigits(g)}${toTwoDigits(b)}${append}`;
 }
 
-function toTwoDigits(n: number) {
-  const hexString = n.toString(16);
-  return hexString.length === 1 ? `${hexString}${hexString}` : hexString;
+function toTwoDigits(value: number) {
+  const hex = value.toString(16);
+  return hex.length === 1 ? `0${hex}` : hex;
 }
 
 export function humanReadableAmount(amount: string, decimals?: number) {
