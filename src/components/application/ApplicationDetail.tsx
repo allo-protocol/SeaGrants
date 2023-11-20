@@ -5,15 +5,17 @@ import {
   humanReadableAmount,
   prettyTimestamp,
   statusColorsScheme,
+  stringToColor,
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
 import NotificationToast from "../shared/NotificationToast";
 import { TAllocatedData, TApplicationData } from "@/app/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getIPFSClient } from "@/services/ipfs";
 import { InboxIcon } from "@heroicons/react/24/outline";
 import LoadingHistorySkeleton from "../shared/LoadingHistorySkeleton";
+import { aspectRatio } from "@/utils/config";
 
 // TODO: Approvals and Rejections should be fetched from the backend
 
@@ -21,9 +23,15 @@ export default function ApplicationDetail(props: {
   application: TApplicationData;
   isError: boolean;
 }) {
+  const bannerRef = useRef<any>(null);
+  const [bannerSize, setBannerSize] = useState({
+    width: 0,
+    height: 0,
+  });
+
   const [metadata, setMetadata] = useState<any>();
-  const [bannerImage, setBannerImage] = useState<any>();
-  console.log("====application====", props.application);
+  const [bannerImage, setBannerImage] = useState<any>("");
+
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
   const allocatedData: {
@@ -38,7 +46,7 @@ export default function ApplicationDetail(props: {
   const tokenMetadata = microGrant.pool.tokenMetadata;
   const amount = humanReadableAmount(
     microGrant.pool.amount,
-    tokenMetadata.decimals
+    tokenMetadata.decimals,
   );
   const token = tokenMetadata.symbol ?? "ETH";
 
@@ -54,16 +62,13 @@ export default function ApplicationDetail(props: {
       };
       try {
         metadata = await ipfsClient.fetchJson(
-          microGrantRecipient.metadataPointer
+          microGrantRecipient.metadataPointer,
         );
 
-        let bannerImage: { data: string } = {
-          data: "https://www.mikeduran.com/wp-content/uploads/2019/02/Solarpink-1.jpg",
-        };
         try {
-          bannerImage = await ipfsClient.fetchJson(metadata.base64Image);
+          const bannerImage = await ipfsClient.fetchJson(metadata.base64Image);
 
-          setBannerImage(bannerImage.data);
+          setBannerImage(bannerImage!.data ? bannerImage.data : "");
         } catch (error) {
           isError = true;
           console.error(error);
@@ -78,6 +83,15 @@ export default function ApplicationDetail(props: {
 
     fetchMetadata();
   }, [microGrantRecipient.metadataPointer]);
+
+  useEffect(() => {
+    if (bannerRef.current) {
+      setBannerSize({
+        width: bannerRef.current.offsetWidth,
+        height: Math.ceil(bannerRef.current.offsetWidth / aspectRatio),
+      });
+    }
+  }, [bannerRef]);
 
   const application = {
     name: metadata?.name,
@@ -129,13 +143,31 @@ export default function ApplicationDetail(props: {
         {/* Banner */}
         <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <Image
-              src={application.logo.src}
-              alt={application.logo.alt}
-              className="h-full w-full object-cover object-center"
-              height={100}
-              width={700}
-            />
+            {application.logo.src !== "" ? (
+              <Image
+                src={application.logo.src}
+                alt={application.logo.alt}
+                className="h-full w-full object-cover object-center"
+                layout="responsive"
+                width={bannerSize.width}
+                height={bannerSize.height}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: `${bannerSize.width}px`,
+                  height: `${bannerSize.height}px`,
+                  backgroundColor: stringToColor(
+                    application.name ?? (Math.random() * 10000).toString(),
+                  ),
+                }}
+              >
+                <span className="text-gray-400 text-3xl">
+                  {application.name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -162,7 +194,7 @@ export default function ApplicationDetail(props: {
                         statusColorsScheme[
                           application.status as keyof typeof statusColorsScheme
                         ],
-                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
                       )}
                     >
                       {application.status.toString()}
@@ -181,7 +213,7 @@ export default function ApplicationDetail(props: {
                     <dd
                       className={classNames(
                         overview.color ? overview.color : "",
-                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
+                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
                       )}
                     >
                       {overview.name}
