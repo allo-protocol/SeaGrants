@@ -1,6 +1,8 @@
 import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
 import PoolOverview from "@/components/pool/PoolOverview";
 import Container from "@/components/shared/Container";
+import { NewPoolContextProvider } from "@/context/NewPoolContext";
+import { PoolContextProvider } from "@/context/PoolContext";
 import { getIPFSClient } from "@/services/ipfs";
 import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
 import request from "graphql-request";
@@ -49,14 +51,16 @@ export default async function Pool({
 
   return (
     <Container>
-      <PoolOverview
-        applications={applications}
-        poolBanner={poolBanner}
-        chainId={params.chainId}
-        poolId={params.poolId}
-        pool={pool}
-        metadata={poolMetadata}
-      />
+      <PoolContextProvider chainId={params.chainId} poolId={params.poolId}>
+        <PoolOverview
+          applications={applications}
+          poolBanner={poolBanner}
+          chainId={params.chainId}
+          poolId={params.poolId}
+          pool={pool}
+          metadata={poolMetadata}
+        />
+      </PoolContextProvider>
     </Container>
   );
 }

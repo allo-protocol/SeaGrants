@@ -143,7 +143,7 @@ export const ApplicationContextProvider = (props: {
       const tx = await sendTransaction({
         to: registerRecipientData.to as string,
         data: registerRecipientData.data,
-        value: BigInt(1),
+        value: BigInt(registerRecipientData.value),
       });
 
       const reciept =

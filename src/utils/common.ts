@@ -66,10 +66,9 @@ export const prettyTimestamp = (timestamp: number) => {
   return `${date.toLocaleDateString()}`;
 };
 
-export const getPoolStatus = (
-  startDate: number,
-  endDate: number
-): EPoolStatus => {
+export const ethereumAddressRegExp = /^(0x)?[0-9a-fA-F]{40}$/;
+
+export const getPoolStatus = (startDate: number, endDate: number): EPoolStatus => {
   const now = new Date().getTime() / 1000;
   const start = new Date(startDate).getTime();
   const end = new Date(endDate).getTime();

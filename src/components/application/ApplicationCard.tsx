@@ -25,7 +25,6 @@ export default function ApplicationCard(props: {
             src={props.application.applicationBanner}
             alt="applicationBanner"
             className="h-full w-full object-cover object-center"
-            layout="responsive"
             width={bannerSize.width}
             height={bannerSize.height}
           />
@@ -70,7 +69,7 @@ export default function ApplicationCard(props: {
             <div
               className={classNames(
                 statusColorsScheme[application.status],
-                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
               )}
             >
               {application.status.toString()}
