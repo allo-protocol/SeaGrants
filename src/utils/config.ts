@@ -1,1 +1,1 @@
-export const aspectRatio = 7 / 1;
+export const aspectRatio = 7 / 2;

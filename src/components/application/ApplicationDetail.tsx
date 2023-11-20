@@ -213,7 +213,7 @@ export default function ApplicationDetail(props: {
             </div>
 
             <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900">Allocations</h3>
+              <h3 className="text-sm font-medium text-gray-900 border-t pt-10">Allocations</h3>
 
               <div className="mt-4">
                 {/* Allocations */}
@@ -262,11 +262,11 @@ export default function ApplicationDetail(props: {
                     <LoadingHistorySkeleton />
                   )
                 ) : (
-                  <div className="flex flex-col items-center mt-16 w-full text-center border-t pt-2">
-                    <div>
-                      <InboxIcon className="w-8 h-8" />
-                    </div>
-                    No Allocation History
+                  <div className="flex flex-col items-center mt-8 w-full text-center pt-2">
+                    <InboxIcon className="mb-4 w-8 h-8 mx-auto"/>
+                    <p>
+                      No Allocation History
+                    </p>
                   </div>
                 )}
               </div>
