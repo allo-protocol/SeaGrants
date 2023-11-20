@@ -2,6 +2,7 @@ import { TPoolData } from "@/app/types";
 import { getIPFSClient } from "@/services/ipfs";
 import {
   classNames,
+  getPoolStatus,
   humanReadableAmount,
   isPoolActive,
   prettyTimestamp,
@@ -9,7 +10,6 @@ import {
   stringToColor,
 } from "@/utils/common";
 import Link from "next/link";
-import { formatEther } from "viem";
 
 const PoolCard = async ({ pool }: { pool: TPoolData }) => {
   const poolDetail = pool.pool;
@@ -52,9 +52,7 @@ const PoolCard = async ({ pool }: { pool: TPoolData }) => {
         <div
           className={classNames(
             statusColorsScheme[
-              isActive
-                ? ("Active" as keyof typeof statusColorsScheme)
-                : ("Ended" as keyof typeof statusColorsScheme)
+              getPoolStatus(pool.allocationStartTime, pool.allocationEndTime)
             ],
             "flex rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
           )}

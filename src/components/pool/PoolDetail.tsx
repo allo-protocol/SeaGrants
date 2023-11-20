@@ -1,10 +1,10 @@
 import { EPoolStatus, TPoolData, TPoolMetadata } from "@/app/types";
 import {
   classNames,
+  getPoolStatus,
   humanReadableAmount,
   statusColorsScheme,
 } from "@/utils/common";
-import { useRouter } from "next/navigation";
 import { MarkdownView } from "../shared/Markdown";
 import Link from "next/link";
 
@@ -15,33 +15,12 @@ export const PoolDetail = (props: {
   metadata: TPoolMetadata;
   poolBanner: string | undefined;
 }) => {
-  const router = useRouter();
-
-  const poolStatus = (startDate: number, endDate: number): EPoolStatus => {
-    const now = new Date().getTime() / 1000;
-    const start = new Date(startDate).getTime();
-    const end = new Date(endDate).getTime();
-
-    if (now < start) {
-      return EPoolStatus.UPCOMING;
-    } else if (now > end) {
-      return EPoolStatus.ENDED;
-    } else {
-      return EPoolStatus.ACTIVE;
-    }
-  };
 
   const getStatusPill = (status: EPoolStatus) => {
-    const colorScheme =
-      status === "Upcoming"
-        ? statusColorsScheme.Pending
-        : status === "Active"
-        ? statusColorsScheme.Accepted
-        : statusColorsScheme.Rejected;
     return (
       <div
         className={classNames(
-          colorScheme,
+          statusColorsScheme[status],
           "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
         )}
       >
@@ -51,7 +30,7 @@ export const PoolDetail = (props: {
     );
   };
 
-  const status: EPoolStatus = poolStatus(
+  const status: EPoolStatus = getPoolStatus(
     props.pool.allocationStartTime,
     props.pool.allocationEndTime,
   );

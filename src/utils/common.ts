@@ -1,3 +1,4 @@
+import { EPoolStatus } from "@/app/types";
 import { formatUnits } from "viem";
 
 export function classNames(...classes: string[]) {
@@ -61,4 +62,18 @@ export const prettyTimestamp = (timestamp: number) => {
   const date = new Date(timestamp * 1000);
 
   return `${date.toLocaleDateString()}`;
+};
+
+export const getPoolStatus = (startDate: number, endDate: number): EPoolStatus => {
+  const now = new Date().getTime() / 1000;
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+
+  if (now < start) {
+    return EPoolStatus.UPCOMING;
+  } else if (now > end) {
+    return EPoolStatus.ENDED;
+  } else {
+    return EPoolStatus.ACTIVE;
+  }
 };
