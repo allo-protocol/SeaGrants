@@ -18,11 +18,13 @@ const schema = yup.object({
   website: yup.string().required().url("Must be a valid website address"),
   description: yup.string().required().min(10, "Must be at least 150 words"),
   email: yup.string().required().min(3).email("Must be a valid email address"),
-  requestedAmount: yup.string().test(
-    'is-number',
-    'Requested amount is required',
-    value => !isNaN(Number(value))
-  ),
+  requestedAmount: yup
+    .string()
+    .test(
+      "is-number",
+      "Requested amount is required",
+      (value) => !isNaN(Number(value))
+    ),
   recipientAddress: yup.string().required("Recipient address is required"),
   profileOwner: yup.string().required("A profile owner is required"),
   nonce: yup.number().required("A nonce is required").min(1),
@@ -71,7 +73,7 @@ export default function ApplicationForm() {
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),
-      Number(poolId),
+      Number(poolId)
     );
 
     setTimeout(() => {

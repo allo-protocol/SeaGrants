@@ -21,7 +21,7 @@ export interface IApplicationContextProps {
   createApplication: (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ) => Promise<string>;
 }
 
@@ -49,12 +49,14 @@ const initialSteps: TProgressStep[] = [
   },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>({
-  steps: initialSteps,
-  createApplication: async () => {
-    return "";
-  },
-});
+export const ApplicationContext = React.createContext<IApplicationContextProps>(
+  {
+    steps: initialSteps,
+    createApplication: async () => {
+      return "";
+    },
+  }
+);
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
@@ -82,7 +84,7 @@ export const ApplicationContextProvider = (props: {
   const createApplication = async (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ): Promise<string> => {
     const chainInfo = getChain(chain);
 
@@ -151,7 +153,7 @@ export const ApplicationContextProvider = (props: {
 
       const { logs } = reciept;
       const decodedLogs = logs.map((log) =>
-        decodeEventLog({ ...log, abi: MicroGrantsABI }),
+        decodeEventLog({ ...log, abi: MicroGrantsABI })
       );
 
       recipientId = (decodedLogs[0].args as any)["recipientId"];
@@ -162,12 +164,11 @@ export const ApplicationContextProvider = (props: {
       updateStepTarget(2, `${chainInfo.name} at ${tx.hash}`);
       updateStepHref(
         2,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
 
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
       updateStepStatus(2, EProgressStatus.IN_PROGRESS);
-
     } catch (e) {
       console.log("Registering Application", e);
       updateStepStatus(1, EProgressStatus.IS_ERROR);
@@ -179,8 +180,12 @@ export const ApplicationContextProvider = (props: {
         chainId: chain,
         poolId: poolId,
         recipientId: recipientId,
-      }
-      await pollUntilDataIsIndexed(checkIfRecipientIsIndexedQuery, pollingData, "microGrantRecipient");
+      };
+      await pollUntilDataIsIndexed(
+        checkIfRecipientIsIndexedQuery,
+        pollingData,
+        "microGrantRecipient"
+      );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
     } catch (e) {
       console.log("Polling", e);
