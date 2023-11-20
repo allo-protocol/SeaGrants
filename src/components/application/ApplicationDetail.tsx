@@ -1,27 +1,33 @@
 "use client";
 
-import { classNames, humanReadableAmount, prettyTimestamp, statusColorsScheme } from "@/utils/common";
+import {
+  classNames,
+  humanReadableAmount,
+  prettyTimestamp,
+  statusColorsScheme,
+} from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
-import Image from "next/image";
 import NotificationToast from "../shared/NotificationToast";
 import { TApplicationData } from "@/app/types";
-import { formatEther } from "viem";
+import { MarkdownView } from "../shared/Markdown";
 
 export default function ApplicationDetail(props: {
-  application: TApplicationData,
-  isError: boolean,
+  application: TApplicationData;
+  isError: boolean;
 }) {
-
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
 
   const tokenMetadata = microGrant.pool.tokenMetadata;
-  const amount = humanReadableAmount(microGrant.pool.amount, tokenMetadata.decimals);
+  const amount = humanReadableAmount(
+    microGrant.pool.amount,
+    tokenMetadata.decimals,
+  );
   const token = tokenMetadata.symbol ?? "ETH";
 
   // TODO: Wire in name + description
   // TODO: Wire in logo
-  // TODO: Wire in approvals/ rejection 
+  // TODO: Wire in approvals/ rejection
   const applicationName = "Papa Kush";
 
   const application = {
@@ -31,7 +37,11 @@ export default function ApplicationDetail(props: {
     href: "#",
     breadcrumbs: [
       { id: 1, name: "Home", href: "/" },
-      { id: 2, name: `Pool ${microGrant.poolId}`, href: `/${microGrant.chainId}/${microGrant.poolId}` },
+      {
+        id: 2,
+        name: `Pool ${microGrant.poolId}`,
+        href: `/${microGrant.chainId}/${microGrant.poolId}`,
+      },
       { id: 3, name: applicationName, href: "#" },
     ],
     logo: {
@@ -52,17 +62,25 @@ export default function ApplicationDetail(props: {
 
   const overviews = [
     { description: "Amount", name: application.amountRequested },
-    { description: "Start Date", name: prettyTimestamp(microGrant.allocationStartTime) },
-    { description: "End Date", name: prettyTimestamp(microGrant.allocationEndTime) },
+    {
+      description: "Start Date",
+      name: prettyTimestamp(microGrant.allocationStartTime),
+    },
+    {
+      description: "End Date",
+      name: prettyTimestamp(microGrant.allocationEndTime),
+    },
     { description: "Approvals", name: "2", color: "text-green-700" },
     { description: "Rejections", name: "3", color: "text-red-700" },
   ];
 
   return (
     <div className="bg-white">
-
       {props.isError && (
-        <NotificationToast success={false} title="Unable to fetch application" />
+        <NotificationToast
+          success={false}
+          title="Unable to fetch application"
+        />
       )}
 
       <div className="pt-6">
@@ -154,10 +172,8 @@ export default function ApplicationDetail(props: {
             <div>
               <h3 className="sr-only">Description</h3>
 
-              <div className="space-y-6">
-                <p className="text-base text-gray-900">
-                  {application.description}
-                </p>
+              <div>
+                <MarkdownView text={application.description} />
               </div>
             </div>
 

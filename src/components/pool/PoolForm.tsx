@@ -11,6 +11,7 @@ import { useNetwork } from "wagmi";
 import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";
 import ImageUpload from "../shared/ImageUpload";
+import { MarkdownEditor } from "../shared/Markdown";
 
 const schema = yup.object({
   profileId: yup.string().required("Recipient address is required"),
@@ -20,10 +21,9 @@ const schema = yup.object({
   fundPoolAmount: yup.number().required("fund pool amount is required"),
   maxAmount: yup.number().required("max amount is required"),
   approvalThreshold: yup.number().required("approval threshold is required"),
-  // base64Image: yup.string().required().url("Must be a valid image url"),
   startDate: yup.date().required("Start time is required"),
   endDate: yup.date().required("End time is required"),
-  tokenAddress: yup.string().required("Token address is required"),
+  tokenAddress: yup.string().notRequired(),
   useRegistryAnchor: yup.boolean().required("Registry anchor is required"),
 });
 
@@ -43,6 +43,7 @@ export default function PoolForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -84,6 +85,10 @@ export default function PoolForm() {
       setIsOpen(false);
       router.push(`/${chainId}/${poolId}`);
     }, 1000);
+  };
+
+  const setText = (text: string) => {
+    setValue("description", text);
   };
 
   return (
@@ -191,30 +196,26 @@ export default function PoolForm() {
 
             <div className="col-span-full">
               <label
-                htmlFor="about"
+                htmlFor="description"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
                 Description
               </label>
-              <div className="mt-2">
-                <textarea
-                  {...register("description")}
-                  id="description"
-                  name="description"
-                  rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={""}
-                />
-              </div>
+              <MarkdownEditor setText={setText} />
+              {/* Register the "description" field */}
+              <input
+                {...register("description")}
+                type="hidden" // Hidden because MarkdownEditor handles the input
+              />
+              <p className="text-xs leading-5 text-gray-600 mt-2">
+                Write a brief description about the pool and who is allowed to
+                apply
+              </p>
               <div>
                 {errors.description && (
                   <Error message={errors.description?.message!} />
                 )}
               </div>
-              <p className="text-xs leading-5 text-gray-600 mt-2">
-                Write a brief description about the pool and who is allowed to
-                apply
-              </p>
             </div>
 
             <div className="sm:col-span-full">
