@@ -6,6 +6,7 @@ import {
 } from "@/utils/common";
 import { useRouter } from "next/navigation";
 import { MarkdownView } from "../shared/Markdown";
+import Link from "next/link";
 
 export const PoolDetail = (props: {
   chainId: string;
@@ -74,7 +75,7 @@ export const PoolDetail = (props: {
     },
     {
       description: "Request Amount",
-      name: `max ${humanReadableAmount(
+      name: `${humanReadableAmount(
         props.pool.maxRequestedAmount,
         tokenMetadata.decimals,
       )} ${tokenMetadata.symbol ?? "ETH"}`,
@@ -139,20 +140,20 @@ export const PoolDetail = (props: {
             ))}
           </dl>
         </div>
-        <button
-          disabled={status !== "Active"}
-          onClick={() => {
-            router.push(`/${props.chainId}/${props.poolId}/new`);
-          }}
-          type="submit"
-          className={`mt-10 flex w-full items-center justify-center rounded-md border border-transparent ${
-            status === "Active"
+        
+        <Link href={status == "Active" ? `/${props.chainId}/${props.poolId}/new` : ""}>
+          <button
+            disabled={status !== "Active"}
+            type="submit"
+            className={`mt-10 flex w-full items-center justify-center rounded-md border border-transparent ${
+              status === "Active"
               ? "bg-indigo-600 text-white hover:bg-indigo-700"
               : "bg-indigo-100 text-white hover:bg-indigo-200"
-          } px-8 py-3 text-base font-medium  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
-        >
-          Apply
-        </button>
+            } px-8 py-3 text-base font-medium  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+            >
+            Apply
+          </button>
+        </Link>
       </div>
 
       <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">

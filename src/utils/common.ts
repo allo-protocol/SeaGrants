@@ -8,9 +8,9 @@ export const statusColorsScheme = {
   Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
   Accepted: "text-green-700 bg-green-50 ring-green-600/20",
   Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600/20",
-  Rejected: "text-red-700 bg-red-50 ring-red-600/20",
+  Rejected: "text-red-700 bg-red-50 ring-red-600/10",
   Active: "text-green-700 bg-green-50 ring-green-600/20",
-  Closed: "text-red-700 bg-red-50 ring-red-600/20",
+  Closed: "text-red-700 bg-red-50 ring-red-600/10",
 };
 
 export function stringToColor2(str: string) {
@@ -28,7 +28,7 @@ export function stringToColor2(str: string) {
 
   const hue = finalHash % 360;
   const saturation = 50 + (finalHash % 10);
-  const lightness = 40 + (finalHash % 10);
+  const lightness = 70 + (finalHash % 20); // Adjusted the lightness value
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
@@ -54,7 +54,15 @@ function toTwoDigits(n: number) {
 }
 
 export function humanReadableAmount(amount: string, decimals?: number) {
-  return Number(formatUnits(BigInt(amount), decimals || 18)).toFixed(5);
+  const amountInUnits = Number(formatUnits(BigInt(amount), decimals || 18));
+
+  for (let i = 5; i <= 10; i++) {
+    const formattedValue = amountInUnits.toFixed(i);
+    if (Number(formattedValue) !== 0) {
+      return formattedValue;
+    }
+  }
+  return amountInUnits.toFixed(10);
 }
 
 export function isPoolActive(

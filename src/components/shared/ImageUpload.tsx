@@ -54,7 +54,7 @@ const ImageUpload = (props: {
           {preview !== "" && (
             <img style={{ maxWidth: "300px" }} src={preview} />
           )}
-          <div className="mt-4 flex text-sm leading-6 text-gray-600">
+          <div className="mt-4 text-sm leading-6 text-gray-600">
             <label
               htmlFor="imageUrl"
               className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
@@ -68,8 +68,8 @@ const ImageUpload = (props: {
                 className="sr-only"
                 onChange={handleFileChange}
               />
+            <span className="pl-1 text-black font-normal">or drag and drop</span>
             </label>
-            <p className="pl-1">or drag and drop</p>
           </div>
           <p className="text-xs leading-5 text-gray-600 mt-2">
             PNG, JPG up to 5MB

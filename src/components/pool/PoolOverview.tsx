@@ -37,9 +37,6 @@ export default function PoolOverview(props: {
     },
   ];
 
-  console.log("====pool====", props.pool);
-  console.log("====metadata====", props.metadata);
-
   // select the current tab by name
   const onTabClick = (tabName: string) => {
     setTabs((tabs) =>
@@ -100,7 +97,6 @@ export default function PoolOverview(props: {
           <label htmlFor="tabs" className="sr-only">
             Select a tab
           </label>
-          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
           <select
             id="tabs"
             name="tabs"
@@ -115,7 +111,7 @@ export default function PoolOverview(props: {
           </select>
         </div>
         <div className="hidden sm:block px-8 pt-10">
-          <div className="border-b border-gray-200 w-80">
+          <div className="border-b border-gray-200 w-52">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
               {tabs.map((tab) => (
                 <span
@@ -125,7 +121,7 @@ export default function PoolOverview(props: {
                     tab.current
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer"
+                    "whitespace-nowrap border-b-2 py-4 px-0.5 text-sm font-medium cursor-pointer"
                   )}
                   aria-current={tab.current ? "page" : undefined}
                 >
@@ -146,7 +142,9 @@ export default function PoolOverview(props: {
             metadata={props.metadata}
           />
         ) : (
-          <ApplicationList applications={props.applications} />
+          <ApplicationList
+            applications={props.applications}
+          />
         )}
       </div>
     </div>
