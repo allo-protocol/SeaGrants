@@ -2,7 +2,7 @@
 
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
-import { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useParams } from "next/navigation";
@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ethereumAddressRegExp } from "@/utils/common";
 import { SetAllocatorData } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { PoolContext } from "@/context/PoolContext";
+import Tooltip from "../shared/Tooltip";
 
 const schema = yup.object().shape({
   allocators: yup.array().of(
@@ -77,6 +78,52 @@ export default function PoolAllocatorForm() {
     );
   };
 
+  const handleCSVUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const text = await file.text();
+
+      const rows = text.split("\n");
+      const newAllocators: { address: string; action: string }[] = [];
+      rows.map((row) => {
+        const [address, action] = row.split(",");
+        // if address matches ethereumAddressRegExp add to newAllocators
+        if (address.match(ethereumAddressRegExp)) {
+          newAllocators.push({
+            address,
+            action: action?.replace(" ", "") === "false" ? "false" : "true",
+          });
+        }
+      });
+
+      updateAllocators(newAllocators);
+    }
+  };
+
+  const updateAllocators = (
+    newAllocators: { address: string; action: string }[],
+  ) => {
+    if (allocators.length === 1 && allocators[0].address === "") {
+      dedupeAllocators(newAllocators);
+    } else {
+      dedupeAllocators([...allocators, ...newAllocators]);
+    }
+  };
+
+  const dedupeAllocators = (data: { address: string; action: string }[]) => {
+    const uniqueAllocators = Array.from(
+      new Map(
+        [...data].map((allocator) => [allocator.address, allocator]),
+      ).values(),
+    );
+
+    setAllocators(uniqueAllocators);
+    setValue("allocators", uniqueAllocators);
+  };
+
   return (
     <form onSubmit={handleSubmit(onHandleSubmit)}>
       <div className="space-y-12">
@@ -92,6 +139,41 @@ export default function PoolAllocatorForm() {
 
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-6">
+              <div className="flex relative">
+                <button
+                  className="w-full text-right text-sm font-medium text-gray-900 py-3 px-1 group-hover:opacity-90"
+                  type="button"
+                  onClick={() => {
+                    document.getElementById("csvFileUpload")!.click();
+                  }}
+                >
+                  <span className="font-bold">&#x21A5;</span>&nbsp;Upload CSV
+                </button>
+                <Tooltip>
+                  <div className="font-bold mt-0.5 pl-1">Allowed formats:</div>
+                  <div className="font-semibold font-mono mt-0.5 pl-1">
+                    address,(bool)
+                  </div>
+                  <div className="font-normal font-mono pl-1">0x123..89</div>
+                  <div className="font-normal font-mono pl-1">
+                    0x456..7a,false
+                  </div>
+                  <div className="font-normal font-mono pl-1">
+                    0x123..89,true
+                  </div>
+                  <div className="font-semibold mt-0.5 pl-1">Legend:</div>
+                  <div className="font-normal pl-1">No bool &#x2192; Add</div>
+                  <div className="font-normal pl-1">true &#x2192; Add</div>
+                  <div className="font-normal pl-1">false &#x2192; Remove</div>
+                </Tooltip>
+              </div>
+              <input
+                type="file"
+                id="csvFileUpload"
+                name="csvFileUpload"
+                className="hidden"
+                onChange={handleCSVUpload}
+              />{" "}
               <table className="w-full text-sm font-medium text-gray-900">
                 <thead>
                   <tr>
@@ -106,8 +188,8 @@ export default function PoolAllocatorForm() {
                 </thead>
                 <tbody>
                   {allocators.map((allocator, index: number) => (
-                    <>
-                      <tr key={index}>
+                    <React.Fragment key={index}>
+                      <tr key={`fragment-${index}`}>
                         <td
                           className={`w-full px-3 ${
                             !errors?.allocators?.[index]?.address && "py-1.5"
@@ -126,8 +208,12 @@ export default function PoolAllocatorForm() {
                             {...register(`allocators.${index}.action`)}
                             className="block w-full border-0 bg-transparent py-1.5 px-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                           >
-                            <option value="true">Add</option>
-                            <option value="false">Remove</option>
+                            <option id={`option[${index}].true`} value="true">
+                              Add
+                            </option>
+                            <option id={`option[${index}].false`} value="false">
+                              Remove
+                            </option>
                           </select>
                         </td>
                         <td className="">
@@ -154,7 +240,7 @@ export default function PoolAllocatorForm() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
@@ -164,6 +250,16 @@ export default function PoolAllocatorForm() {
                 onClick={addAllocator}
               >
                 &#10010;&nbsp;Add Row
+              </button>
+              <button
+                className="w-full text-right text-sm font-medium text-gray-900 px-6"
+                type="button"
+                onClick={() => {
+                  setAllocators([{ address: "", action: "true" }]);
+                  setValue("allocators", [{ address: "", action: "true" }]);
+                }}
+              >
+                <span className="font-bold">&#x2298;</span>&nbsp;Clear
               </button>
               <div className="w-full mt-6 flex items-center justify-end gap-x-6 px-6">
                 <button
