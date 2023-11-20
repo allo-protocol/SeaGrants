@@ -1,13 +1,15 @@
 "use client";
 
 import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Breadcrumb from "../shared/Breadcrumb";
 import Image from "next/image";
 import { aspectRatio } from "@/utils/config";
 import { classNames, stringToColor } from "@/utils/common";
 import PoolDetail from "./PoolDetail";
 import ApplicationList from "../application/ApplicationList";
+import { PoolContext } from "@/context/PoolContext";
+import PoolManagement from "./PoolManagement";
 
 export default function PoolOverview(props: {
   chainId: string;
@@ -17,6 +19,8 @@ export default function PoolOverview(props: {
   poolBanner: string | undefined;
   applications: TNewApplicationResponse[];
 }) {
+  const { isPoolManager } = useContext(PoolContext);
+
   const bannerRef = useRef<any>(null);
   const [bannerSize, setBannerSize] = useState({
     width: 0,
@@ -37,16 +41,13 @@ export default function PoolOverview(props: {
     },
   ];
 
-  console.log("====pool====", props.pool);
-  console.log("====metadata====", props.metadata);
-
   // select the current tab by name
   const onTabClick = (tabName: string) => {
     setTabs((tabs) =>
       tabs.map((tab) => ({
         ...tab,
         current: tab.name === tabName,
-      }))
+      })),
     );
   };
 
@@ -58,6 +59,16 @@ export default function PoolOverview(props: {
       });
     }
   }, [bannerRef]);
+
+  useEffect(() => {
+    if (isPoolManager) {
+      setTabs([
+        { name: "Pool Details", current: true },
+        { name: "Applications", current: false },
+        { name: "Manage Pool", current: false },
+      ]);
+    }
+  }, [isPoolManager]);
 
   const currentTab = tabs.find((tab) => tab.current)?.name;
 
@@ -74,7 +85,6 @@ export default function PoolOverview(props: {
                 src={props.poolBanner}
                 alt="poolBanner"
                 className="h-full w-full object-cover object-center"
-                layout="responsive"
                 width={bannerSize.width}
                 height={bannerSize.height}
               />
@@ -85,7 +95,7 @@ export default function PoolOverview(props: {
                   width: `${bannerSize.width}px`,
                   height: `${bannerSize.height}px`,
                   backgroundColor: stringToColor(
-                    props.metadata.name ?? (Math.random() * 10000).toString()
+                    props.metadata.name ?? (Math.random() * 10000).toString(),
                   ),
                 }}
               >
@@ -116,7 +126,7 @@ export default function PoolOverview(props: {
         </div>
         <div className="hidden sm:block px-8 pt-10">
           <div className="border-b border-gray-200 w-80">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+            <nav className="-mb-px flex space-x-4" aria-label="Tabs">
               {tabs.map((tab) => (
                 <span
                   onClick={() => onTabClick(tab.name)}
@@ -125,7 +135,7 @@ export default function PoolOverview(props: {
                     tab.current
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer"
+                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer",
                   )}
                   aria-current={tab.current ? "page" : undefined}
                 >
@@ -137,7 +147,7 @@ export default function PoolOverview(props: {
         </div>
 
         {/* Pool info */}
-        {currentTab === "Pool Details" ? (
+        {currentTab === "Pool Details" && (
           <PoolDetail
             poolBanner={props.poolBanner}
             chainId={props.chainId}
@@ -145,9 +155,11 @@ export default function PoolOverview(props: {
             pool={props.pool}
             metadata={props.metadata}
           />
-        ) : (
+        )}
+        {currentTab == "Applications" && (
           <ApplicationList applications={props.applications} />
         )}
+        {currentTab == "Manage Pool" && <PoolManagement />}
       </div>
     </div>
   );

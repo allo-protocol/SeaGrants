@@ -1,6 +1,7 @@
 import { TApplicationData, TApplicationMetadata } from "@/app/types";
 import ApplicationDetail from "@/components/application/ApplicationDetail";
 import Container from "@/components/shared/Container";
+import { PoolContextProvider } from "@/context/PoolContext";
 import { getIPFSClient } from "@/services/ipfs";
 import { graphqlEndpoint, getMicroGrantRecipientQuery } from "@/utils/query";
 import request from "graphql-request";
@@ -44,12 +45,14 @@ export default async function Application({
 
   return (
     <Container>
-      <ApplicationDetail
-        application={recipient}
-        metadata={metadata}
-        bannerImage={banner}
-        isError={isError}
-      />
+      <PoolContextProvider chainId={params.chainId} poolId={params.poolId}>
+        <ApplicationDetail
+          application={recipient}
+          metadata={metadata}
+          bannerImage={banner}
+          isError={isError}
+        />
+      </PoolContextProvider>
     </Container>
   );
 }
