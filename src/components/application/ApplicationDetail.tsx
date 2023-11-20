@@ -9,17 +9,22 @@ import {
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import NotificationToast from "../shared/NotificationToast";
-import { TAllocatedData, TApplicationData } from "@/app/types";
+import {
+  TAllocatedData,
+  TApplicationData,
+  TApplicationMetadata,
+} from "@/app/types";
 import { useEffect, useRef, useState } from "react";
-import { getIPFSClient } from "@/services/ipfs";
 import { InboxIcon } from "@heroicons/react/24/outline";
 import LoadingHistorySkeleton from "../shared/LoadingHistorySkeleton";
 import { aspectRatio } from "@/utils/config";
-import { TApplicationData } from "@/app/types";
 import { MarkdownView } from "../shared/Markdown";
+import Image from "next/image";
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
+  metadata: TApplicationMetadata;
+  bannerImage: string;
   isError: boolean;
 }) {
   const bannerRef = useRef<any>(null);
@@ -27,9 +32,6 @@ export default function ApplicationDetail(props: {
     width: 0,
     height: 0,
   });
-
-  const [metadata, setMetadata] = useState<any>();
-  const [bannerImage, setBannerImage] = useState<any>("");
 
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
@@ -49,40 +51,6 @@ export default function ApplicationDetail(props: {
   );
   const token = tokenMetadata.symbol ?? "ETH";
 
-  let isError = false;
-
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      const ipfsClient = getIPFSClient();
-      const DEFAULT_NAME = `Pool ${microGrant.poolId}`;
-      let metadata = {
-        name: DEFAULT_NAME,
-        base64Image: "",
-      };
-      try {
-        metadata = await ipfsClient.fetchJson(
-          microGrantRecipient.metadataPointer,
-        );
-
-        try {
-          const bannerImage = await ipfsClient.fetchJson(metadata.base64Image);
-
-          setBannerImage(bannerImage!.data ? bannerImage.data : "");
-        } catch (error) {
-          isError = true;
-          console.error(error);
-        }
-      } catch {
-        isError = true;
-        console.log("IPFS", "Unable to fetch metadata");
-      }
-      if (metadata.name === undefined) metadata.name = DEFAULT_NAME;
-      setMetadata(metadata);
-    };
-
-    fetchMetadata();
-  }, [microGrantRecipient.metadataPointer]);
-
   useEffect(() => {
     if (bannerRef.current) {
       setBannerSize({
@@ -93,7 +61,7 @@ export default function ApplicationDetail(props: {
   }, [bannerRef]);
 
   const application = {
-    name: metadata?.name,
+    name: props.metadata?.name,
     status: microGrantRecipient.status,
     amountRequested: `${amount} ${token}`,
     href: "#",
@@ -104,13 +72,13 @@ export default function ApplicationDetail(props: {
         name: `Pool ${microGrant.poolId}`,
         href: `/${microGrant.chainId}/${microGrant.poolId}`,
       },
-      { id: 3, name: metadata?.name, href: "#" },
+      { id: 3, name: props.metadata?.name, href: "#" },
     ],
     logo: {
-      src: bannerImage,
-      alt: metadata?.name,
+      src: props.bannerImage,
+      alt: props.metadata.name,
     },
-    description: metadata?.description,
+    description: props.metadata.description,
   };
 
   const overviews = [
@@ -147,7 +115,6 @@ export default function ApplicationDetail(props: {
                 src={application.logo.src}
                 alt={application.logo.alt}
                 className="h-full w-full object-cover object-center"
-                layout="responsive"
                 width={bannerSize.width}
                 height={bannerSize.height}
               />
@@ -158,12 +125,12 @@ export default function ApplicationDetail(props: {
                   width: `${bannerSize.width}px`,
                   height: `${bannerSize.height}px`,
                   backgroundColor: stringToColor(
-                    application.name ?? (Math.random() * 10000).toString(),
+                    props.metadata.name ?? (Math.random() * 10000).toString(),
                   ),
                 }}
               >
                 <span className="text-gray-400 text-3xl">
-                  {application.name}
+                  {props.metadata.name}
                 </span>
               </div>
             )}
@@ -242,10 +209,7 @@ export default function ApplicationDetail(props: {
             {/* Description and details */}
             <div>
               <h3 className="sr-only">Description</h3>
-
-              <div>
-                <MarkdownView text={application.description} />
-              </div>
+              <MarkdownView text={application.description} />
             </div>
 
             <div className="mt-10">
