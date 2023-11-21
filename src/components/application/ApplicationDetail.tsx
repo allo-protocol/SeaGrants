@@ -213,7 +213,9 @@ export default function ApplicationDetail(props: {
             </div>
 
             <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900 border-t pt-10">Allocations</h3>
+              <h3 className="text-sm font-medium text-gray-900 border-t pt-10">
+                Allocations
+              </h3>
 
               <div className="mt-4">
                 {/* Allocations */}
@@ -240,7 +242,9 @@ export default function ApplicationDetail(props: {
                       <tbody>
                         {allocatedData.allocateds.map((item: any) => (
                           <tr
-                            key={`${item.recipientId} + ${item.chainId}`}
+                            key={`${item.recipientId.toLowerCase()} + ${
+                              item.chainId
+                            }`}
                             className="border-b border-gray-100"
                           >
                             <td className="max-w-0 px-0 py-5 align-top">
@@ -263,10 +267,8 @@ export default function ApplicationDetail(props: {
                   )
                 ) : (
                   <div className="flex flex-col items-center mt-8 w-full text-center pt-2">
-                    <InboxIcon className="mb-4 w-8 h-8 mx-auto"/>
-                    <p>
-                      No Allocation History
-                    </p>
+                    <InboxIcon className="mb-4 w-8 h-8 mx-auto" />
+                    <p>No Allocation History</p>
                   </div>
                 )}
               </div>

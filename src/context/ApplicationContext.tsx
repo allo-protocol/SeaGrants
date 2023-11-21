@@ -153,10 +153,10 @@ export const ApplicationContextProvider = (props: {
 
       const { logs } = reciept;
       const decodedLogs = logs.map((log) =>
-        decodeEventLog({ ...log, abi: MicroGrantsABI })
+        decodeEventLog({ ...log, abi: MicroGrantsABI }),
       );
 
-      recipientId = (decodedLogs[0].args as any)["recipientId"];
+      recipientId = (decodedLogs[0].args as any)["recipientId"].toLowerCase();
 
       console.log("Hash", tx.hash);
       console.log("recipientId", recipientId);
@@ -164,7 +164,7 @@ export const ApplicationContextProvider = (props: {
       updateStepTarget(2, `${chainInfo.name} at ${tx.hash}`);
       updateStepHref(
         2,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
@@ -179,12 +179,12 @@ export const ApplicationContextProvider = (props: {
       const pollingData: any = {
         chainId: chain,
         poolId: poolId,
-        recipientId: recipientId,
+        recipientId: recipientId.toLowerCase(),
       };
       await pollUntilDataIsIndexed(
         checkIfRecipientIsIndexedQuery,
         pollingData,
-        "microGrantRecipient"
+        "microGrantRecipient",
       );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
     } catch (e) {

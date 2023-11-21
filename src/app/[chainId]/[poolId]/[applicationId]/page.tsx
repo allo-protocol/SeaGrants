@@ -20,7 +20,7 @@ export default async function Application({
     {
       chainId: params.chainId,
       poolId: params.poolId,
-      recipientId: params.applicationId,
+      recipientId: params.applicationId.toLocaleLowerCase(),
     },
   );
 

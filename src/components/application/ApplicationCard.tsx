@@ -15,7 +15,9 @@ export default function ApplicationCard(props: {
   });
   const params = useParams();
   const application = props.application;
-  const navLink = `/${params.chainId}/${params.poolId}/${application.recipientId}`;
+  const navLink = `/${params.chainId}/${
+    params.poolId
+  }/${application.recipientId.toLocaleLowerCase()}`;
 
   return (
     <Link href={navLink}>

@@ -15,10 +15,10 @@ const ApplicationList = (props: {
           >
             {props.applications.map((application) => (
               <li
-                key={application.recipientId}
+                key={application.recipientId.toLowerCase()}
                 className="overflow-hidden rounded-xl border border-gray-200"
               >
-                <ApplicationCard application={application}/>
+                <ApplicationCard application={application} />
               </li>
             ))}
           </ul>
