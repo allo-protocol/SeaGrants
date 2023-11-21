@@ -106,6 +106,17 @@ export const getMicroGrantRecipientQuery = gql`
           amount
           blockTimestamp
         }
+        distributeds {
+          recipientId
+          recipientAddress
+          amount
+          sender
+          contractName
+          contractAddress
+          transactionHash
+          blockTimestamp
+          chainId
+        }
       }
       sender
       recipientId

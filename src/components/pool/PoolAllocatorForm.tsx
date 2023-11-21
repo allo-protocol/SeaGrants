@@ -2,10 +2,9 @@
 
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useParams } from "next/navigation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ethereumAddressRegExp } from "@/utils/common";
 import { SetAllocatorData } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
@@ -29,11 +28,6 @@ export default function PoolAllocatorForm() {
   const [allocators, setAllocators] = useState([
     { address: "", action: "true" }, // Initial allocator
   ]);
-
-  const params = useParams();
-
-  const chainId = params["chainId"];
-  const poolId = params["poolId"];
 
   const [isOpen, setIsOpen] = useState(false);
   const {

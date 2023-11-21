@@ -134,6 +134,7 @@ export type TApplicationData = {
       amount: string;
     };
     allocateds: TAllocatedData[];
+    distributeds: TDistributedData[];
   };
   sender: string;
   recipientId: string;

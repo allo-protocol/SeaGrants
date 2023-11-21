@@ -7,6 +7,8 @@ import {
 } from "@/utils/common";
 import { MarkdownView } from "../shared/Markdown";
 import Link from "next/link";
+import { useContext } from "react";
+import { PoolContext } from "@/context/PoolContext";
 
 export const PoolDetail = (props: {
   chainId: string;
@@ -15,7 +17,7 @@ export const PoolDetail = (props: {
   metadata: TPoolMetadata;
   poolBanner: string | undefined;
 }) => {
-
+  const { isLoaded, isRecipient } = useContext(PoolContext);
   const getStatusPill = (status: EPoolStatus) => {
     return (
       <div
@@ -61,11 +63,11 @@ export const PoolDetail = (props: {
     },
     {
       description: "Start Date",
-      name: new Date(props.pool.allocationStartTime).toLocaleString(),
+      name: new Date(props.pool.allocationStartTime * 1000).toLocaleString(),
     },
     {
       description: "End Date",
-      name: new Date(props.pool.allocationEndTime).toLocaleString(),
+      name: new Date(props.pool.allocationEndTime * 1000).toLocaleString(),
     },
     {
       description: "Threshold",
@@ -119,17 +121,21 @@ export const PoolDetail = (props: {
             ))}
           </dl>
         </div>
-        
-        <Link href={status == "Active" ? `/${props.chainId}/${props.poolId}/new` : ""}>
+
+        <Link
+          href={
+            status == "Active" ? `/${props.chainId}/${props.poolId}/new` : ""
+          }
+        >
           <button
-            disabled={status !== "Active"}
+            disabled={status !== "Active" || !isLoaded || isRecipient}
             type="submit"
             className={`mt-10 flex w-full items-center justify-center rounded-md border border-transparent ${
-              status === "Active"
-              ? "bg-indigo-600 text-white hover:bg-indigo-700"
-              : "bg-indigo-100 text-white hover:bg-indigo-200"
+              status === "Active" && !isRecipient
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-indigo-100 text-white hover:bg-indigo-200"
             } px-8 py-3 text-base font-medium  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
-            >
+          >
             Apply
           </button>
         </Link>
