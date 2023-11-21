@@ -1,7 +1,8 @@
-import { TNewApplicationResponse } from "@/app/types";
+import { TNewApplicationResponse, TPoolData } from "@/app/types";
 import ApplicationCard from "./ApplicationCard";
 
 const ApplicationList = (props: {
+  pool: TPoolData,
   applications: TNewApplicationResponse[];
 }) => {
 
@@ -18,7 +19,7 @@ const ApplicationList = (props: {
                 key={application.recipientId.toLowerCase()}
                 className="overflow-hidden rounded-xl border border-gray-200"
               >
-                <ApplicationCard application={application} />
+                <ApplicationCard pool={props.pool} application={application} />
               </li>
             ))}
           </ul>

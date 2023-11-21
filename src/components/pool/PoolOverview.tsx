@@ -133,7 +133,7 @@ export default function PoolOverview(props: {
           />
         )}
         {currentTab == "Applications" && (
-          <ApplicationList applications={props.applications} />
+          <ApplicationList pool={props.pool} applications={props.applications}  />
         )}
         {currentTab == "Manage Pool" && <PoolManagement />}
       </div>

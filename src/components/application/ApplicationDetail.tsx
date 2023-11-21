@@ -129,8 +129,9 @@ export default function ApplicationDetail(props: {
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               {application.name}
             </h1>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 mt-5">
               {/* First row */}
+
               <div className="font-mono text-xs">
                 <div className="flex items-center">
                   Application ID: &nbsp;
