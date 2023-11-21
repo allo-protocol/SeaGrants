@@ -13,40 +13,43 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
 
-const schema = yup.object({
-  name: yup.string().required().min(6, "Must be at least 6 characters"),
-  website: yup.string().required().url("Must be a valid website address"),
-  description: yup.string().required().min(10, "Must be at least 150 words"),
-  email: yup.string().required().min(3).email("Must be a valid email address"),
-  requestedAmount: yup
-    .string()
-    .test(
-      "is-number",
-      "Requested amount is required",
-      (value) => !isNaN(Number(value))
-    ),
-  recipientAddress: yup.string().required("Recipient address is required"),
-  profileOwner: yup.string().required("A profile owner is required"),
-  nonce: yup.number().required("A nonce is required").min(1),
-});
-
 export default function ApplicationForm() {
   const { steps, createApplication } = useContext(ApplicationContext);
   const [base64Image, setBase64Image] = useState<string>("");
-
   const params = useParams();
-
   const chainId = params["chainId"];
   const poolId = params["poolId"];
-
   const [isOpen, setIsOpen] = useState(false);
+
+  // Validation schema
+  const schema = yup.object({
+    name: yup.string().required().min(6, "Must be at least 6 characters"),
+    website: yup.string().required().url("Must be a valid website address"),
+    description: yup.string().required().min(10, "Must be at least 150 words"),
+    email: yup
+      .string()
+      .required()
+      .min(3)
+      .email("Must be a valid email address"),
+    requestedAmount: yup
+      .string()
+      .test(
+        "is-number",
+        "Requested amount is required",
+        (value) => !isNaN(Number(value))
+      ),
+    // .max(maxRequestedAmount, "Requested amount must be less than the allowed maximum amount"),
+    recipientAddress: yup.string().required("Recipient address is required"),
+    profileOwner: yup.string().required("A profile owner is required"),
+    nonce: yup.number().required("A nonce is required").min(1),
+  });
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
   });
 
   const handleCancel = () => {
@@ -135,9 +138,7 @@ export default function ApplicationForm() {
               </label>
               <div className="mt-2">
                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
-                    https://
-                  </span>
+                  <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
                   <input
                     {...register("website")}
                     type="text"
@@ -252,70 +253,6 @@ export default function ApplicationForm() {
             <ImageUpload setBase64Image={setBase64Image} />
           </div>
         </div>
-
-        {/* <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-gray-900">
-              Profile Information
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-600">
-              A profile will be created on the registry to maintain your
-              project. Additonally an anchor wallet would be created which will
-              be controlled by the profile. The anchor creation requires a nonce
-              unique to the owner. You can use the anchor wallet to recive funds
-              , gather attestations and generate reputation for your project.
-            </p>
-          </div>
-
-          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
-            <div className="sm:col-span-full">
-              <label
-                htmlFor="profile-owner"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Profile Owner
-              </label>
-              <div className="mt-2">
-                <input
-                  {...register("profileOwner")}
-                  type="text"
-                  name="profileOwner"
-                  id="profileOwner"
-                  placeholder=" 0x..."
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <div>
-                {errors.profileOwner && (
-                  <Error message={errors.profileOwner?.message!} />
-                )}
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="nonce"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Nonce
-              </label>
-              <div className="mt-2">
-                <input
-                  {...register("nonce")}
-                  type="number"
-                  name="nonce"
-                  id="nonce"
-                  defaultValue={1}
-                  placeholder="1"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <div>
-                {errors.nonce && <Error message={errors.nonce?.message!} />}
-              </div>
-            </div>
-          </div>
-        </div> */}
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
