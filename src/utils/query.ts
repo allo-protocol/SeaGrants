@@ -68,7 +68,7 @@ export const getMicroGrantsRecipientsQuery = gql`
         contractAddress
         contractName
         chainId
-        amount
+        status
         blockTimestamp
       }
       distributeds {
@@ -124,7 +124,7 @@ export const getMicroGrantRecipientQuery = gql`
           contractAddress
           contractName
           chainId
-          amount
+          status
           blockTimestamp
         }
         distributeds {

@@ -157,9 +157,8 @@ export type TAllocatedData = {
   contractAddress: `0x${string}`;
   contractName: string;
   chainId: string;
-  amount: string;
   blockTimestamp: string;
-  status?: string;
+  status: string;
 };
 
 export type TDistributedData = {
