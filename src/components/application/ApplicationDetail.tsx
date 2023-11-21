@@ -13,7 +13,7 @@ import {
   TApplicationData,
   TApplicationMetadata,
 } from "@/app/types";
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import { MarkdownView } from "../shared/Markdown";
 import { PoolContext } from "@/context/PoolContext";
 import Banner from "../shared/Banner";
@@ -22,6 +22,77 @@ import { Allocation } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsSt
 import { Status } from "@allo-team/allo-v2-sdk/dist/strategies/types";
 import { AddressResponsive } from "../shared/Address";
 import AllocatedList from "../shared/AllocatedsList";
+import { Dialog, Listbox, Menu, Transition } from "@headlessui/react";
+import {
+  Bars3Icon,
+  CalendarDaysIcon,
+  CreditCardIcon,
+  EllipsisVerticalIcon,
+  FaceFrownIcon,
+  FaceSmileIcon,
+  FireIcon,
+  HandThumbUpIcon,
+  HeartIcon,
+  PaperClipIcon,
+  UserCircleIcon,
+  XMarkIcon as XMarkIconMini,
+} from "@heroicons/react/20/solid";
+import {
+  BellIcon,
+  XMarkIcon as XMarkIconOutline,
+} from "@heroicons/react/24/outline";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
+
+const activity = [
+  {
+    id: 1,
+    type: "created",
+    person: { name: "Chelsea Hagon" },
+    date: "7d ago",
+    dateTime: "2023-01-23T10:32",
+  },
+  {
+    id: 2,
+    type: "edited",
+    person: { name: "Chelsea Hagon" },
+    date: "6d ago",
+    dateTime: "2023-01-23T11:03",
+  },
+  {
+    id: 3,
+    type: "sent",
+    person: { name: "Chelsea Hagon" },
+    date: "6d ago",
+    dateTime: "2023-01-23T11:24",
+  },
+  {
+    id: 4,
+    type: "commented",
+    person: {
+      name: "Chelsea Hagon",
+      imageUrl:
+        "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    comment:
+      "Called client, they reassured me the invoice would be paid by the 25th.",
+    date: "3d ago",
+    dateTime: "2023-01-23T15:56",
+  },
+  {
+    id: 5,
+    type: "viewed",
+    person: { name: "Alex Curren" },
+    date: "2d ago",
+    dateTime: "2023-01-24T09:12",
+  },
+  {
+    id: 6,
+    type: "paid",
+    person: { name: "Alex Curren" },
+    date: "1d ago",
+    dateTime: "2023-01-24T09:20",
+  },
+];
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
@@ -37,7 +108,7 @@ export default function ApplicationDetail(props: {
   const tokenMetadata = microGrant.pool.tokenMetadata;
   const amount = humanReadableAmount(
     microGrant.pool.amount,
-    tokenMetadata.decimals,
+    tokenMetadata.decimals
   );
   const token = tokenMetadata.symbol ?? "ETH";
 
@@ -66,7 +137,7 @@ export default function ApplicationDetail(props: {
 
   const allocateds = microGrant.allocateds.filter(
     (allocated) =>
-      allocated.recipientId === microGrantRecipient.recipientId.toLowerCase(),
+      allocated.recipientId === microGrantRecipient.recipientId.toLowerCase()
   );
 
   // const distributeds = microGrant.distributeds.filter(
@@ -111,121 +182,104 @@ export default function ApplicationDetail(props: {
         />
       )}
 
-      <div className="pt-6">
-        <Breadcrumb breadcrumbs={application.breadcrumbs} />
+      <div>
+        <header>
+          <Breadcrumb breadcrumbs={application.breadcrumbs} />
 
-        {/* Banner */}
-        <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
-          <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <Banner image={application.logo.src} alt={application.logo.alt} />
+          {/* Banner */}
+          <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
+            <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
+              <Banner image={application.logo.src} alt={application.logo.alt} />
+            </div>
           </div>
-        </div>
-
+        </header>
         {/* Application info */}
-        <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
-          <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-              {application.name}
-            </h1>
-            <div className="lg:col-span-2 mt-5">
-              {/* First row */}
-
-              <div className="font-mono text-xs">
-                <div className="flex items-center">
-                  Application ID: &nbsp;
-                  <AddressResponsive
-                    address={application.recipientId}
-                    chainId={Number(microGrant.chainId)}
-                  />
-                </div>
-              </div>
-
-              {/* Second row */}
-              <div className="font-mono text-xs">
-                <div className="flex items-center">
-                  Recipient Address:&nbsp;
-                  <AddressResponsive
-                    address={application.recipientAddress}
-                    chainId={Number(microGrant.chainId)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Overview */}
-          <div className="mt-4 lg:row-span-3 lg:mt-0">
-            <div className="mt-6 border-t border-gray-100">
-              <dl className="divide-y divide-gray-100">
-                {/* Status */}
-                <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-sm font-medium leading-6 text-gray-900">
-                    Status
-                  </dt>
-                  <dd className="mt-1 text-sm leading-6 text-gray-700 text-center sm:mt-0">
-                    <div
-                      className={classNames(
-                        statusColorsScheme[
-                          application.status as keyof typeof statusColorsScheme
-                        ],
-                        "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
-                      )}
-                    >
-                      {application.status.toString()}
+        <div>
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+            <div className="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+              <div className="-mx-4 px-4 py-8 shadow-sm ring-1 ring-gray-900/5 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pb-20 xl:pt-16">
+                <h2 className="text-base font-semibold leading-6 text-gray-900">
+                  {application.name} Details
+                </h2>
+                {/* Add details info */}
+                <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
+                  <div className="lg:col-span-2 mt-5">
+                    <div className="font-mono text-xs">
+                      Application ID: &nbsp;
+                      <AddressResponsive
+                        address={application.recipientId}
+                        chainId={Number(microGrant.chainId)}
+                      />
                     </div>
-                  </dd>
-                </div>
-
-                {overviews.map((overview, index) => (
-                  <div
-                    key={index}
-                    className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
-                  >
-                    <dt className="text-sm font-medium leading-6 text-gray-900">
-                      {overview.description}
-                    </dt>
-                    <dd
-                      className={classNames(
-                        overview.color ? overview.color : "",
-                        "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
-                      )}
-                    >
-                      {overview.name}
-                    </dd>
+                    <div className="font-mono text-xs">
+                      Recipient Address:&nbsp;
+                      <AddressResponsive
+                        address={application.recipientAddress}
+                        chainId={Number(microGrant.chainId)}
+                      />
+                    </div>
                   </div>
-                ))}
-              </dl>
+                </div>
+                <div className="mt-10">
+                  <h3 className="sr-only">Description</h3>
+                  <MarkdownView text={application.description} />
+                </div>
+                <div className="mt-10">
+                  <AllocatedList
+                    allocateds={allocateds}
+                    showApplication={false}
+                  />
+                </div>
+              </div>
+              <div className="lg:col-start-3">
+                {/* Activity feed */}
+                <h2 className="text-sm font-semibold leading-6 text-gray-900">
+                  Activity
+                </h2>
+                <ul role="list" className="mt-6 space-y-6">
+                  {activity.map((activityItem, activityItemIdx) => (
+                    <li key={activityItem.id} className="relative flex gap-x-4">
+                      <div
+                        className={classNames(
+                          activityItemIdx === activity.length - 1
+                            ? "h-6"
+                            : "-bottom-6",
+                          "absolute left-0 top-0 flex w-6 justify-center"
+                        )}
+                      >
+                        <div className="w-px bg-gray-200" />
+                      </div>
+                      <>
+                        <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+                          {activityItem.type === "paid" ? (
+                            <CheckCircleIcon
+                              className="h-6 w-6 text-indigo-600"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                          )}
+                        </div>
+                        <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
+                          <span className="font-medium text-gray-900">
+                            {activityItem.person.name}
+                          </span>{" "}
+                          {activityItem.type} the invoice.
+                        </p>
+                        <time
+                          dateTime={activityItem.dateTime}
+                          className="flex-none py-0.5 text-xs leading-5 text-gray-500"
+                        >
+                          {activityItem.date}
+                        </time>
+                      </>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-
-            {isAllocator && application.status !== "Accepted" && (
-              <>
-                <button
-                  onClick={() => onAllocate(true)}
-                  className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => onAllocate(false)}
-                  className="mt-4 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:ring-offset-2"
-                >
-                  Reject
-                </button>
-              </>
-            )}
           </div>
-
-          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
-            {/* Description and details */}
-            <div>
-              <h3 className="sr-only">Description</h3>
-              <MarkdownView text={application.description} />
-            </div>
-
-            <div className="mt-10">
-              <AllocatedList allocateds={allocateds} showApplication={false} />
-            </div>
-          </div>
+          {/* Progress Modal */}
           <Modal isOpen={isOpen} setIsOpen={setIsOpen} steps={steps} />
         </div>
       </div>

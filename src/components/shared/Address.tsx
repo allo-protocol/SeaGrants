@@ -95,6 +95,7 @@ export const AddressResponsive = (props: {
 
   if (isMobile)
     return <Address address={props.address} chainId={props.chainId} />;
+
   return <AddressFull address={props.address} chainId={props.chainId} />;
 };
 
