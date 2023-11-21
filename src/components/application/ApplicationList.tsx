@@ -1,12 +1,13 @@
-import { TNewApplicationResponse } from "@/app/types";
+import { TNewApplicationResponse, TPoolData } from "@/app/types";
 import ApplicationCard from "./ApplicationCard";
 
 const ApplicationList = (props: {
+  pool: TPoolData,
   applications: TNewApplicationResponse[];
 }) => {
 
   return (
-    <div className="flex flex-col pt-10 px-8">
+    <div className="flex flex-col pt-10 px-10">
       {props.applications.length > 0 ? (
         <div>
           <ul
@@ -15,10 +16,10 @@ const ApplicationList = (props: {
           >
             {props.applications.map((application) => (
               <li
-                key={application.recipientId}
+                key={application.recipientId.toLowerCase()}
                 className="overflow-hidden rounded-xl border border-gray-200"
               >
-                <ApplicationCard application={application}/>
+                <ApplicationCard pool={props.pool} application={application} />
               </li>
             ))}
           </ul>

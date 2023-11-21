@@ -2,7 +2,11 @@
 import { EProgressStatus, ETarget, TProgressStep } from "@/app/types";
 import { Allo, MicroGrantsStrategy } from "@allo-team/allo-v2-sdk";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
-import { SetAllocatorData } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import {
+  Allocation,
+  Recipient,
+  SetAllocatorData,
+} from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { createContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
@@ -19,18 +23,24 @@ const initialSteps: TProgressStep[] = [
 ];
 
 export interface IPoolContextProps {
+  isLoaded: boolean;
   isAllocator: boolean;
   isPoolManager: boolean;
+  isRecipient: boolean;
   strategy?: MicroGrantsStrategy;
   batchSetAllocator: (data: SetAllocatorData[]) => Promise<void>;
+  allocate: (data: Allocation) => Promise<void>;
   steps: TProgressStep[];
 }
 
 export const PoolContext = createContext<IPoolContextProps>({
+  isLoaded: false,
   isAllocator: false,
   isPoolManager: false,
+  isRecipient: false,
   strategy: undefined,
   batchSetAllocator: async () => {},
+  allocate: async () => {},
   steps: initialSteps,
 });
 
@@ -39,18 +49,22 @@ export const PoolContextProvider = (props: {
   poolId: string;
   children: JSX.Element | JSX.Element[];
 }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
   const [isAllocator, setIsAllocator] = useState(false);
   const [isPoolManager, setIsPoolManager] = useState(false);
+  const [isRecipient, setIsRecipient] = useState(false);
   const [strategy, setStrategy] = useState<MicroGrantsStrategy | undefined>(
     undefined,
   );
 
   const { isConnected, address } = useAccount();
 
+  // todo: replace contract queries with spec
   useEffect(() => {
     const checkAllocator = async () => {
       if (isConnected && address) {
+        setIsLoaded(false);
         const allo = new Allo({
           chain: Number(props.chainId),
         });
@@ -73,11 +87,16 @@ export const PoolContextProvider = (props: {
 
         const _isAllocator = await microGrants.allocator(address);
         setIsAllocator(_isAllocator);
+
+        const recipient: Recipient = await microGrants.getRecipient(address);
+
+        setIsRecipient(recipient.recipientStatus !== 0);
+        setIsLoaded(true);
       }
     };
 
     checkAllocator();
-  }, [props.chainId, props.poolId, address]);
+  }, [props.chainId, props.poolId, address, isConnected]);
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
@@ -128,13 +147,60 @@ export const PoolContextProvider = (props: {
     }
   };
 
+  const allocate = async (data: Allocation) => {
+    setSteps([
+      {
+        id: 0,
+        content: "Allocating",
+        target: ETarget.POOL,
+        href: "#",
+        status: EProgressStatus.IN_PROGRESS,
+      },
+    ]);
+
+    if (strategy) {
+      const chainInfo = getChain(Number(props.chainId));
+
+      const txData: TransactionData = strategy.getAllocationData(
+        data.recipientId,
+        data.status,
+      );
+
+      try {
+        const tx = await sendTransaction({
+          to: txData.to as string,
+          data: txData.data,
+          value: BigInt(txData.value),
+        });
+
+        await wagmiConfigData.publicClient.waitForTransactionReceipt({
+          hash: tx.hash,
+        });
+
+        updateStepTarget(0, `${chainInfo.name} at ${tx.hash}`);
+        updateStepHref(
+          0,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        );
+
+        updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+      } catch (e) {
+        console.log("Allocating", e);
+        updateStepStatus(0, EProgressStatus.IS_ERROR);
+      }
+    }
+  };
+
   return (
     <PoolContext.Provider
       value={{
+        isLoaded,
         isAllocator,
         isPoolManager,
+        isRecipient,
         strategy,
         batchSetAllocator,
+        allocate,
         steps,
       }}
     >

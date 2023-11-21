@@ -3,13 +3,14 @@
 import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
 import { useContext, useEffect, useRef, useState } from "react";
 import Breadcrumb from "../shared/Breadcrumb";
-import Image from "next/image";
 import { aspectRatio } from "@/utils/config";
-import { classNames, stringToColor } from "@/utils/common";
+import { classNames } from "@/utils/common";
 import PoolDetail from "./PoolDetail";
 import ApplicationList from "../application/ApplicationList";
 import { PoolContext } from "@/context/PoolContext";
 import PoolManagement from "./PoolManagement";
+import Banner from "../shared/Banner";
+import AllocatedList from "../shared/AllocatedsList";
 
 export default function PoolOverview(props: {
   chainId: string;
@@ -30,6 +31,7 @@ export default function PoolOverview(props: {
   const [tabs, setTabs] = useState([
     { name: "Pool Details", current: true },
     { name: "Applications", current: false },
+    { name: "Reviews", current: false },
   ]);
 
   const breadcrumbs = [
@@ -65,6 +67,7 @@ export default function PoolOverview(props: {
       setTabs([
         { name: "Pool Details", current: true },
         { name: "Applications", current: false },
+        { name: "Reviews", current: false },
         { name: "Manage Pool", current: false },
       ]);
     }
@@ -80,30 +83,7 @@ export default function PoolOverview(props: {
         {/* Banner */}
         <div className="mx-auto mt-6 max-h-[20rem] sm:px-6 lg:grid lg:gap-x-8 lg:px-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            {props.poolBanner ? (
-              <Image
-                src={props.poolBanner}
-                alt="poolBanner"
-                className="h-full w-full object-cover object-center"
-                width={bannerSize.width}
-                height={bannerSize.height}
-              />
-            ) : (
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: `${bannerSize.width}px`,
-                  height: `${bannerSize.height}px`,
-                  backgroundColor: stringToColor(
-                    props.metadata.name ?? (Math.random() * 10000).toString(),
-                  ),
-                }}
-              >
-                <span className="text-gray-400 text-3xl">
-                  {props.metadata.name}
-                </span>
-              </div>
-            )}
+            <Banner image={props.poolBanner} alt={props.metadata.name} />
           </div>
         </div>
         <div className="sm:hidden">
@@ -134,7 +114,7 @@ export default function PoolOverview(props: {
                     tab.current
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "whitespace-nowrap border-b-2 py-4 px-0.5 text-sm font-medium cursor-pointer"
+                    "whitespace-nowrap border-b-2 py-4 px-0.5 text-sm font-medium cursor-pointer",
                   )}
                   aria-current={tab.current ? "page" : undefined}
                 >
@@ -156,7 +136,20 @@ export default function PoolOverview(props: {
           />
         )}
         {currentTab == "Applications" && (
-          <ApplicationList applications={props.applications} />
+          <ApplicationList pool={props.pool} applications={props.applications}  />
+        )}
+        {currentTab == "Reviews" && (
+          <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-10">
+            <div className="lg:col-span-2 lg:pr-8">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Application Reviews
+              </h1>
+              <AllocatedList
+                allocateds={props.pool.allocateds}
+                showApplication={true}
+              />
+            </div>
+          </div>
         )}
         {currentTab == "Manage Pool" && <PoolManagement />}
       </div>

@@ -1,3 +1,5 @@
+import { Status } from "@allo-team/allo-v2-sdk/dist/strategies/types";
+
 type ApplicationStatus = "Accepted" | "Rejected" | "Pending" | "Paid";
 
 export type TApplication = {
@@ -115,6 +117,8 @@ export type TPoolData = {
       name: string;
     };
   };
+  allocateds: TAllocatedData[];
+  distributeds: TDistributedData[];
   microGrantRecipients: any[]; // todo: set type
 };
 
@@ -134,6 +138,7 @@ export type TApplicationData = {
       amount: string;
     };
     allocateds: TAllocatedData[];
+    distributeds: TDistributedData[];
   };
   sender: string;
   recipientId: string;
@@ -152,8 +157,8 @@ export type TAllocatedData = {
   contractAddress: `0x${string}`;
   contractName: string;
   chainId: string;
-  amount: string;
   blockTimestamp: string;
+  status: string;
 };
 
 export type TDistributedData = {

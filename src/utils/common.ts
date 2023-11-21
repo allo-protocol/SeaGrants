@@ -18,6 +18,7 @@ export const statusColorsScheme = {
   Rejected: "text-red-700 bg-red-50 ring-red-600/10",
 
   Ended: "text-gray-600 bg-gray-50 ring-gray-500/10",
+  Undefined: "text-gray-600 bg-gray-50 ring-gray-500/10",
 };
 
 export function stringToColor(text: string) {
@@ -110,4 +111,16 @@ export const pollUntilDataIsIndexed = async (
 
   // Initial fetch
   return await fetchData();
+};
+
+export const convertBytesToShortString = (address: string) => {
+  return address.slice(0, 6) + "..." + address.slice(-4);
+};
+
+export const convertAddressToShortString = (address: string) => {
+  return address.slice(0, 6) + "..." + address.slice(-4);
+};
+
+export const copy = (data: string) => {
+  navigator.clipboard.writeText(data);
 };

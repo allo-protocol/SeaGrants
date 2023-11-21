@@ -1,11 +1,13 @@
-import { IApplication, TNewApplicationResponse } from "@/app/types";
-import { classNames, statusColorsScheme, stringToColor } from "@/utils/common";
+import { IApplication, TNewApplicationResponse, TPoolData } from "@/app/types";
+import { classNames, humanReadableAmount, statusColorsScheme, stringToColor } from "@/utils/common";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
+import Banner from "../shared/Banner";
 
 export default function ApplicationCard(props: {
+  pool: TPoolData,
   application: TNewApplicationResponse;
 }) {
   const bannerRef = useRef<any>(null);
@@ -15,33 +17,23 @@ export default function ApplicationCard(props: {
   });
   const params = useParams();
   const application = props.application;
-  const navLink = `/${params.chainId}/${params.poolId}/${application.recipientId}`;
+  const navLink = `/${params.chainId}/${
+    params.poolId
+  }/${application.recipientId.toLocaleLowerCase()}`;
+
+  const pool = props.pool.pool;
+
+  const amount = humanReadableAmount(
+    application.requestedAmount,
+    pool.tokenMetadata.decimals || 18,
+  );
+
+ const token =  pool.tokenMetadata.symbol ?? "ETH";
 
   return (
     <Link href={navLink}>
       <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50">
-        {props.application.applicationBanner ? (
-          <Image
-            src={props.application.applicationBanner}
-            alt="applicationBanner"
-            className="h-full w-full object-cover object-center"
-            width={bannerSize.width}
-            height={bannerSize.height}
-          />
-        ) : (
-          <div
-            className="flex items-center justify-center"
-            style={{
-              width: `${bannerSize.width}px`,
-              height: `${bannerSize.height}px`,
-              backgroundColor: stringToColor(application.metadata!.name),
-            }}
-          >
-            <span className="text-gray-400 text-3xl">
-              {application.metadata!.name}
-            </span>
-          </div>
-        )}
+        <Banner image={application.applicationBanner} alt="applicationBanner" />
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
         <div className="text-sm font-medium leading-6 text-gray-900 py-3">
@@ -59,7 +51,7 @@ export default function ApplicationCard(props: {
           <dt className="text-gray-500">Amount</dt>
           <dd className="flex items-start gap-x-2">
             <div className="font-medium text-gray-900">
-              {application.requestedAmount}
+              {amount} {token}
             </div>
           </dd>
         </div>
