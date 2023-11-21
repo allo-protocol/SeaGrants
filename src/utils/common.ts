@@ -18,6 +18,7 @@ export const statusColorsScheme = {
   Rejected: "text-red-700 bg-red-50 ring-red-600/10",
 
   Ended: "text-gray-600 bg-gray-50 ring-gray-500/10",
+  Undefined: "text-gray-600 bg-gray-50 ring-gray-500/10",
 };
 
 export function stringToColor(text: string) {

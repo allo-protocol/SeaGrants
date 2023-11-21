@@ -62,6 +62,27 @@ export const getMicroGrantsRecipientsQuery = gql`
           name
         }
       }
+      allocateds {
+        recipientId
+        sender
+        contractAddress
+        contractName
+        chainId
+        amount
+        blockTimestamp
+      }
+      distributeds {
+        recipientId
+        recipientAddress
+        amount
+        sender
+        contractName
+        contractAddress
+        transactionHash
+        blockNumber
+        blockTimestamp
+        chainId
+      }
       microGrantRecipients {
         recipientId
         recipientAddress
