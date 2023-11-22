@@ -115,6 +115,7 @@ export const getMicroGrantRecipientQuery = gql`
         chainId
         allocationStartTime
         allocationEndTime
+        blockTimestamp
         pool {
           tokenMetadata
           token

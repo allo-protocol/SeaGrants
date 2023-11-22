@@ -111,7 +111,7 @@ export default function ApplicationDetail(props: {
   const distributeds = microGrant.distributeds.filter(
     (distributed) =>
       distributed.recipientId === microGrantRecipient.recipientId.toLowerCase()
-  );
+  );  
 
   const generateActivity = () => {
     const activity: TActivity[] = [];
@@ -119,7 +119,8 @@ export default function ApplicationDetail(props: {
     const poolCreatedActivity: TActivity = {
       id: 1,
       status: "none",
-      text: `Pool ${microGrant.poolId} Created`,
+      textBold: `Pool Id ${microGrant.poolId}`,
+      text: `Created`,
       date: formatDateDifference(microGrant.blockTimestamp),
       dateTime: prettyTimestamp(Number(microGrant.blockTimestamp)),
     };
@@ -128,7 +129,7 @@ export default function ApplicationDetail(props: {
       id: 2,
       status: "none",
       textBold: convertAddressToShortString(microGrantRecipient.recipientId),
-      text: "Application Registered",
+      text: "Application Submitted",
       date: formatDateDifference(microGrantRecipient.blockTimestamp),
       dateTime: prettyTimestamp(Number(microGrantRecipient.blockTimestamp)),
     };
@@ -143,7 +144,7 @@ export default function ApplicationDetail(props: {
         id: activity.length,
         status: status,
         textBold: convertAddressToShortString(allocated.sender),
-        text: `Allocator has ${status}`,
+        text: `allocator ${status}`,
         date: formatDateDifference(allocated.blockTimestamp),
         dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
       };
@@ -155,8 +156,8 @@ export default function ApplicationDetail(props: {
       const distributedActivity: TActivity = {
         id: activity.length,
         status: "completed",
-        textBold: `${distributed.amount} ${token}`,
-        text: "Distributed",
+        textBold: `${amount} ${token}`,
+        text: "distributed",
         date: formatDateDifference(distributed.blockTimestamp),
         dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
       };
