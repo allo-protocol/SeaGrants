@@ -44,13 +44,13 @@ function toTwoDigits(value: number) {
 export function humanReadableAmount(amount: string, decimals?: number) {
   const amountInUnits = Number(formatUnits(BigInt(amount), decimals || 18));
 
-  for (let i = 5; i <= 10; i++) {
+  for (let i = 5; i <= 15; i++) {
     const formattedValue = amountInUnits.toFixed(i);
     if (Number(formattedValue) !== 0) {
       return formattedValue;
     }
   }
-  return amountInUnits.toFixed(10);
+  return 0;
 }
 
 export function isPoolActive(

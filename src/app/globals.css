@@ -50,7 +50,7 @@
 .mde-preview h2,
 .mde-preview p,
 .mde-textarea-wrapper textarea {
-  font-size: small !important;
+  font-size: inherit !important;
 }
 
 .mde-preview h1,

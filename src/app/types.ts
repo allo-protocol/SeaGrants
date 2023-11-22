@@ -203,3 +203,12 @@ export enum EPoolStatus {
   ACTIVE = "Active",
   ENDED = "Ended",
 }
+
+export type TActivity = {
+  id: number;
+  status: string;
+  text: string;
+  textBold?: string;
+  date: string;
+  dateTime: string;
+};
