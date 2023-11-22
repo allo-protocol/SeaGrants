@@ -135,35 +135,34 @@ export default function ApplicationDetail(props: {
 
     activity.push(poolCreatedActivity, applicationRegisteredActivity);
 
-    for (let i = 0; i < 5; i++) {
-      // allocation activity
-      allocateds.forEach((allocated) => {
-        const status = allocated.status === "2" ? "approved" : "rejected";
+    // allocation activity
+    allocateds.forEach((allocated) => {
+      const status = allocated.status === "2" ? "approved" : "rejected";
 
-        const allocatedActivity: TActivity = {
-          id: activity.length,
-          status: status,
-          textBold: convertAddressToShortString(allocated.sender),
-          text: `Allocator has ${status}`,
-          date: formatDateDifference(allocated.blockTimestamp),
-          dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
-        };
-        activity.push(allocatedActivity);
-      });
+      const allocatedActivity: TActivity = {
+        id: activity.length,
+        status: status,
+        textBold: convertAddressToShortString(allocated.sender),
+        text: `Allocator has ${status}`,
+        date: formatDateDifference(allocated.blockTimestamp),
+        dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
+      };
+      activity.push(allocatedActivity);
+    });
 
-      // distribution activity
-      distributeds.forEach((distributed) => {
-        const distributedActivity: TActivity = {
-          id: activity.length,
-          status: "completed",
-          textBold: `${distributed.amount} ${token}`,
-          text: "Distributed",
-          date: formatDateDifference(distributed.blockTimestamp),
-          dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
-        };
-        activity.push(distributedActivity);
-      });
-    }
+    // distribution activity
+    distributeds.forEach((distributed) => {
+      const distributedActivity: TActivity = {
+        id: activity.length,
+        status: "completed",
+        textBold: `${distributed.amount} ${token}`,
+        text: "Distributed",
+        date: formatDateDifference(distributed.blockTimestamp),
+        dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
+      };
+      activity.push(distributedActivity);
+    });
+
     return activity;
   };
 

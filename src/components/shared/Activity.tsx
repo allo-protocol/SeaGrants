@@ -1,6 +1,7 @@
 import { TActivity } from "@/app/types";
 import { classNames } from "@/utils/common";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
+import { ArrowDownCircleIcon, ArrowUpCircleIcon } from "@heroicons/react/24/outline";
 
 export default function Activity(props: { activity: TActivity[] }) {
   return (
@@ -28,13 +29,13 @@ export default function Activity(props: { activity: TActivity[] }) {
                   />
                 } 
                 { activityItem.status === "approved" && 
-                  <CheckCircleIcon
+                  <ArrowUpCircleIcon
                     className="h-6 w-6 text-green-600"
                     aria-hidden="true"
                   />
                 } 
                 { activityItem.status === "rejected" &&
-                  <XCircleIcon
+                  <ArrowDownCircleIcon
                     className="h-6 w-6 text-red-600"
                     aria-hidden="true"
                   />
