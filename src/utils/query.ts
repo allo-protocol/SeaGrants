@@ -30,6 +30,7 @@ export const getMicroGrantsQuery = gql`
       maxRequestedAmount
       blockTimestamp
       pool {
+        strategy
         tokenMetadata
         token
         amount
@@ -55,6 +56,7 @@ export const getMicroGrantsRecipientsQuery = gql`
       maxRequestedAmount
       blockTimestamp
       pool {
+        strategy
         tokenMetadata
         token
         amount
@@ -118,6 +120,7 @@ export const getMicroGrantRecipientQuery = gql`
         allocationEndTime
         blockTimestamp
         pool {
+          strategy
           tokenMetadata
           token
           amount

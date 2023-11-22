@@ -53,7 +53,7 @@ export default function Activity(props: { activity: TActivity[] }) {
               {activityItem.prefixText}
               <span className="font-medium text-gray-900">
                 {activityItem.href ? (
-                  <a href={activityItem.href}>{activityItem.textBold}</a>
+                  <a target="_blank" href={activityItem.href}>{activityItem.textBold}</a>
                 ) : (
                   activityItem.textBold
                 )}

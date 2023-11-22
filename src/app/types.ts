@@ -105,6 +105,7 @@ export type TPoolData = {
   maxRequestedAmount: string;
   blockTimestamp: string;
   pool: {
+    strategy: string;
     tokenMetadata: {
       name?: string;
       symbol?: string;
@@ -131,6 +132,7 @@ export type TApplicationData = {
     allocationEndTime: number;
     blockTimestamp: string;
     pool: {
+      strategy: string;
       tokenMetadata: {
         name?: string;
         symbol?: string;

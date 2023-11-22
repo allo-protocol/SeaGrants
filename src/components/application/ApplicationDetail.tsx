@@ -86,7 +86,7 @@ export default function ApplicationDetail(props: {
       id: 1,
       status: "none",
       textBold: `Pool Id ${microGrant.poolId}`,
-      href: `/${microGrant.chainId}/${microGrant.poolId}`,
+      href: getAddressExplorerLink(Number(microGrant.chainId), microGrant.pool.strategy),
       suffixText: `created`,
       date: formatDateDifference(microGrant.blockTimestamp),
       dateTime: prettyTimestamp(Number(microGrant.blockTimestamp)),
