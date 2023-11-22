@@ -8,17 +8,17 @@ export function classNames(...classes: string[]) {
 }
 
 export const statusColorsScheme = {
-  Accepted: "text-green-700 bg-green-50 ring-green-600/20",
-  Active: "text-green-700 bg-green-50 ring-green-600/20",
+  Accepted: "text-green-700 bg-green-50 ring-green-600-20",
+  Active: "text-green-700 bg-green-50 ring-green-600-20",
 
-  Upcoming: "text-blue-700 bg-blue-50 ring-blue-600/20",
-  Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
+  Upcoming: "text-blue-700 bg-blue-50 ring-blue-600-20",
+  Paid: "text-blue-700 bg-blue-50 ring-blue-600-20",
 
-  Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600/20",
+  Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600-20",
   Rejected: "text-red-700 bg-red-50 ring-red-600/10",
 
-  Ended: "text-gray-600 bg-gray-50 ring-gray-500/10",
-  Undefined: "text-gray-600 bg-gray-50 ring-gray-500/10",
+  Ended: "text-gray-600 bg-gray-50 ring-gray-500-10",
+  Undefined: "text-gray-600 bg-gray-50 ring-gray-500-10",
 };
 
 export function stringToColor(text: string) {
@@ -44,13 +44,13 @@ function toTwoDigits(value: number) {
 export function humanReadableAmount(amount: string, decimals?: number) {
   const amountInUnits = Number(formatUnits(BigInt(amount), decimals || 18));
 
-  for (let i = 5; i <= 10; i++) {
+  for (let i = 5; i <= 15; i++) {
     const formattedValue = amountInUnits.toFixed(i);
     if (Number(formattedValue) !== 0) {
       return formattedValue;
     }
   }
-  return amountInUnits.toFixed(10);
+  return 0;
 }
 
 export function isPoolActive(
@@ -124,3 +124,23 @@ export const convertAddressToShortString = (address: string) => {
 export const copy = (data: string) => {
   navigator.clipboard.writeText(data);
 };
+
+export const formatDateDifference = (dateString: string): string => {
+  const currentDate = new Date();
+  const inputDate = new Date(dateString);
+  const timeDifference = currentDate.getTime() - inputDate.getTime();
+  const secondsDifference = Math.floor(timeDifference / 1000);
+  const minutesDifference = Math.floor(secondsDifference / 60);
+  const hoursDifference = Math.floor(minutesDifference / 60);
+  const daysDifference = Math.floor(hoursDifference / 24);
+
+  if (secondsDifference < 60) {
+    return 'now';
+  } else if (minutesDifference < 60) {
+    return `${minutesDifference}m ago`;
+  } else if (hoursDifference < 24) {
+    return `${hoursDifference}h ago`;
+  } else {
+    return `${daysDifference}d ago`;
+  }
+}

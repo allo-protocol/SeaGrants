@@ -1,5 +1,5 @@
 import { IApplication, TNewApplicationResponse, TPoolData } from "@/app/types";
-import { classNames, humanReadableAmount, statusColorsScheme, stringToColor } from "@/utils/common";
+import { classNames, humanReadableAmount, prettyTimestamp, statusColorsScheme, stringToColor } from "@/utils/common";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -28,7 +28,8 @@ export default function ApplicationCard(props: {
     pool.tokenMetadata.decimals || 18,
   );
 
- const token =  pool.tokenMetadata.symbol ?? "ETH";
+ const token = pool.tokenMetadata.symbol ?? "ETH";
+ const time = new Date(application.blockTimestamp).getTime()/1000;
 
   return (
     <Link href={navLink}>
@@ -43,7 +44,7 @@ export default function ApplicationCard(props: {
           <dt className="text-gray-500">Submitted On</dt>
           <dd className="text-gray-700">
             <time dateTime={application.blockTimestamp}>
-              {application.blockTimestamp}
+              {prettyTimestamp(time)}
             </time>
           </dd>
         </div>

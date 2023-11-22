@@ -103,7 +103,9 @@ export type TPoolData = {
   allocationEndTime: number;
   approvalThreshold: number;
   maxRequestedAmount: string;
+  blockTimestamp: string;
   pool: {
+    strategy: string;
     tokenMetadata: {
       name?: string;
       symbol?: string;
@@ -128,7 +130,9 @@ export type TApplicationData = {
     poolId: string;
     allocationStartTime: number;
     allocationEndTime: number;
+    blockTimestamp: string;
     pool: {
+      strategy: string;
       tokenMetadata: {
         name?: string;
         symbol?: string;
@@ -159,6 +163,7 @@ export type TAllocatedData = {
   chainId: string;
   blockTimestamp: string;
   status: string;
+  transactionHash: string;
 };
 
 export type TDistributedData = {
@@ -170,6 +175,7 @@ export type TDistributedData = {
   chainId: string;
   amount: string;
   blockTimestamp: string;
+  transactionHash: string;
 };
 
 // Progress Modal
@@ -203,3 +209,14 @@ export enum EPoolStatus {
   ACTIVE = "Active",
   ENDED = "Ended",
 }
+
+export type TActivity = {
+  id: number;
+  status: string;
+  prefixText?: string;
+  textBold?: string;
+  href?: string;
+  suffixText?: string;
+  date: string;
+  dateTime: string;
+};

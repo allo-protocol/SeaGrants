@@ -28,7 +28,9 @@ export const getMicroGrantsQuery = gql`
       allocationEndTime
       approvalThreshold
       maxRequestedAmount
+      blockTimestamp
       pool {
+        strategy
         tokenMetadata
         token
         amount
@@ -52,7 +54,9 @@ export const getMicroGrantsRecipientsQuery = gql`
       allocationEndTime
       approvalThreshold
       maxRequestedAmount
+      blockTimestamp
       pool {
+        strategy
         tokenMetadata
         token
         amount
@@ -70,6 +74,7 @@ export const getMicroGrantsRecipientsQuery = gql`
         chainId
         status
         blockTimestamp
+        transactionHash
       }
       distributeds {
         recipientId
@@ -113,7 +118,9 @@ export const getMicroGrantRecipientQuery = gql`
         chainId
         allocationStartTime
         allocationEndTime
+        blockTimestamp
         pool {
+          strategy
           tokenMetadata
           token
           amount
@@ -126,6 +133,7 @@ export const getMicroGrantRecipientQuery = gql`
           chainId
           status
           blockTimestamp
+          transactionHash
         }
         distributeds {
           recipientId

@@ -8,6 +8,50 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+.text-yellow-600 {
+  color: #D97706; /* This is the hex code for yellow-600 in Tailwind */
+}
+.bg-yellow-50 {
+  background-color: #FFFBEB; /* This is the hex code for yellow-50 in Tailwind */
+}
+.ring-yellow-600-20 {
+  --tw-ring-color: rgba(217, 119, 6, 0.2); /* This is the rgba value for yellow-600 with 20% opacity */
+  box-shadow: 0 0 0 1px var(--tw-ring-color);
+}
+
+.text-gray-600 {
+  color: #4B5563; /* Hex code for gray-600 in Tailwind */
+}
+.bg-gray-50 {
+  background-color: #F9FAFB; /* Hex code for gray-50 in Tailwind */
+}
+.ring-gray-500-10 {
+  --tw-ring-color: rgba(107, 114, 128, 0.1); /* RGBA value for gray-500 */
+  box-shadow: 0 0 0 1px var(--tw-ring-color);
+}
+
+.text-green-700 {
+  color: #047857; /* Hex code for green-700 in Tailwind */
+}
+.bg-green-50 {
+  background-color: #F0FFF4; /* Hex code for green-50 in Tailwind */
+}
+.ring-green-600-20 {
+  --tw-ring-color: rgba(5, 150, 105, 0.2); /* RGBA value for green-600 with 20% opacity in Tailwind */
+  box-shadow: 0 0 0 1px var(--tw-ring-color);
+}
+
+.text-blue-700 {
+  color: #185ADB; /* Hex code for blue-700 in Tailwind */
+}
+.bg-blue-50 {
+  background-color: #EFF6FF; /* Hex code for blue-50 in Tailwind */
+}
+.ring-blue-600-20 {
+  --tw-ring-color: rgba(59, 130, 246, 0.2); /* RGBA value for blue-600 with 20% opacity in Tailwind */
+  box-shadow: 0 0 0 3px var(--tw-ring-color);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     /* --foreground-rgb: 255, 255, 255;
@@ -48,13 +92,34 @@
 
 .mde-preview h1,
 .mde-preview h2,
-.mde-preview p {
+.mde-preview p,
+.mde-textarea-wrapper textarea {
   font-size: inherit !important;
+}
+
+.mde-preview h1,
+.mde-preview h2,
+.mde-preview p {
   border-bottom: 0 !important;
 }
 
 .mde-preview {
   .mde-preview-content {
     padding: 0 !important;
+  }
+}
+
+.react-mde {
+  .mde-preview {
+    .mde-preview-content {
+      padding: 10px !important;
+    }
+  }
+}
+
+a {
+  color: #5a67d8;
+  &:hover {
+    color: #667eea;
   }
 }

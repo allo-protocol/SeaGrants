@@ -95,9 +95,19 @@ export const AddressResponsive = (props: {
 
   if (isMobile)
     return <Address address={props.address} chainId={props.chainId} />;
+
   return <AddressFull address={props.address} chainId={props.chainId} />;
 };
 
 export const truncatedString = (str: string) => {
   return <div className="truncate font-mono w-32">{str}</div>;
 };
+
+
+export const getAddressExplorerLink = (chainId: number, hash: string) => {
+  return getChain(chainId).blockExplorers.default.url + "/address/" + hash;
+}
+
+export const getTxnExplorerLink = (chainId: number, hash: string) => {
+  return getChain(chainId).blockExplorers.default.url + "/tx/" + hash;
+}
