@@ -8,17 +8,17 @@ export function classNames(...classes: string[]) {
 }
 
 export const statusColorsScheme = {
-  Accepted: "text-green-700 bg-green-50 ring-green-600/20",
-  Active: "text-green-700 bg-green-50 ring-green-600/20",
+  Accepted: "text-green-700 bg-green-50 ring-green-600-20",
+  Active: "text-green-700 bg-green-50 ring-green-600-20",
 
-  Upcoming: "text-blue-700 bg-blue-50 ring-blue-600/20",
-  Paid: "text-blue-700 bg-blue-50 ring-blue-600/20",
+  Upcoming: "text-blue-700 bg-blue-50 ring-blue-600-20",
+  Paid: "text-blue-700 bg-blue-50 ring-blue-600-20",
 
-  Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600/20",
+  Pending: "text-yellow-600 bg-yellow-50 ring-yellow-600-20",
   Rejected: "text-red-700 bg-red-50 ring-red-600/10",
 
-  Ended: "text-gray-600 bg-gray-50 ring-gray-500/10",
-  Undefined: "text-gray-600 bg-gray-50 ring-gray-500/10",
+  Ended: "text-gray-600 bg-gray-50 ring-gray-500-10",
+  Undefined: "text-gray-600 bg-gray-50 ring-gray-500-10",
 };
 
 export function stringToColor(text: string) {
