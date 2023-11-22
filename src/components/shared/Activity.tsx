@@ -21,9 +21,15 @@ export default function Activity(props: { activity: TActivity[] }) {
             </div>
 
               <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                { activityItem.status === "approved" && 
+                { activityItem.status === "completed" && 
                   <CheckCircleIcon
                     className="h-6 w-6 text-indigo-600"
+                    aria-hidden="true"
+                  />
+                } 
+                { activityItem.status === "approved" && 
+                  <CheckCircleIcon
+                    className="h-6 w-6 text-green-600"
                     aria-hidden="true"
                   />
                 } 

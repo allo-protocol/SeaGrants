@@ -103,6 +103,7 @@ export type TPoolData = {
   allocationEndTime: number;
   approvalThreshold: number;
   maxRequestedAmount: string;
+  blockTimestamp: string;
   pool: {
     tokenMetadata: {
       name?: string;
@@ -128,6 +129,7 @@ export type TApplicationData = {
     poolId: string;
     allocationStartTime: number;
     allocationEndTime: number;
+    blockTimestamp: string;
     pool: {
       tokenMetadata: {
         name?: string;

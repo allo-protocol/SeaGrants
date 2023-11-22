@@ -124,3 +124,23 @@ export const convertAddressToShortString = (address: string) => {
 export const copy = (data: string) => {
   navigator.clipboard.writeText(data);
 };
+
+export const formatDateDifference = (dateString: string): string => {
+  const currentDate = new Date();
+  const inputDate = new Date(dateString);
+  const timeDifference = currentDate.getTime() - inputDate.getTime();
+  const secondsDifference = Math.floor(timeDifference / 1000);
+  const minutesDifference = Math.floor(secondsDifference / 60);
+  const hoursDifference = Math.floor(minutesDifference / 60);
+  const daysDifference = Math.floor(hoursDifference / 24);
+
+  if (secondsDifference < 60) {
+    return 'now';
+  } else if (minutesDifference < 60) {
+    return `${minutesDifference}m ago`;
+  } else if (hoursDifference < 24) {
+    return `${hoursDifference}h ago`;
+  } else {
+    return `${daysDifference}d ago`;
+  }
+}

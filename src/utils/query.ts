@@ -28,6 +28,7 @@ export const getMicroGrantsQuery = gql`
       allocationEndTime
       approvalThreshold
       maxRequestedAmount
+      blockTimestamp
       pool {
         tokenMetadata
         token
@@ -52,6 +53,7 @@ export const getMicroGrantsRecipientsQuery = gql`
       allocationEndTime
       approvalThreshold
       maxRequestedAmount
+      blockTimestamp
       pool {
         tokenMetadata
         token

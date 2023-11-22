@@ -2,17 +2,15 @@
 
 import {
   classNames,
+  convertAddressToShortString,
+  formatDateDifference,
   humanReadableAmount,
   prettyTimestamp,
   statusColorsScheme,
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import NotificationToast from "../shared/NotificationToast";
-import {
-  TActivity,
-  TApplicationData,
-  TApplicationMetadata,
-} from "@/app/types";
+import { TActivity, TApplicationData, TApplicationMetadata } from "@/app/types";
 import { useContext, useState } from "react";
 import { MarkdownView } from "../shared/Markdown";
 import { PoolContext } from "@/context/PoolContext";
@@ -114,6 +112,60 @@ export default function ApplicationDetail(props: {
     (distributed) =>
       distributed.recipientId === microGrantRecipient.recipientId.toLowerCase()
   );
+
+  const generateActivity = () => {
+    const activity: TActivity[] = [];
+
+    const poolCreatedActivity: TActivity = {
+      id: 1,
+      status: "none",
+      text: `Pool ${microGrant.poolId} Created`,
+      date: formatDateDifference(microGrant.blockTimestamp),
+      dateTime: prettyTimestamp(Number(microGrant.blockTimestamp)),
+    };
+
+    const applicationRegisteredActivity: TActivity = {
+      id: 2,
+      status: "none",
+      textBold: convertAddressToShortString(microGrantRecipient.recipientId),
+      text: "Application Registered",
+      date: formatDateDifference(microGrantRecipient.blockTimestamp),
+      dateTime: prettyTimestamp(Number(microGrantRecipient.blockTimestamp)),
+    };
+
+    activity.push(poolCreatedActivity, applicationRegisteredActivity);
+
+    for (let i = 0; i < 5; i++) {
+      // allocation activity
+      allocateds.forEach((allocated) => {
+        const status = allocated.status === "2" ? "approved" : "rejected";
+
+        const allocatedActivity: TActivity = {
+          id: activity.length,
+          status: status,
+          textBold: convertAddressToShortString(allocated.sender),
+          text: `Allocator has ${status}`,
+          date: formatDateDifference(allocated.blockTimestamp),
+          dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
+        };
+        activity.push(allocatedActivity);
+      });
+
+      // distribution activity
+      distributeds.forEach((distributed) => {
+        const distributedActivity: TActivity = {
+          id: activity.length,
+          status: "completed",
+          textBold: `${distributed.amount} ${token}`,
+          text: "Distributed",
+          date: formatDateDifference(distributed.blockTimestamp),
+          dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
+        };
+        activity.push(distributedActivity);
+      });
+    }
+    return activity;
+  };
 
   const overviews = [
     { description: "Amount", name: application.amountRequested },
@@ -266,7 +318,7 @@ export default function ApplicationDetail(props: {
 
               <div className="-mx-4 px-4 py-8 lg:col-span-2 lg:row-span-2 lg:row-end-2">
                 <div className="lg:col-start-3 mt-10">
-                  <Activity activity={activity} />
+                  <Activity activity={generateActivity()} />
 
                   {isAllocator && application.status !== "Accepted" && (
                     <>
