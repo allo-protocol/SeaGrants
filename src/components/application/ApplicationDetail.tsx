@@ -106,14 +106,14 @@ export default function ApplicationDetail(props: {
 
     // allocation activity
     allocateds.forEach((allocated) => {
-      const status = allocated.status === "2" ? "approved" : "rejected";
+      const status = allocated.status === "2" ? "Approved" : "Rejected";
 
       const allocatedActivity: TActivity = {
         id: activity.length,
         status: status,
         textBold: convertAddressToShortString(allocated.sender),
         href: getTxnExplorerLink(Number(microGrant.chainId), allocated.transactionHash),
-        suffixText: `allocator ${status}`,
+        suffixText: `${status} the application`,
         date: formatDateDifference(allocated.blockTimestamp),
         dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
       };
@@ -124,10 +124,10 @@ export default function ApplicationDetail(props: {
     distributeds.forEach((distributed) => {
       const distributedActivity: TActivity = {
         id: activity.length,
-        status: "completed",
+        status: "Completed",
         textBold: `${humanReadableAmount(distributed.amount, microGrant.pool.tokenMetadata.decimals || 18)} ${token}`,
         href: getTxnExplorerLink(Number(microGrant.chainId), distributed.transactionHash),
-        suffixText: "distributed",
+        suffixText: `Distributed to ${convertAddressToShortString(microGrantRecipient.recipientId)}`,
         date: formatDateDifference(distributed.blockTimestamp),
         dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
       };
