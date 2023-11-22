@@ -18,7 +18,11 @@ import Banner from "../shared/Banner";
 import Modal from "../shared/Modal";
 import { Allocation } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { Status } from "@allo-team/allo-v2-sdk/dist/strategies/types";
-import { AddressResponsive, getAddressExplorerLink, getTxnExplorerLink } from "../shared/Address";
+import {
+  AddressResponsive,
+  getAddressExplorerLink,
+  getTxnExplorerLink,
+} from "../shared/Address";
 import Activity from "../shared/Activity";
 
 export default function ApplicationDetail(props: {
@@ -77,7 +81,7 @@ export default function ApplicationDetail(props: {
   const distributeds = microGrant.distributeds.filter(
     (distributed) =>
       distributed.recipientId === microGrantRecipient.recipientId.toLowerCase()
-  );  
+  );
 
   const generateActivity = () => {
     const activity: TActivity[] = [];
@@ -86,7 +90,10 @@ export default function ApplicationDetail(props: {
       id: 1,
       status: "none",
       textBold: `Pool Id ${microGrant.poolId}`,
-      href: getAddressExplorerLink(Number(microGrant.chainId), microGrant.pool.strategy),
+      href: getAddressExplorerLink(
+        Number(microGrant.chainId),
+        microGrant.pool.strategy
+      ),
       suffixText: `created`,
       date: formatDateDifference(microGrant.blockTimestamp),
       dateTime: prettyTimestamp(Number(microGrant.blockTimestamp)),
@@ -112,7 +119,10 @@ export default function ApplicationDetail(props: {
         id: activity.length,
         status: status,
         textBold: convertAddressToShortString(allocated.sender),
-        href: getTxnExplorerLink(Number(microGrant.chainId), allocated.transactionHash),
+        href: getTxnExplorerLink(
+          Number(microGrant.chainId),
+          allocated.transactionHash
+        ),
         suffixText: `${status} the application`,
         date: formatDateDifference(allocated.blockTimestamp),
         dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
@@ -125,9 +135,17 @@ export default function ApplicationDetail(props: {
       const distributedActivity: TActivity = {
         id: activity.length,
         status: "Completed",
-        textBold: `${humanReadableAmount(distributed.amount, microGrant.pool.tokenMetadata.decimals || 18)} ${token}`,
-        href: getTxnExplorerLink(Number(microGrant.chainId), distributed.transactionHash),
-        suffixText: `Distributed to ${convertAddressToShortString(microGrantRecipient.recipientId)}`,
+        textBold: `${humanReadableAmount(
+          distributed.amount,
+          microGrant.pool.tokenMetadata.decimals || 18
+        )} ${token}`,
+        href: getTxnExplorerLink(
+          Number(microGrant.chainId),
+          distributed.transactionHash
+        ),
+        suffixText: `Distributed to ${convertAddressToShortString(
+          microGrantRecipient.recipientId
+        )}`,
         date: formatDateDifference(distributed.blockTimestamp),
         dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
       };
@@ -157,12 +175,12 @@ export default function ApplicationDetail(props: {
     },
   ];
 
-  function ApplicationOverView() {
+  function ApplicationInfo() {
     return (
       <div className="lg:col-span-2 lg:pr-8">
         <div className="lg:col-span-2 mt-5">
           <div className="mt-4 lg:row-span-3 lg:mt-0">
-            <div className="mt-6 border-t border-gray-100">
+            <div className="mt-6 pb-2 border-t border-b border-gray-100">
               <dl className="divide-gray-100">
                 {/* Application ID */}
                 <div className="px-4 pt-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -189,49 +207,55 @@ export default function ApplicationDetail(props: {
                     />
                   </dd>
                 </div>
-
-                {/* Status */}
-                <div className="px-4 pt-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-xs font-medium leading-6 text-gray-900">
-                    Status
-                  </dt>
-                  <dd className="mt-1 text-xs leading-6 text-gray-700 text-center sm:mt-0">
-                    <div
-                      className={classNames(
-                        statusColorsScheme[
-                          application.status as keyof typeof statusColorsScheme
-                        ],
-                        "w-[100px] rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
-                      )}
-                    >
-                      {application.status.toString()}
-                    </div>
-                  </dd>
-                </div>
-
-                {overviews.map((overview, index) => (
-                  <div
-                    key={index}
-                    className="px-4 pt-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
-                  >
-                    <dt className="text-xs font-medium leading-6 text-gray-900">
-                      {overview.description}
-                    </dt>
-                    <dd
-                      className={classNames(
-                        overview.color ? overview.color : "",
-                        "mt-1 text-xs leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
-                      )}
-                    >
-                      {overview.name}
-                    </dd>
-                  </div>
-                ))}
               </dl>
             </div>
           </div>
         </div>
       </div>
+    );
+  }
+
+  function ApplicationOverView() {
+    return (
+      <dl className="divide-y divide-gray-100">
+        {/* Status */}
+        <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt className="text-sm font-medium leading-6 text-gray-900">
+            Status
+          </dt>
+          <dd className="mt-1 text-sm leading-6 text-gray-700 text-center sm:mt-0">
+            <div
+              className={classNames(
+                statusColorsScheme[
+                  application.status as keyof typeof statusColorsScheme
+                ],
+                "rounded-md py-1 px-2 text-sm font-medium ring-1 ring-inset"
+              )}
+            >
+              {application.status.toString()}
+            </div>
+          </dd>
+        </div>
+
+        {overviews.map((overview, index) => (
+          <div
+            key={index}
+            className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
+          >
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {overview.description}
+            </dt>
+            <dd
+              className={classNames(
+                overview.color ? overview.color : "",
+                "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
+              )}
+            >
+              {overview.name}
+            </dd>
+          </div>
+        ))}
+      </dl>
     );
   }
 
@@ -273,28 +297,27 @@ export default function ApplicationDetail(props: {
         <div>
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
             <div className="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-              <div className="-mx-4 px-4 py-8 shadow-sm ring-1 ring-gray-900/5 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2">
-                <h2 className="text-base font-semibold leading-6 text-gray-900">
+              <div className="-mx-4 px-4 py-8 sm:mx-0 border-r border-gray-100 lg:col-span-2 lg:row-span-2 lg:row-end-2">
+                <h2 className="text-xl font-semibold leading-6 text-gray-900">
                   {application.name}
                 </h2>
 
-                <ApplicationOverView />
+                <ApplicationInfo />
 
-                <div className="mt-10">
+                <div className="mt-5">
                   <h3 className="sr-only">Description</h3>
                   <MarkdownView text={application.description} />
                 </div>
               </div>
 
-              <div className="-mx-4 px-4 py-8 lg:col-span-2 lg:row-span-2 lg:row-end-2">
-                <div className="lg:col-start-3 mt-10">
-                  <Activity activity={generateActivity()} />
-
+              <div className="-mx-4 px-4 py-4 lg:col-span-2 lg:row-span-2 lg:row-end-2">
+                <div className="lg:col-start-3 mt-1">
+                  <ApplicationOverView />
                   {isAllocator && application.status !== "Accepted" && (
-                    <>
+                    <div className="mt-5 mb-5">
                       <button
                         onClick={() => onAllocate(true)}
-                        className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                       >
                         Approve
                       </button>
@@ -304,8 +327,12 @@ export default function ApplicationDetail(props: {
                       >
                         Reject
                       </button>
-                    </>
+                    </div>
                   )}
+
+                  <div className="pt-4 border-t border-gray-100">
+                    <Activity activity={generateActivity()} />
+                  </div>
                 </div>
               </div>
             </div>

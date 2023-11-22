@@ -10,7 +10,7 @@ import ApplicationList from "../application/ApplicationList";
 import { PoolContext } from "@/context/PoolContext";
 import PoolManagement from "./PoolManagement";
 import Banner from "../shared/Banner";
-import AllocatedList from "../shared/AllocatedsList";
+// import AllocatedList from "../shared/AllocatedsList";
 
 export default function PoolOverview(props: {
   chainId: string;
@@ -31,7 +31,7 @@ export default function PoolOverview(props: {
   const [tabs, setTabs] = useState([
     { name: "Pool Details", current: true },
     { name: "Applications", current: false },
-    { name: "Reviews", current: false },
+    // { name: "Reviews", current: false },
   ]);
 
   const breadcrumbs = [
@@ -67,7 +67,7 @@ export default function PoolOverview(props: {
       setTabs([
         { name: "Pool Details", current: true },
         { name: "Applications", current: false },
-        { name: "Reviews", current: false },
+        // { name: "Reviews", current: false },
         { name: "Manage Pool", current: false },
       ]);
     }
@@ -104,7 +104,7 @@ export default function PoolOverview(props: {
           </select>
         </div>
         <div className="hidden sm:block px-8 pt-10">
-          <div className="border-b border-gray-200 w-80">
+          <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-4" aria-label="Tabs">
               {tabs.map((tab) => (
                 <span
@@ -138,7 +138,7 @@ export default function PoolOverview(props: {
         {currentTab == "Applications" && (
           <ApplicationList pool={props.pool} applications={props.applications}  />
         )}
-        {currentTab == "Reviews" && (
+        {/* {currentTab == "Reviews" && (
           <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-10">
             <div className="lg:col-span-2 lg:pr-8">
               <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
@@ -150,7 +150,7 @@ export default function PoolOverview(props: {
               />
             </div>
           </div>
-        )}
+        )} */}
         {currentTab == "Manage Pool" && <PoolManagement />}
       </div>
     </div>
