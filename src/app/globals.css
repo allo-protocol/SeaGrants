@@ -48,13 +48,27 @@
 
 .mde-preview h1,
 .mde-preview h2,
+.mde-preview p,
+.mde-textarea-wrapper textarea {
+  font-size: small !important;
+}
+
+.mde-preview h1,
+.mde-preview h2,
 .mde-preview p {
-  font-size: inherit !important;
   border-bottom: 0 !important;
 }
 
 .mde-preview {
   .mde-preview-content {
     padding: 0 !important;
+  }
+}
+
+.react-mde {
+  .mde-preview {
+    .mde-preview-content {
+      padding: 10px !important;
+    }
   }
 }
