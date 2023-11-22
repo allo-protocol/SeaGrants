@@ -72,6 +72,7 @@ export const getMicroGrantsRecipientsQuery = gql`
         chainId
         status
         blockTimestamp
+        transactionHash
       }
       distributeds {
         recipientId
@@ -129,6 +130,7 @@ export const getMicroGrantRecipientQuery = gql`
           chainId
           status
           blockTimestamp
+          transactionHash
         }
         distributeds {
           recipientId

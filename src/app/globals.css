@@ -72,3 +72,10 @@
     }
   }
 }
+
+a {
+  color: #5a67d8;
+  &:hover {
+    color: #667eea;
+  }
+}

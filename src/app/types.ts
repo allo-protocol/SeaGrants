@@ -161,6 +161,7 @@ export type TAllocatedData = {
   chainId: string;
   blockTimestamp: string;
   status: string;
+  transactionHash: string;
 };
 
 export type TDistributedData = {
@@ -172,6 +173,7 @@ export type TDistributedData = {
   chainId: string;
   amount: string;
   blockTimestamp: string;
+  transactionHash: string;
 };
 
 // Progress Modal
@@ -209,8 +211,10 @@ export enum EPoolStatus {
 export type TActivity = {
   id: number;
   status: string;
-  text: string;
+  prefixText?: string;
   textBold?: string;
+  href?: string;
+  suffixText?: string;
   date: string;
   dateTime: string;
 };

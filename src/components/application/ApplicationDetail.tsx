@@ -18,42 +18,8 @@ import Banner from "../shared/Banner";
 import Modal from "../shared/Modal";
 import { Allocation } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { Status } from "@allo-team/allo-v2-sdk/dist/strategies/types";
-import { AddressResponsive } from "../shared/Address";
+import { AddressResponsive, getAddressExplorerLink, getTxnExplorerLink } from "../shared/Address";
 import Activity from "../shared/Activity";
-
-const activity: TActivity[] = [
-  {
-    id: 1,
-    status: "none",
-    text: "Submitted Application",
-    date: "4d ago",
-    dateTime: "2023-01-23T10:32",
-  },
-  {
-    id: 2,
-    status: "none",
-    textBold: "0x4b..2bd",
-    text: "Rejected Application",
-    date: "3d ago",
-    dateTime: "2023-01-23T11:03",
-  },
-  {
-    id: 3,
-    status: "approved",
-    textBold: "0x1b..4ce",
-    text: "Approved Application",
-    date: "2d ago",
-    dateTime: "2023-01-23T11:24",
-  },
-  {
-    id: 3,
-    status: "approved",
-    textBold: "0.1 ETH",
-    text: "Recieved",
-    date: "1d ago",
-    dateTime: "2023-01-23T11:24",
-  },
-];
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
@@ -120,7 +86,8 @@ export default function ApplicationDetail(props: {
       id: 1,
       status: "none",
       textBold: `Pool Id ${microGrant.poolId}`,
-      text: `Created`,
+      href: `/${microGrant.chainId}/${microGrant.poolId}`,
+      suffixText: `created`,
       date: formatDateDifference(microGrant.blockTimestamp),
       dateTime: prettyTimestamp(Number(microGrant.blockTimestamp)),
     };
@@ -129,7 +96,8 @@ export default function ApplicationDetail(props: {
       id: 2,
       status: "none",
       textBold: convertAddressToShortString(microGrantRecipient.recipientId),
-      text: "Application Submitted",
+      href: `#`,
+      suffixText: "Application Submitted",
       date: formatDateDifference(microGrantRecipient.blockTimestamp),
       dateTime: prettyTimestamp(Number(microGrantRecipient.blockTimestamp)),
     };
@@ -144,7 +112,8 @@ export default function ApplicationDetail(props: {
         id: activity.length,
         status: status,
         textBold: convertAddressToShortString(allocated.sender),
-        text: `allocator ${status}`,
+        href: getTxnExplorerLink(Number(microGrant.chainId), allocated.transactionHash),
+        suffixText: `allocator ${status}`,
         date: formatDateDifference(allocated.blockTimestamp),
         dateTime: prettyTimestamp(Number(allocated.blockTimestamp)),
       };
@@ -156,8 +125,9 @@ export default function ApplicationDetail(props: {
       const distributedActivity: TActivity = {
         id: activity.length,
         status: "completed",
-        textBold: `${amount} ${token}`,
-        text: "distributed",
+        textBold: `${humanReadableAmount(distributed.amount, microGrant.pool.tokenMetadata.decimals || 18)} ${token}`,
+        href: getTxnExplorerLink(Number(microGrant.chainId), distributed.transactionHash),
+        suffixText: "distributed",
         date: formatDateDifference(distributed.blockTimestamp),
         dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
       };
