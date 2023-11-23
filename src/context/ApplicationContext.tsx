@@ -43,7 +43,7 @@ const initialSteps: TProgressStep[] = [
   },
   {
     id: 2,
-    content: "Indexing your application",
+    content: "Indexing your application on ",
     target: "",
     href: "",
     status: EProgressStatus.NOT_STARTED,
