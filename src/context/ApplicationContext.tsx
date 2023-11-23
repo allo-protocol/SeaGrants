@@ -13,9 +13,13 @@ import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { decodeEventLog } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
-import { pollUntilDataIsIndexed } from "@/utils/common";
+import {
+  pollUntilDataIsIndexed,
+  pollUntilMetadataIsAvailable,
+} from "@/utils/common";
 import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
 import { truncatedStringWithoutStyle } from "@/components/shared/Address";
+import { useRouter } from "next/navigation";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -44,7 +48,14 @@ const initialSteps: TProgressStep[] = [
   {
     id: 2,
     content: "Indexing your application on ",
-    target: "",
+    target: ETarget.SPEC,
+    href: "",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    id: 3,
+    content: "Indexing you metadata on ",
+    target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
@@ -61,6 +72,7 @@ export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
+  const router = useRouter();
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
@@ -174,22 +186,42 @@ export const ApplicationContextProvider = (props: {
     }
 
     // 4. Poll indexer for recipientId
-    try {
-      const pollingData: any = {
-        chainId: chain,
-        poolId: poolId,
-        recipientId: recipientId.toLowerCase(),
-      };
-      await pollUntilDataIsIndexed(
-        checkIfRecipientIsIndexedQuery,
-        pollingData,
-        "microGrantRecipient",
-      );
+    const pollingData: any = {
+      chainId: chain,
+      poolId: poolId,
+      recipientId: recipientId.toLowerCase(),
+    };
+    const pollingResult: boolean = await pollUntilDataIsIndexed(
+      checkIfRecipientIsIndexedQuery,
+      pollingData,
+      "microGrantRecipient",
+    );
+
+    if (pollingResult) {
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
-    } catch (e) {
-      console.log("Polling", e);
+    } else {
+      console.log("Polling ERROR");
       updateStepStatus(2, EProgressStatus.IS_ERROR);
     }
+
+    updateStepStatus(3, EProgressStatus.IN_PROGRESS);
+
+    // 5. Index Metadata
+
+    const pollingMetadataResult = await pollUntilMetadataIsAvailable(
+      pointer.IpfsHash,
+    );
+
+    if (pollingMetadataResult) {
+      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
+    } else {
+      console.log("Polling ERROR");
+      updateStepStatus(3, EProgressStatus.IS_ERROR);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    router.push(`/${chain}/${poolId}/${recipientId}`);
 
     return recipientId;
   };

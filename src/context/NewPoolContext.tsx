@@ -52,15 +52,15 @@ const initialSteps: TProgressStep[] = [
   },
   {
     id: 3,
-    content: "Indexing your pool",
-    target: "",
+    content: "Indexing your pool on ",
+    target: ETarget.SPEC,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
     id: 4,
-    content: "Indexing you metadata",
-    target: "",
+    content: "Indexing you metadata on ",
+    target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
@@ -105,9 +105,6 @@ export const NewPoolContextProvider = (props: {
     chain: number,
   ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
-
-    console.log("new pool data");
-    console.log(data);
 
     // return values
     let strategyAddress: string = "0x";
@@ -211,9 +208,6 @@ export const NewPoolContextProvider = (props: {
       managers: data.managers,
     };
 
-    console.log("initStrategyData", initStrategyData);
-    console.log("poolCreationData", poolCreationData);
-
     const allo = new Allo({
       chain: chain,
     });
@@ -287,6 +281,10 @@ export const NewPoolContextProvider = (props: {
       console.log("Polling ERROR");
       updateStepStatus(4, EProgressStatus.IS_ERROR);
     }
+
+    setTimeout(() => {
+      router.push(`/${chain}/${poolId}`);
+    }, 5000);
 
     router.push(`/${chain}/${poolId}`);
 

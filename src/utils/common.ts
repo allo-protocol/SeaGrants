@@ -96,12 +96,12 @@ export const pollUntilMetadataIsAvailable = async (
     } else {
       counter++;
       if (counter > 20) return false;
-      return await new Promise((resolve) => setTimeout(resolve, 2000)).then(
+      return new Promise((resolve) => setTimeout(resolve, 2000)).then(
         fetchMetadata,
       );
     }
   };
-  return false;
+  return await fetchMetadata();
 };
 
 export const pollUntilDataIsIndexed = async (
@@ -111,9 +111,7 @@ export const pollUntilDataIsIndexed = async (
 ): Promise<boolean> => {
   let counter = 0;
   const fetchData: any = async () => {
-    const response: any = await request(graphqlEndpoint, QUERY_ENDPOINT, data);
-
-    console.log("response", response);
+    const response: any = request(graphqlEndpoint, QUERY_ENDPOINT, data);
 
     if (response && response[propToCheck] !== null) {
       // Data is found, return true

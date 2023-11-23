@@ -34,7 +34,10 @@ export default function ApplicationCard(props: {
   return (
     <Link href={navLink}>
       <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50">
-        <Banner image={application.applicationBanner} alt="applicationBanner" />
+        <Banner
+          image={application.applicationBanner}
+          alt={application.metadata!.name}
+        />
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
         <div className="text-sm font-medium leading-6 text-gray-900 py-3">
