@@ -47,15 +47,15 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
       <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50">
         <Banner image={poolDetail.poolBanner} alt={metadata.name} />
       </div>
-      <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+      <dl className="-my-3 divide-y divide-gray-100 px-6 py-6 text-sm leading-6">
         <div className="flex justify-between gap-x-4 py-3">
           <dt className="text-gray-500">
             {" "}
-            <div className="text-sm font-medium leading-6 text-gray-900 py-3">
+            <div className="font-semibold leading-6 text-gray-900">
               {metadata!.name}
             </div>
           </dt>
-          <div className="flex justify-between gap-x-4 py-3">
+          <div className="flex justify-between gap-x-4">
             <dd className="text-gray-500">
               <div
                 className={classNames(
@@ -69,23 +69,31 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
           </div>
         </div>
         <div className="flex justify-between gap-x-4 py-3">
-          <dt className="text-gray-500">
-            Pool Amount: {amount} {tokenMetadata.symbol ?? "ETH"}
+          <dt className="text-sm font-medium leading-6 text-gray-900">
+            Pool Amount
           </dt>
-          <dd className="text-gray-500">
-            Request Amount: max {maxRequestedAmount}{" "}
-            {tokenMetadata.symbol ?? "ETH"}
+          <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 text-gray-500">
+            {amount} {tokenMetadata.symbol ?? "ETH"}
           </dd>
         </div>
         <div className="flex justify-between gap-x-4 py-3">
-          <dt className="text-gray-500">
-            Start Date:{" "}
+          <dt className="text-sm font-medium leading-6 text-gray-900">
+            Max Allocation: 
+          </dt>
+          <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 text-gray-500">
+            {maxRequestedAmount} {tokenMetadata.symbol ?? "ETH"}
+          </dd>
+        </div>
+        <div className="flex justify-between gap-x-4 py-3">
+          <dt className="text-sm font-medium leading-6 text-gray-900">
+            Period
+          </dt>
+
+          <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
             <time dateTime={pool.allocationStartTime.toString()}>
               {prettyTimestamp(pool.allocationStartTime)}
             </time>
-          </dt>
-          <dd className="text-gray-500">
-            End Date:{" "}
+            <span className="mx-1">-</span>
             <time dateTime={pool.allocationEndTime.toString()}>
               {prettyTimestamp(pool.allocationEndTime)}
             </time>
@@ -95,7 +103,7 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
           <div
             ref={containerRef}
             className={`text-gray-500 line-clamp-4 ${
-              isTextOverflowing ? "overflow-hidden" : ""
+              isTextOverflowing && "overflow-hidden"
             }`}
           >
             <ReactMarkdown
@@ -108,7 +116,6 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
             </ReactMarkdown>
           </div>
         </div>
-        {isTextOverflowing && <>Show more...</>}
       </dl>
     </Link>
   );

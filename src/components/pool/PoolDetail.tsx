@@ -65,8 +65,8 @@ export const PoolDetail = (props: {
       )} ${tokenMetadata.symbol ?? "ETH"}`,
     },
     {
-      description: "Request Amount",
-      name: `max ${humanReadableAmount(
+      description: "Max Allocation",
+      name: `${humanReadableAmount(
         props.pool.maxRequestedAmount,
         tokenMetadata.decimals,
       )} ${tokenMetadata.symbol ?? "ETH"}`,
