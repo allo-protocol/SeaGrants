@@ -12,6 +12,7 @@ import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { useRouter } from "next/navigation";
+import { truncatedStringWithoutStyle } from "@/components/shared/Address";
 
 const initialSteps: TProgressStep[] = [
   {
@@ -135,7 +136,7 @@ export const PoolContextProvider = (props: {
           hash: tx.hash,
         });
 
-        updateStepTarget(0, `${chainInfo.name} at ${tx.hash}`);
+        updateStepTarget(0, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
         updateStepHref(
           0,
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
@@ -182,7 +183,7 @@ export const PoolContextProvider = (props: {
           hash: tx.hash,
         });
 
-        updateStepTarget(0, `${chainInfo.name} at ${tx.hash}`);
+        updateStepTarget(0, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
         updateStepHref(
           0,
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
