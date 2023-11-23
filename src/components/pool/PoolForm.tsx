@@ -15,7 +15,14 @@ import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
 
 const schema = yup.object({
-  profileId: yup.string().required("Recipient address is required"),
+  profileId: yup
+    .string()
+    .required("Recipient address is required")
+    .test(
+      "address-check",
+      "Must start with 0x",
+      (value) => value?.toLowerCase()?.startsWith("0x")
+    ),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
   description: yup.string().required().min(10, "Must be at least 150 words"),

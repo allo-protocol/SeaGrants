@@ -88,7 +88,7 @@ export default async function Home() {
         flyoutOptions={{
           useFlyout: true,
           startIndex: 2,
-          label: `Show all active pools (${activePools.length})`,
+          label: `Show all active pools (${activePools.length > 2 ? activePools.length - 2 : activePools.length})`,
         }}
       />
       <PoolList

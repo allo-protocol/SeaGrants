@@ -37,7 +37,14 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
         `Amount must be less than ${maxRequestedAmount}`,
         (value) => Number(value) <= maxRequestedAmount
       ),
-    recipientAddress: yup.string().required("Recipient address is required"),
+    recipientAddress: yup
+      .string()
+      .required("Recipient address is required")
+      .test(
+      "address-check",
+      "Must start with 0x",
+      (value) => value?.toLowerCase()?.startsWith("0x")
+    ),
     profileOwner: yup.string().required("A profile owner is required"),
     nonce: yup.number().required("A nonce is required").min(1),
   });
