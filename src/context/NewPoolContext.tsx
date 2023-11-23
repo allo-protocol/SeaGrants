@@ -275,6 +275,8 @@ export const NewPoolContextProvider = (props: {
       pointer.IpfsHash,
     );
 
+    console.log("pollingMetadataResult", pollingMetadataResult);
+
     if (pollingMetadataResult) {
       updateStepStatus(4, EProgressStatus.IS_SUCCESS);
     } else {

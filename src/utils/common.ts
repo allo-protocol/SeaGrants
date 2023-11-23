@@ -54,7 +54,10 @@ export function humanReadableAmount(amount: string, decimals?: number) {
   return 0;
 }
 
-export function isPoolActive(allocationStartTime: number, allocationEndTime: number) {
+export function isPoolActive(
+  allocationStartTime: number,
+  allocationEndTime: number,
+) {
   const now = Date.now() / 1000;
   return now >= allocationStartTime && now <= allocationEndTime;
 }
@@ -89,15 +92,18 @@ export const pollUntilMetadataIsAvailable = async (
 ): Promise<boolean> => {
   const ipfsClient = getIPFSClient();
   let counter = 0;
+
   const fetchMetadata: any = async () => {
     const metadata = await ipfsClient.fetchJson(pointer);
+
     if (metadata) {
       return true;
     } else {
       counter++;
       if (counter > 20) return false;
-      return new Promise((resolve) => setTimeout(resolve, 2000)).then(
-        fetchMetadata,
+      // Corrected: Return the result of the recursive call
+      return await new Promise((resolve) => setTimeout(resolve, 2000)).then(
+        () => fetchMetadata(),
       );
     }
   };

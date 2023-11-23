@@ -219,7 +219,7 @@ export const ApplicationContextProvider = (props: {
       updateStepStatus(3, EProgressStatus.IS_ERROR);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     router.push(`/${chain}/${poolId}/${recipientId}`);
 
