@@ -158,6 +158,10 @@ export const truncatedString = (str: string) => {
   return <div className="truncate font-mono w-32">{str}</div>;
 };
 
+export const truncatedStringWithoutStyle = (str: string) => {
+  return <span className="truncate">{str}</span>;
+};
+
 export const getAddressExplorerLink = (chainId: number, hash: string) => {
   return getChain(chainId).blockExplorers.default.url + "/address/" + hash;
 }

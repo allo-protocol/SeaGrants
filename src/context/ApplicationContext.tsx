@@ -15,6 +15,7 @@ import { decodeEventLog } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
 import { pollUntilDataIsIndexed } from "@/utils/common";
 import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
+import { truncatedStringWithoutStyle } from "@/components/shared/Address";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -159,9 +160,9 @@ export const ApplicationContextProvider = (props: {
       console.log("Hash", tx.hash);
       console.log("recipientId", recipientId);
 
-      updateStepTarget(2, `${chainInfo.name} at ${tx.hash}`);
+      updateStepTarget(1, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
       updateStepHref(
-        2,
+        1,
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
@@ -185,8 +186,6 @@ export const ApplicationContextProvider = (props: {
         "microGrantRecipient",
       );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      window.location.reload();
     } catch (e) {
       console.log("Polling", e);
       updateStepStatus(2, EProgressStatus.IS_ERROR);
