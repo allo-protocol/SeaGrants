@@ -11,16 +11,16 @@ const PoolList = (props: {
   const { pools, title, flyoutOptions } = props;
 
   const renderPools = (_pools: TPoolData[]) => {
-    const cols = _pools.length === 1 ? "3" : "6";
+    const cols = _pools.length === 1 ? "6" : "3";
     return (
       <div
         // role="list"
-        className={`grid grid-cols-${cols} gap-x-6 gap-y-8 lg:grid-cols-${cols} xl:gap-x-8 w-full`}
+        className={`grid grid-cols-6 gap-x-6 gap-y-8 lg:grid-cols-6 xl:gap-x-8 w-full`}
       >
         {_pools.map((pool) => (
           <div
             key={`${pool.chainId}-${pool.poolId}`}
-            className={`overflow-hidden rounded-xl border border-gray-200 col-span-3`}
+            className={`overflow-hidden rounded-xl border border-gray-200 col-span-${cols}`}
           >
             <PoolCard key={`${pool.chainId}-${pool.poolId}`} pool={pool} />
           </div>

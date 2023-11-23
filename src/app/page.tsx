@@ -7,7 +7,6 @@ import { getPoolStatus } from "@/utils/common";
 
 export default async function Home() {
   const ipfsClient = getIPFSClient();
-  let isError = false;
 
   let pools: TPoolData[] = [];
   try {
@@ -34,7 +33,6 @@ export default async function Home() {
       }
     }
   } catch (e) {
-    isError = true;
     console.log(e);
   }
 
