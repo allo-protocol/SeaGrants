@@ -32,7 +32,6 @@ export const Hash = (props: { hash: string; chainId: number }) => {
 };
 
 export const AlloProfileFull = (props: { id: string; chainId: number }) => {
-  // const explorerLink = "";
 
   return (
     <div className="flex items-center">
@@ -46,16 +45,15 @@ export const AlloProfileFull = (props: { id: string; chainId: number }) => {
         <TbCopy />
       </div>
       <div>
-        {/* <a target="_blank" href={explorerLink}>
+        <a target="_blank" href={getAddressExplorerLink(props.chainId, props.id)}>
           <TbExternalLink />
-        </a> */}
+        </a>
       </div>
     </div>
   );
 };
 
 export const AlloProfile = (props: { id: string; chainId: number }) => {
-  // const explorerLink = "";
 
   return (
     <div className="flex items-center">
@@ -69,9 +67,9 @@ export const AlloProfile = (props: { id: string; chainId: number }) => {
         <TbCopy />
       </div>
       <div>
-        {/* <a target="_blank" href={explorerLink}>
+        <a target="_blank" href={getAddressExplorerLink(props.chainId, props.id)}>
           <TbExternalLink />
-        </a> */}
+        </a>
       </div>
     </div>
   );
@@ -159,7 +157,6 @@ export const AddressResponsive = (props: {
 export const truncatedString = (str: string) => {
   return <div className="truncate font-mono w-32">{str}</div>;
 };
-
 
 export const getAddressExplorerLink = (chainId: number, hash: string) => {
   return getChain(chainId).blockExplorers.default.url + "/address/" + hash;
