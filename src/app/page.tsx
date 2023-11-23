@@ -89,7 +89,7 @@ export default async function Home() {
         }}
       />
       <PoolList
-        pools={[activePools[0]]}
+        pools={activePools}
         title={"Active Pools"}
         flyoutOptions={{
           useFlyout: true,
