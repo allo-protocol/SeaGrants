@@ -88,8 +88,8 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     );
 
     setTimeout(() => {
-      setIsOpen(false);
       window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
+      setIsOpen(false);
     }, 1000);
   };
 
