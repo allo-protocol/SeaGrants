@@ -150,14 +150,18 @@ export default function CropModal(props: {
                     </Dialog.Title>
                   )}
                   {imageSrc && (
-                    <ReactCrop
-                      crop={crop} // error here
-                      onChange={(c) => setCrop(c)}
-                      onComplete={(c) => setCompletedCrop(c)}
-                      aspect={props.aspectRatio}
-                    >
-                      <img ref={imgRef} src={imageSrc as unknown as string} />
-                    </ReactCrop>
+                    <>
+                      {" "}
+                      <ReactCrop
+                        crop={crop} // error here
+                        onChange={(c) => setCrop(c)}
+                        onComplete={(c) => setCompletedCrop(c)}
+                        aspect={props.aspectRatio}
+                      >
+                        <img ref={imgRef} src={imageSrc as unknown as string} />
+                      </ReactCrop>
+                      <p>Please select crop area.</p>
+                    </>
                   )}
 
                   <div className="mt-6 flex items-center justify-end gap-x-6">
@@ -169,8 +173,11 @@ export default function CropModal(props: {
                       Cancel
                     </button>
                     <button
+                      disabled={!completedCrop}
                       onClick={handleDone}
-                      className="bg-green-700 hover:bg-green-500 rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm"
+                      className={`bg-green-700 ${
+                        completedCrop && "hover:bg-green-500"
+                      } rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm`}
                     >
                       Save
                     </button>

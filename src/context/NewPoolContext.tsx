@@ -16,8 +16,12 @@ import {
   waitForTransaction,
 } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
-import { pollUntilDataIsIndexed } from "@/utils/common";
+import {
+  pollUntilDataIsIndexed,
+  pollUntilMetadataIsAvailable,
+} from "@/utils/common";
 import { checkIfPoolIsIndexedQuery } from "@/utils/query";
+import { useRouter } from "next/navigation";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -48,8 +52,15 @@ const initialSteps: TProgressStep[] = [
   },
   {
     id: 3,
-    content: "Indexing your pool",
-    target: "",
+    content: "Indexing your pool on ",
+    target: ETarget.SPEC,
+    href: "",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    id: 4,
+    content: "Indexing you metadata on ",
+    target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
@@ -69,6 +80,7 @@ export const NewPoolContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
+  const router = useRouter();
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
@@ -90,7 +102,7 @@ export const NewPoolContextProvider = (props: {
 
   const createNewPool = async (
     data: TNewPool,
-    chain: number
+    chain: number,
   ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
 
@@ -154,30 +166,34 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(2, `${chainInfo.name}`);
       updateStepHref(
         2,
-        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress
+        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
       );
       updateStepStatus(1, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
     } catch (e) {
       console.log("Deploying Strategy", e);
       updateStepStatus(1, EProgressStatus.IS_ERROR);
     }
 
     const startDateInSeconds = Math.floor(
-      new Date(data.startDate).getTime() / 1000
+      new Date(data.startDate).getTime() / 1000,
     );
 
     const endDateInSeconds = Math.floor(
-      new Date(data.endDate).getTime() / 1000
+      new Date(data.endDate).getTime() / 1000,
     );
 
-    // create new pool
-    const initStrategyData = await strategy.getInitializeData({
+    const initParams = {
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
       allocationEndTime: BigInt(endDateInSeconds),
       approvalThreshold: BigInt(data.approvalThreshold),
       maxRequestedAmount: BigInt(data.maxAmount),
-    });
+    };
+
+    console.log("initParams", initParams);
+    // create new pool
+    const initStrategyData = await strategy.getInitializeData(initParams);
 
     const poolCreationData = {
       profileId: data.profileId,
@@ -192,18 +208,21 @@ export const NewPoolContextProvider = (props: {
       managers: data.managers,
     };
 
-    console.log("initStrategyData", initStrategyData);
-    console.log("poolCreationData", poolCreationData);
-
     const allo = new Allo({
       chain: chain,
     });
 
     const createPoolData = await allo.createPoolWithCustomStrategy(
-      poolCreationData
+      poolCreationData,
     );
 
     try {
+      console.log("pool tx creation data");
+      console.log({
+        to: createPoolData.to as string,
+        data: createPoolData.data,
+        value: BigInt(createPoolData.value),
+      });
       const tx = await sendTransaction({
         to: createPoolData.to as string,
         data: createPoolData.data,
@@ -221,7 +240,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(3, `${chainInfo.name}`);
       updateStepHref(
         3,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
       updateStepStatus(3, EProgressStatus.IN_PROGRESS);
@@ -231,17 +250,45 @@ export const NewPoolContextProvider = (props: {
     }
 
     // 4. Index Pool
-    try {
-      const pollingData: any = {
-        chainId: chain,
-        poolId: poolId,
-      };
-      await pollUntilDataIsIndexed(checkIfPoolIsIndexedQuery, pollingData, "microGrant");
+    const pollingData: any = {
+      chainId: chain,
+      poolId: poolId,
+    };
+    let pollingResult = await pollUntilDataIsIndexed(
+      checkIfPoolIsIndexedQuery,
+      pollingData,
+      "microGrant",
+    );
+
+    if (pollingResult) {
       updateStepStatus(3, EProgressStatus.IS_SUCCESS);
-    } catch (e) {
-      console.log("Polling", e);
+    } else {
+      console.log("Polling ERROR");
       updateStepStatus(3, EProgressStatus.IS_ERROR);
     }
+
+    updateStepStatus(4, EProgressStatus.IN_PROGRESS);
+
+    // 5. Index Metadata
+
+    const pollingMetadataResult = await pollUntilMetadataIsAvailable(
+      pointer.IpfsHash,
+    );
+
+    console.log("pollingMetadataResult", pollingMetadataResult);
+
+    if (pollingMetadataResult) {
+      updateStepStatus(4, EProgressStatus.IS_SUCCESS);
+    } else {
+      console.log("Polling ERROR");
+      updateStepStatus(4, EProgressStatus.IS_ERROR);
+    }
+
+    setTimeout(() => {
+      router.push(`/${chain}/${poolId}`);
+    }, 5000);
+
+    router.push(`/${chain}/${poolId}`);
 
     return {
       address: strategyAddress as `0x${string}`,

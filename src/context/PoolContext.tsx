@@ -11,6 +11,7 @@ import { createContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
+import { useRouter } from "next/navigation";
 
 const initialSteps: TProgressStep[] = [
   {
@@ -59,6 +60,7 @@ export const PoolContextProvider = (props: {
   );
 
   const { isConnected, address } = useAccount();
+  const router = useRouter();
 
   // todo: replace contract queries with spec
   useEffect(() => {
@@ -140,6 +142,9 @@ export const PoolContextProvider = (props: {
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+        setTimeout(() => {
+          router.refresh();
+        }, 3000);
       } catch (e) {
         console.log("Updating Allocators", e);
         updateStepStatus(0, EProgressStatus.IS_ERROR);

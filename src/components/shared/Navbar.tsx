@@ -72,7 +72,7 @@ export default function Navbar() {
                                 ${open ? "text-black" : "text-black/90"}
                                 group inline-flex items-center rounded-md px-3 py-2 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75`}
                           >
-                            <span>Create</span>
+                            Create
                             <ChevronDownIcon
                               className={`${
                                 open ? "text-black-300" : "text-black-300/70"

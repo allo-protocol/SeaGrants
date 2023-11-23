@@ -1,7 +1,6 @@
 import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
 import PoolOverview from "@/components/pool/PoolOverview";
 import Container from "@/components/shared/Container";
-import { NewPoolContextProvider } from "@/context/NewPoolContext";
 import { PoolContextProvider } from "@/context/PoolContext";
 import { getIPFSClient } from "@/services/ipfs";
 import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";

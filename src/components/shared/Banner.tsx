@@ -10,41 +10,58 @@ const Banner = (props: { image: string | undefined | null; alt: string }) => {
     height: 0,
   });
 
-  useEffect(() => {
+useEffect(() => {
+  const updateBannerSize = () => {
     if (bannerRef.current) {
       setBannerSize({
         width: bannerRef.current.offsetWidth,
         height: Math.ceil(bannerRef.current.offsetWidth / aspectRatio),
       });
     }
-  }, [bannerRef]);
+  };
 
-  return (
-    <>
-      {props.image && props.image !== "" ? (
-        <Image
-          src={props.image}
-          alt={props.alt}
-          className="h-full w-full object-cover object-center"
-          width={bannerSize.width}
-          height={bannerSize.height}
-        />
-      ) : (
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: `${bannerSize.width}px`,
-            height: `${bannerSize.height}px`,
-            backgroundColor: stringToColor(
-              props.alt ?? (Math.random() * 10000).toString(),
-            ),
-          }}
-        >
-          <span className="text-gray-400 text-3xl">{props.alt}</span>
-        </div>
-      )}
-    </>
-  );
+  window.addEventListener("resize", updateBannerSize);
+  updateBannerSize();
+
+  return () => {
+    window.removeEventListener("resize", updateBannerSize);
+  };
+}, [bannerRef.current, props.image]);
+
+return (
+  <>
+    {props.image && props.image !== "" ? (
+      <Image
+        ref={bannerRef}
+        src={props.image}
+        alt={props.alt}
+        className="h-full w-full object-cover object-center"
+        width={bannerSize.width}
+        height={bannerSize.height}
+        onLoad={() =>
+          setBannerSize({
+            width: bannerRef.current.offsetWidth,
+            height: Math.ceil(bannerRef.current.offsetWidth / aspectRatio),
+          })
+        }
+      />
+    ) : (
+      <div
+        ref={bannerRef}
+        className="flex items-center justify-center"
+        style={{
+          width: `100%`,
+          height: `${bannerSize.height}px`,
+          backgroundColor: stringToColor(
+            props.alt ?? (Math.random() * 10000).toString(),
+          ),
+        }}
+      >
+        <span className="text-gray-400 text-3xl">{props.alt}</span>
+      </div>
+    )}
+  </>
+);
 };
 
 export default Banner;

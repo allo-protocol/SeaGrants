@@ -24,7 +24,7 @@ export default function RootLayout({
         <WagmiConfig config={wagmiConfigData}>
           <RainbowKitProvider chains={chainData}>
             <Navbar />
-            <main className="mt-8">{children}</main>
+            <main className="px-6 md:px-0 mt-8">{children}</main>
           </RainbowKitProvider>
         </WagmiConfig>
       </body>

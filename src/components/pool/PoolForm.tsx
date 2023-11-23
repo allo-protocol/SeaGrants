@@ -12,14 +12,27 @@ import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";
 import ImageUpload from "../shared/ImageUpload";
 import { MarkdownEditor } from "../shared/Markdown";
+import { parseUnits } from "viem";
 
 const schema = yup.object({
   profileId: yup.string().required("Recipient address is required"),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
   description: yup.string().required().min(10, "Must be at least 150 words"),
-  fundPoolAmount: yup.number().required("fund pool amount is required"),
-  maxAmount: yup.number().required("max amount is required"),
+  fundPoolAmount: yup
+    .string()
+    .test(
+      "is-number",
+      "fund pool amount is required",
+      (value) => !isNaN(Number(value)),
+    ),
+  maxAmount: yup
+    .string()
+    .test(
+      "is-number",
+      "max amount is required",
+      (value) => !isNaN(Number(value)),
+    ),
   approvalThreshold: yup.number().required("approval threshold is required"),
   startDate: yup.date().required("Start time is required"),
   endDate: yup.date().required("End time is required"),
@@ -64,8 +77,8 @@ export default function PoolForm() {
       tokenAddress: data.tokenAddress
         ? data.tokenAddress
         : "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      fundPoolAmount: data.fundPoolAmount,
-      maxAmount: data.maxAmount,
+      fundPoolAmount: parseUnits(data.fundPoolAmount, 18).toString(),
+      maxAmount: parseUnits(data.maxAmount, 18).toString(),
       approvalThreshold: data.approvalThreshold,
       startDate: data.startDate,
       endDate: data.endDate,
@@ -135,6 +148,24 @@ export default function PoolForm() {
                     <Error message={errors.profileId?.message!} />
                   )}
                 </div>
+                {/* <div className="sm:col-span-4">
+                  <label
+                    htmlFor="useRegistryAnchor"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Registry Profile ID
+                  </label>
+                  <select
+                    {...register("profileId")}
+                    id="profileId"
+                    name="profileId"
+                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    defaultValue="false"
+                  >
+                    <option>0x1234</option>
+                    <option>0x456</option>
+                  </select>
+                </div> */}
                 <p className="text-xs leading-5 text-gray-600 mt-2">
                   The registry profile id of you organization your pool will be
                   linked to
@@ -247,11 +278,10 @@ export default function PoolForm() {
               </label>
               <div className="mt-2">
                 <input
-                  min={0}
                   {...register("fundPoolAmount")}
                   id="fundPoolAmount"
                   name="fundPoolAmount"
-                  type="number"
+                  type="text"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
                 <p className="text-xs leading-5 text-gray-600 mt-2">
@@ -274,11 +304,10 @@ export default function PoolForm() {
               </label>
               <div className="mt-2">
                 <input
-                  min={0}
                   {...register("maxAmount")}
                   id="maxAmount"
                   name="maxAmount"
-                  type="number"
+                  type="text"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
                 <p className="text-xs leading-5 text-gray-600 mt-2">
