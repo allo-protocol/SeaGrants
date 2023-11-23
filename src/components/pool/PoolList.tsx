@@ -15,7 +15,7 @@ const PoolList = (props: {
     return (
       <div
         // role="list"
-        className={`grid md:grid-cols-6 gap-x-6 gap-y-8 lg:grid-cols-6 xl:gap-x-8 w-full`}
+        className={`grid gap-x-6 gap-y-8 md:grid-cols-2 md:gap-x-8 w-full`}
       >
         {_pools.map((pool) => (
           <div
