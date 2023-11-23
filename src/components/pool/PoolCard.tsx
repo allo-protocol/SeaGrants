@@ -99,12 +99,13 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
             }`}
           >
             <ReactMarkdown
-              children={metadata.description}
               remarkPlugins={[gfm]}
               components={{
                 img: ({ node, ...props }) => null, // Skip rendering images
               }}
-            />
+            >
+              {metadata.description}
+            </ReactMarkdown>
           </div>
         </div>
         {isTextOverflowing && <>Show more...</>}
