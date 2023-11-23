@@ -31,11 +31,9 @@ const PoolList = (props: {
 
   const renderTitle = () => {
     return (
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl py-4 px-2">
-          {title}
-        </h2>
-      </div>
+      <h2 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl py-4 px-2 mb-3">
+        {title}
+      </h2>
     );
   };
 
@@ -56,7 +54,9 @@ const PoolList = (props: {
     <Container>
       {renderTitle()}
       {renderPools(shownPools)}
-      <Flyout label={flyoutOptions.label}>{renderPools(hiddenPools)}</Flyout>
+      <div className="px-2">
+        <Flyout label={flyoutOptions.label}>{renderPools(hiddenPools)}</Flyout>
+      </div>
     </Container>
   );
 };
