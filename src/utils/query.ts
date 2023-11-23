@@ -3,8 +3,16 @@ import { gql } from "graphql-request";
 export const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_URL || "";
 
 export const checkIfRecipientIsIndexedQuery = gql`
-  query checkIfRecipientIsIndexedQuery($chainId: String!, $poolId: String!, $recipientId: String!) {
-    microGrantRecipient(chainId: $chainId, poolId: $poolId, recipientId: $recipientId) {
+  query checkIfRecipientIsIndexedQuery(
+    $chainId: String!
+    $poolId: String!
+    $recipientId: String!
+  ) {
+    microGrantRecipient(
+      chainId: $chainId
+      poolId: $poolId
+      recipientId: $recipientId
+    ) {
       recipientId
     }
   }
@@ -45,14 +53,8 @@ export const getMicroGrantsQuery = gql`
 `;
 
 export const getMicroGrantQuery = gql`
-  query getMicroGrantQuery(
-    $chainId: String!
-    $poolId: String!
-  ) {
-    microGrant(
-      chainId: $chainId
-      poolId: $poolId
-    ) {
+  query getMicroGrantQuery($chainId: String!, $poolId: String!) {
+    microGrant(chainId: $chainId, poolId: $poolId) {
       poolId
       chainId
       strategy
@@ -81,6 +83,7 @@ export const getMicroGrantsRecipientsQuery = gql`
       approvalThreshold
       maxRequestedAmount
       blockTimestamp
+      useRegistryAnchor
       pool {
         strategy
         tokenMetadata
@@ -182,6 +185,33 @@ export const getMicroGrantRecipientQuery = gql`
       blockTimestamp
       isUsingRegistryAnchor
       status
+    }
+  }
+`;
+
+export const getProfilesByOwnerQuery = gql`
+  query getProfilesByOwnerQuery($chainId: String!, $owner: String!) {
+    profilesByOwner(chainId: $chainId, owner: $owner) {
+      profileId
+      name
+      owner
+      createdAt
+      anchor
+    }
+  }
+`;
+
+export const getProfile = gql`
+  query getProfile($chainId: String!, $profileId: String!) {
+    profile(chainId: $chainId, profileId: $profileId) {
+      profileId
+      nonce
+      name
+      metadataPointer
+      owner
+      anchor
+      creator
+      createdAt
     }
   }
 `;

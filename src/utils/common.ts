@@ -69,6 +69,7 @@ export const prettyTimestamp = (timestamp: number) => {
 };
 
 export const ethereumAddressRegExp = /^(0x)?[0-9a-fA-F]{40}$/;
+export const ethereumHashRegExp = /^(0x)?[0-9a-fA-F]{64}$/;
 
 export const getPoolStatus = (
   startDate: number,

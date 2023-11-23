@@ -2,40 +2,52 @@
 
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useParams } from "next/navigation";
-import { TNewApplication, TPoolData } from "@/app/types";
+import { useParams, useRouter } from "next/navigation";
+import {
+  TNewApplication,
+  TPoolData,
+  TProfilesByOwnerResponse,
+} from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import ImageUpload from "../shared/ImageUpload";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
 import { humanReadableAmount } from "@/utils/common";
+import { useAccount } from "wagmi";
+import getProfilesByOwner from "@/utils/request";
 
 export default function ApplicationForm(props: { microGrant: TPoolData }) {
-  
-  const maxRequestedAmount = Number(humanReadableAmount(
-    props.microGrant.maxRequestedAmount,
-    props.microGrant.pool.tokenMetadata.decimals || 18
-  ));
+  const maxRequestedAmount = Number(
+    humanReadableAmount(
+      props.microGrant.maxRequestedAmount,
+      props.microGrant.pool.tokenMetadata.decimals || 18,
+    ),
+  );
 
   const schema = yup.object({
     name: yup.string().required().min(6, "Must be at least 6 characters"),
     website: yup.string().required().url("Must be a valid website address"),
     description: yup.string().required().min(10, "Must be at least 150 words"),
-    email: yup.string().required().min(3).email("Must be a valid email address"),
+    email: yup
+      .string()
+      .required()
+      .min(3)
+      .email("Must be a valid email address"),
     requestedAmount: yup
       .string()
       .test(
         "is-number",
         "Requested amount is required",
-        (value) => !isNaN(Number(value))
-      ).test(
+        (value) => !isNaN(Number(value)),
+      )
+      .test(
         "max-amount",
         `Amount must be less than ${maxRequestedAmount}`,
-        (value) => Number(value) <= maxRequestedAmount
+        (value) => Number(value) <= maxRequestedAmount,
       ),
     recipientAddress: yup
       .string()
@@ -45,12 +57,24 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       "Must start with 0x",
       (value) => value?.toLowerCase()?.startsWith("0x")
     ),
-    profileOwner: yup.string().required("A profile owner is required"),
-    nonce: yup.number().required("A nonce is required").min(1),
+    //todo: fix this
+    // profilename: yup.string().when("profileId", {
+    //   is: (profileId: string) => profileId.trim() === "0x0",
+    //   then: yup
+    //     .string()
+    //     .required("Profile name is required"),
+    //   otherwise: yup.string(),
+    // }),
+    profilename: yup.string().notRequired(),
+    profileId: yup.string().notRequired(), //todo: required("Profile ID is required"),
   });
 
   const { steps, createApplication } = useContext(ApplicationContext);
   const [base64Image, setBase64Image] = useState<string>("");
+  const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
+  const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
+  const { address } = useAccount();
+  const router = useRouter();
 
   const params = useParams();
 
@@ -67,6 +91,8 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     resolver: yupResolver(schema),
   });
 
+  const isUsingRegistryAnchor = props.microGrant.useRegistryAnchor;
+
   const handleCancel = () => {
     setIsOpen(false);
 
@@ -76,6 +102,12 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   const onHandleSubmit = async (data: any) => {
     setIsOpen(true);
 
+    const newProfileName = !createNewProfile
+      ? undefined
+      : data.profilename
+      ? data.profilename
+      : data.name;
+
     const newApplicationData: TNewApplication = {
       name: data.name,
       website: data.website,
@@ -84,24 +116,128 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       requestedAmount: parseUnits(data.requestedAmount, 18), // TODO: wire in actual decimal
       recipientAddress: data.recipientAddress,
       base64Image: base64Image,
-      profileOwner: data.profileOwner,
-      nonce: data.nonce,
+      profileName: newProfileName,
+      profileId: data.profileId,
     };
 
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),
-      Number(poolId)
+      Number(poolId),
     );
 
     setTimeout(() => {
-      window.location.assign(`/${chainId}/${poolId}/${recipientId}`);
       setIsOpen(false);
+      router.push(`/${chainId}/${poolId}/${recipientId}`);
+      router.refresh();
     }, 1000);
   };
 
   const setText = (text: string) => {
     setValue("description", text);
+  };
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      if (chainId && address) {
+        const customProfile: TProfilesByOwnerResponse = {
+          name: "New Profile",
+          profileId: "0x0",
+          owner: address.toLocaleLowerCase(),
+          createdAt: "0",
+          anchor: "0x",
+        };
+
+        const profiles: TProfilesByOwnerResponse[] = await getProfilesByOwner({
+          chainId: chainId.toString(),
+          account: address.toLocaleLowerCase(),
+        });
+
+        if (profiles.length === 0) setCreateNewProfile(true);
+        profiles.push(customProfile);
+
+        setProfiles(profiles);
+      }
+    };
+
+    fetchProfiles();
+  }, [address]);
+
+  const profileSection = () => {
+    return (
+      <>
+        <div className="sm:col-span-full">
+          <label
+            htmlFor="profileId"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Registry Profile ID
+          </label>
+          <div className="mt-2">
+            <div className="sm:col-span-4">
+              {profiles.length > 0 && (
+                <select
+                  {...register("profileId")}
+                  id="profileId"
+                  name="profileId"
+                  className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  defaultValue={profiles[0].profileId}
+                  onChange={(e) => {
+                    setCreateNewProfile(e.target.value === "0x0");
+                  }}
+                >
+                  {profiles.map((profile) => (
+                    <option key={profile.profileId} value={profile.profileId}>
+                      {`${profile.name} ${
+                        profile.profileId === "0x0" ? "" : profile.profileId
+                      }`}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            <p className="text-xs leading-5 text-gray-600 mt-2">
+              The registry profile id of you organization your pool will be
+              linked to
+            </p>
+            <div>
+              {errors.profileId && (
+                <Error message={errors.profileId?.message!} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {createNewProfile && (
+          <div className="sm:col-span-4">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Profile Name
+            </label>
+            <div className="mt-2">
+              <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
+                <input
+                  {...register("profilename")}
+                  type="text"
+                  name="profilename"
+                  id="profilename"
+                  className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                  placeholder="Allo Protocol"
+                />
+              </div>
+            </div>
+            <div>
+              {errors.profilename && (
+                <Error message={errors.profilename?.message!} />
+              )}
+            </div>
+          </div>
+        )}
+      </>
+    );
   };
 
   return (
@@ -135,7 +271,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                     name="name"
                     id="name"
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="sporkdao"
+                    placeholder="Allo Protocol"
                   />
                 </div>
               </div>
@@ -160,7 +296,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                     name="website"
                     id="website"
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="www.example.com"
+                    placeholder="https://www.example.com"
                   />
                 </div>
               </div>
@@ -231,6 +367,11 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-xs leading-5 text-gray-600 mt-2">
+                {`max ${maxRequestedAmount} ${
+                  props.microGrant.pool.tokenMetadata.symbol ?? "ETH"
+                }`}
+              </p>
               <div>
                 {errors.requestedAmount && (
                   <Error message={errors.requestedAmount?.message!} />
@@ -274,6 +415,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
             <h2 className="text-base font-semibold leading-7 text-gray-900">
               Profile Information
             </h2>
+            {/* todo: fix text */}
             <p className="mt-1 text-sm leading-6 text-gray-600">
               A profile will be created on the registry to maintain your
               project. Additonally an anchor wallet would be created which will
@@ -286,50 +428,76 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-full">
               <label
-                htmlFor="profile-owner"
+                htmlFor="profileId"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Profile Owner
+                Registry Profile ID
               </label>
               <div className="mt-2">
-                <input
-                  {...register("profileOwner")}
-                  type="text"
-                  name="profileOwner"
-                  id="profileOwner"
-                  placeholder=" 0x..."
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <div>
-                {errors.profileOwner && (
-                  <Error message={errors.profileOwner?.message!} />
-                )}
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="nonce"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Nonce
-              </label>
-              <div className="mt-2">
-                <input
-                  {...register("nonce")}
-                  type="number"
-                  name="nonce"
-                  id="nonce"
-                  defaultValue={1}
-                  placeholder="1"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <div>
-                {errors.nonce && <Error message={errors.nonce?.message!} />}
+                <div className="sm:col-span-4">
+                  {profiles.length > 0 && (
+                    <select
+                      {...register("profileId")}
+                      id="profileId"
+                      name="profileId"
+                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      defaultValue={profiles[0].profileId}
+                      onChange={(e) => {
+                        setCreateNewProfile(e.target.value === "0x0");
+                      }}
+                    >
+                      {profiles.map((profile) => (
+                        <option
+                          key={profile.profileId}
+                          value={profile.profileId}
+                        >
+                          {`${profile.name} ${
+                            profile.profileId === "0x0" ? "" : profile.profileId
+                          }`}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <p className="text-xs leading-5 text-gray-600 mt-2">
+                  The registry profile id of you organization your pool will be
+                  linked to
+                </p>
+                <div>
+                  {errors.profileId && (
+                    <Error message={errors.profileId?.message!} />
+                  )}
+                </div>
               </div>
             </div>
+            {createNewProfile && (
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Profile Name
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                    <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
+                    <input
+                      {...register("profilename")}
+                      type="text"
+                      name="profilename"
+                      id="profilename"
+                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                      placeholder="Allo Protocol"
+                    />
+                  </div>
+                </div>
+                <div>
+                  {errors.profilename && (
+                    <Error message={errors.profilename?.message!} />
+                  )}
+                </div>
+              </div>
+            )}{" "}
           </div>
         </div>
       </div>

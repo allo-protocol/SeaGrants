@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { MicroGrantsStrategy, Allo } from "@allo-team/allo-v2-sdk/";
+import { MicroGrantsStrategy, Allo, Registry } from "@allo-team/allo-v2-sdk/";
 
 import { getIPFSClient } from "@/services/ipfs";
 import {
@@ -21,7 +21,8 @@ import {
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
 import { checkIfPoolIsIndexedQuery } from "@/utils/query";
-import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
+import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -30,35 +31,30 @@ export interface INewPoolContextProps {
 
 const initialSteps: TProgressStep[] = [
   {
-    id: 0,
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 1,
     content: "Deploying new pool strategy to ",
     target: ETarget.CHAIN,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 2,
     content: "Creating new pool on ",
     target: ETarget.ALLO,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 3,
     content: "Indexing your pool on ",
     target: ETarget.SPEC,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 4,
     content: "Indexing pool metadata on ",
     target: ETarget.IPFS,
     href: "",
@@ -76,21 +72,17 @@ export const NewPoolContext = React.createContext<INewPoolContextProps>({
   },
 });
 
+// if true, set current step to success and next step to in progress, if false set current step to error
+
 export const NewPoolContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
-  const router = useRouter();
+  const { address } = useAccount();
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
     newSteps[index].target = target;
-    setSteps(newSteps);
-  };
-
-  const updateStepStatus = (index: number, status: EProgressStatus) => {
-    const newSteps = [...steps];
-    newSteps[index].status = status;
     setSteps(newSteps);
   };
 
@@ -100,23 +92,123 @@ export const NewPoolContextProvider = (props: {
     setSteps(newSteps);
   };
 
+  const updateStepStatus = (index: number, flag: boolean) => {
+    const newSteps = [...steps];
+    if (flag) {
+      newSteps[index].status = EProgressStatus.IS_SUCCESS;
+    } else {
+      newSteps[index].status = EProgressStatus.IS_ERROR;
+    }
+
+    if (steps.length > index)
+      newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
+
+    setSteps(newSteps);
+    return newSteps;
+  };
+
   const createNewPool = async (
     data: TNewPool,
     chain: number,
   ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
 
+    // if data.profileName set a new step at index 0 of steps
+    if (data.profileName) {
+      const newSteps = [...steps];
+      newSteps.unshift({
+        content: "Creating new profile on ",
+        target: ETarget.CHAIN,
+        href: "",
+        status: EProgressStatus.NOT_STARTED,
+      });
+      setSteps(newSteps);
+    }
+
+    // update step 0 to in progress
+    setSteps((prevSteps) => {
+      const newSteps = [...prevSteps];
+      newSteps[0] = {
+        ...newSteps[0],
+        status: EProgressStatus.IN_PROGRESS,
+      };
+      return newSteps;
+    });
+
+    // if step target is CHAIN update target to chainInfo.name
+    setSteps((prevSteps) => {
+      const newSteps = [...prevSteps];
+      newSteps.map((step) => {
+        if (step.target === ETarget.CHAIN) {
+          step.target = chainInfo.name;
+        }
+      });
+      return newSteps;
+    });
+
+    let stepIndex = 0;
+
     // return values
     let strategyAddress: string = "0x";
     let poolId: number = -1;
+    const walletClient = await getWalletClient({ chainId: chain });
 
-    updateStepTarget(2, `${chainInfo.name}`);
+    let profileId = data.profileId;
+
+    // if profileName is set, create profile
+    if (data.profileName && address) {
+      const registry = new Registry({ chain: chain });
+      const randomNumber = Math.floor(Math.random() * 10000000000);
+
+      const txCreateProfile: TransactionData = await registry.createProfile({
+        nonce: randomNumber,
+        name: data.profileName,
+        metadata: {
+          protocol: BigInt(0),
+          pointer: "",
+        },
+        owner: address,
+        members: [],
+      });
+
+      try {
+        const tx = await sendTransaction({
+          to: txCreateProfile.to as string,
+          data: txCreateProfile.data,
+          value: BigInt(txCreateProfile.value),
+        });
+
+        const receipt =
+          await wagmiConfigData.publicClient.waitForTransactionReceipt({
+            hash: tx.hash,
+          });
+
+        const { logs } = receipt;
+        profileId = logs[0].topics[1] || "0x";
+
+        if (profileId === "0x") {
+          throw new Error("Profile creation failed");
+        }
+
+        updateStepHref(
+          stepIndex,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        );
+
+        updateStepStatus(stepIndex, true);
+      } catch (e) {
+        updateStepStatus(stepIndex, false);
+        console.log("Creating Profile", e);
+      }
+
+      stepIndex++;
+    }
 
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
 
     const metadata = {
-      profileId: data.profileId,
+      profileId: profileId,
       name: data.name,
       website: data.website,
       description: data.description,
@@ -135,13 +227,14 @@ export const NewPoolContextProvider = (props: {
       }
 
       pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
-      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
+      updateStepHref(stepIndex, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      updateStepStatus(stepIndex, true);
     } catch (e) {
       console.log("IPFS", e);
-      updateStepStatus(0, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
+
+    stepIndex++;
 
     // 2. Deploy new pool strategy
 
@@ -150,8 +243,6 @@ export const NewPoolContextProvider = (props: {
     });
 
     const deployParams = strategy.getDeployParams();
-
-    const walletClient = await getWalletClient({ chainId: chain });
 
     try {
       const hash = await walletClient!.deployContract({
@@ -163,17 +254,18 @@ export const NewPoolContextProvider = (props: {
       const result = await waitForTransaction({ hash: hash, chainId: chain });
       strategyAddress = result.contractAddress!;
 
-      updateStepTarget(2, `${chainInfo.name}`);
+      updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
-        2,
+        stepIndex,
         `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
       );
-      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
+      updateStepStatus(stepIndex, true);
     } catch (e) {
       console.log("Deploying Strategy", e);
-      updateStepStatus(1, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
+
+    stepIndex++;
 
     const startDateInSeconds = Math.floor(
       new Date(data.startDate).getTime() / 1000,
@@ -191,12 +283,11 @@ export const NewPoolContextProvider = (props: {
       maxRequestedAmount: BigInt(data.maxAmount),
     };
 
-    console.log("initParams", initParams);
     // create new pool
     const initStrategyData = await strategy.getInitializeData(initParams);
 
     const poolCreationData = {
-      profileId: data.profileId,
+      profileId: profileId,
       strategy: strategyAddress,
       initStrategyData: initStrategyData,
       token: data.tokenAddress,
@@ -217,12 +308,6 @@ export const NewPoolContextProvider = (props: {
     );
 
     try {
-      console.log("pool tx creation data");
-      console.log({
-        to: createPoolData.to as string,
-        data: createPoolData.data,
-        value: BigInt(createPoolData.value),
-      });
       const tx = await sendTransaction({
         to: createPoolData.to as string,
         data: createPoolData.data,
@@ -237,17 +322,18 @@ export const NewPoolContextProvider = (props: {
       const { logs } = reciept;
       poolId = Number(logs[6].topics[1]);
 
-      updateStepTarget(3, `${chainInfo.name}`);
+      updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
-        3,
+        stepIndex,
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
-      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(3, EProgressStatus.IN_PROGRESS);
+      updateStepStatus(stepIndex, true);
     } catch (e) {
-      updateStepStatus(2, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
       console.log("Creating Pool", e);
     }
+
+    stepIndex++;
 
     // 4. Index Pool
     const pollingData: any = {
@@ -261,13 +347,13 @@ export const NewPoolContextProvider = (props: {
     );
 
     if (pollingResult) {
-      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(stepIndex, true);
     } else {
       console.log("Polling ERROR");
-      updateStepStatus(3, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
 
-    updateStepStatus(4, EProgressStatus.IN_PROGRESS);
+    stepIndex++;
 
     // 5. Index Metadata
 
@@ -275,20 +361,16 @@ export const NewPoolContextProvider = (props: {
       pointer.IpfsHash,
     );
 
-    console.log("pollingMetadataResult", pollingMetadataResult);
-
     if (pollingMetadataResult) {
-      updateStepStatus(4, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(stepIndex, true);
     } else {
       console.log("Polling ERROR");
-      updateStepStatus(4, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
 
-    setTimeout(() => {
-      router.push(`/${chain}/${poolId}`);
-    }, 5000);
+    stepIndex++;
 
-    router.push(`/${chain}/${poolId}`);
+    setTimeout(() => {}, 5000);
 
     return {
       address: strategyAddress as `0x${string}`,
