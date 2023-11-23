@@ -15,7 +15,7 @@ const PoolList = (props: {
     return (
       <div
         // role="list"
-        className={`grid grid-cols-6 gap-x-6 gap-y-8 lg:grid-cols-6 xl:gap-x-8 w-full`}
+        className={`grid md:grid-cols-6 gap-x-6 gap-y-8 lg:grid-cols-6 xl:gap-x-8 w-full`}
       >
         {_pools.map((pool) => (
           <div
@@ -54,9 +54,7 @@ const PoolList = (props: {
     <Container>
       {renderTitle()}
       {renderPools(shownPools)}
-      <div className="px-2">
-        <Flyout label={flyoutOptions.label}>{renderPools(hiddenPools)}</Flyout>
-      </div>
+      <Flyout label={flyoutOptions.label}>{renderPools(hiddenPools)}</Flyout>
     </Container>
   );
 };

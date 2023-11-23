@@ -56,11 +56,7 @@ export default async function Home() {
 
   return (
     <main>
-      {/* NOTE:
-          What do we want to show on landing page? This will depend on if the user 
-          is logged in or not.
-      */}
-      <div className="mx-auto max-w-2xl py-32 sm:py-32">
+      <div className="mx-auto max-w-2xl py-16 sm:py-32">
         <img
           src=" https://tailwindui.com/img/beams-basic.png"
           alt=""
