@@ -54,7 +54,7 @@ const initialSteps: TProgressStep[] = [
   },
   {
     id: 3,
-    content: "Indexing you metadata on ",
+    content: "Indexing application metadata on ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,

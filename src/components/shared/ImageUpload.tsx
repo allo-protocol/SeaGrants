@@ -52,7 +52,7 @@ const ImageUpload = (props: {
             />
           )}
           {preview !== "" && (
-            <img style={{ maxWidth: "300px" }} src={preview} />
+            <img className="mx-auto" style={{ maxWidth: "300px" }} src={preview} />
           )}
           <div className="mt-4 text-sm leading-6 text-gray-600">
             <label
