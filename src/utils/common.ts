@@ -47,7 +47,7 @@ export function humanReadableAmount(amount: string, decimals?: number) {
   for (let i = 5; i <= 15; i++) {
     const formattedValue = amountInUnits.toFixed(i);
     if (Number(formattedValue) !== 0) {
-      return formattedValue;
+      return formattedValue.replace(/\.?0+$/, ""); // Remove trailing zeros
     }
   }
   return 0;

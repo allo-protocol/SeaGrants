@@ -31,6 +31,63 @@ export const Hash = (props: { hash: string; chainId: number }) => {
   );
 };
 
+export const AlloProfileFull = (props: { id: string; chainId: number }) => {
+  // const explorerLink = "";
+
+  return (
+    <div className="flex items-center">
+      <div className="text-xs font-medium text-gray-900 font-mono">
+        {props.id}
+      </div>
+      <div
+        onClick={() => copy(props.id)}
+        className="flex-shrink-0 h-5 w-5 mt-1.5 ml-1 cursor-pointer"
+      >
+        <TbCopy />
+      </div>
+      <div>
+        {/* <a target="_blank" href={explorerLink}>
+          <TbExternalLink />
+        </a> */}
+      </div>
+    </div>
+  );
+};
+
+export const AlloProfile = (props: { id: string; chainId: number }) => {
+  // const explorerLink = "";
+
+  return (
+    <div className="flex items-center">
+      <div className="text-xs font-medium text-gray-900 font-mono">
+        {convertAddressToShortString(props.id)}
+      </div>
+      <div
+        onClick={() => copy(props.id)}
+        className="flex-shrink-0 h-5 w-5 mt-1.5 ml-1 cursor-pointer"
+      >
+        <TbCopy />
+      </div>
+      <div>
+        {/* <a target="_blank" href={explorerLink}>
+          <TbExternalLink />
+        </a> */}
+      </div>
+    </div>
+  );
+};
+
+export const AlloProfileResponsive = (props: {
+  id: string;
+  chainId: number;
+}) => {
+  const isMobile = useMediaQuery(1240);
+
+  if (isMobile) return <AlloProfile id={props.id} chainId={props.chainId} />;
+
+  return <AlloProfileFull id={props.id} chainId={props.chainId} />;
+};
+
 export const Address = (props: { address: string; chainId: number }) => {
   const explorerLink =
     getChain(props.chainId).blockExplorers.default.url +

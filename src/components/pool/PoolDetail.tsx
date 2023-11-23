@@ -9,6 +9,7 @@ import { MarkdownView } from "../shared/Markdown";
 import Link from "next/link";
 import { useContext } from "react";
 import { PoolContext } from "@/context/PoolContext";
+import { AlloProfile } from "../shared/Address";
 
 export const PoolDetail = (props: {
   chainId: string;
@@ -48,6 +49,15 @@ export const PoolDetail = (props: {
       ),
     },
     {
+      description: "Profile Id",
+      name: (
+        <AlloProfile
+          id={props.metadata.profileId}
+          chainId={Number(props.pool.chainId)}
+        />
+      ),
+    },
+    {
       description: "Pool Amount",
       name: `${humanReadableAmount(
         props.pool.pool.amount,
@@ -56,7 +66,7 @@ export const PoolDetail = (props: {
     },
     {
       description: "Request Amount",
-      name: `${humanReadableAmount(
+      name: `max ${humanReadableAmount(
         props.pool.maxRequestedAmount,
         tokenMetadata.decimals,
       )} ${tokenMetadata.symbol ?? "ETH"}`,
@@ -145,7 +155,6 @@ export const PoolDetail = (props: {
         {/* Description and details */}
         <div>
           <h3 className="sr-only">Description</h3>
-
           <div>
             <MarkdownView text={props.metadata.description} />
           </div>

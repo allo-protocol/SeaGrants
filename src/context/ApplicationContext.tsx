@@ -21,7 +21,7 @@ export interface IApplicationContextProps {
   createApplication: (
     data: TNewApplication,
     chain: number,
-    poolId: number
+    poolId: number,
   ) => Promise<string>;
 }
 
@@ -49,14 +49,12 @@ const initialSteps: TProgressStep[] = [
   },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>(
-  {
-    steps: initialSteps,
-    createApplication: async () => {
-      return "";
-    },
-  }
-);
+export const ApplicationContext = React.createContext<IApplicationContextProps>({
+  steps: initialSteps,
+  createApplication: async () => {
+    return "";
+  },
+});
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
@@ -84,7 +82,7 @@ export const ApplicationContextProvider = (props: {
   const createApplication = async (
     data: TNewApplication,
     chain: number,
-    poolId: number
+    poolId: number,
   ): Promise<string> => {
     const chainInfo = getChain(chain);
 
@@ -187,6 +185,8 @@ export const ApplicationContextProvider = (props: {
         "microGrantRecipient",
       );
       updateStepStatus(2, EProgressStatus.IS_SUCCESS);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      window.location.reload();
     } catch (e) {
       console.log("Polling", e);
       updateStepStatus(2, EProgressStatus.IS_ERROR);

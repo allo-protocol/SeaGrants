@@ -24,6 +24,7 @@ import {
   getTxnExplorerLink,
 } from "../shared/Address";
 import Activity from "../shared/Activity";
+import { useAccount } from "wagmi";
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
@@ -33,14 +34,19 @@ export default function ApplicationDetail(props: {
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const { isAllocator, steps, allocate } = useContext(PoolContext);
+  const { address } = useAccount();
 
   const microGrantRecipient = props.application;
   const microGrant = microGrantRecipient.microGrant;
   const tokenMetadata = microGrant.pool.tokenMetadata;
+
   const amount = humanReadableAmount(
-    microGrantRecipient.requestedAmount,
-    tokenMetadata.decimals
+    microGrantRecipient.requestedAmount === "0"
+      ? microGrant.maxRequestedAmount
+      : microGrantRecipient.requestedAmount,
+    tokenMetadata.decimals || 18,
   );
+
   const token = tokenMetadata.symbol ?? "ETH";
 
   const application = {
@@ -68,20 +74,27 @@ export default function ApplicationDetail(props: {
 
   const allocateds = microGrant.allocateds.filter(
     (allocated) =>
-      allocated.recipientId === microGrantRecipient.recipientId.toLowerCase()
+      allocated.recipientId === microGrantRecipient.recipientId.toLowerCase(),
   );
 
   const approvals = allocateds.filter(
-    (allocation) => allocation.status === Status.Accepted.toString()
+    (allocation) => allocation.status === Status.Accepted.toString(),
   );
+
   const rejections = allocateds.filter(
-    (allocation) => allocation.status === Status.Rejected.toString()
+    (allocation) => allocation.status === Status.Rejected.toString(),
   );
 
   const distributeds = microGrant.distributeds.filter(
     (distributed) =>
-      distributed.recipientId === microGrantRecipient.recipientId.toLowerCase()
+      distributed.recipientId === microGrantRecipient.recipientId.toLowerCase(),
   );
+
+  const hasAllocated = allocateds.filter(
+    (allocated) => allocated.sender.toLowerCase() === address?.toLowerCase(),
+  ).length
+    ? true
+    : false;
 
   const generateActivity = () => {
     const activity: TActivity[] = [];
@@ -92,7 +105,7 @@ export default function ApplicationDetail(props: {
       textBold: `Pool Id ${microGrant.poolId}`,
       href: getAddressExplorerLink(
         Number(microGrant.chainId),
-        microGrant.pool.strategy
+        microGrant.pool.strategy,
       ),
       suffixText: `created`,
       date: formatDateDifference(microGrant.blockTimestamp),
@@ -114,14 +127,13 @@ export default function ApplicationDetail(props: {
     // allocation activity
     allocateds.forEach((allocated) => {
       const status = allocated.status === "2" ? "Approved" : "Rejected";
-
       const allocatedActivity: TActivity = {
         id: activity.length,
         status: status,
         textBold: convertAddressToShortString(allocated.sender),
         href: getTxnExplorerLink(
           Number(microGrant.chainId),
-          allocated.transactionHash
+          allocated.transactionHash,
         ),
         suffixText: `${status} the application`,
         date: formatDateDifference(allocated.blockTimestamp),
@@ -137,14 +149,14 @@ export default function ApplicationDetail(props: {
         status: "Completed",
         textBold: `${humanReadableAmount(
           distributed.amount,
-          microGrant.pool.tokenMetadata.decimals || 18
+          microGrant.pool.tokenMetadata.decimals || 18,
         )} ${token}`,
         href: getTxnExplorerLink(
           Number(microGrant.chainId),
-          distributed.transactionHash
+          distributed.transactionHash,
         ),
         suffixText: `Distributed to ${convertAddressToShortString(
-          microGrantRecipient.recipientId
+          microGrantRecipient.recipientId,
         )}`,
         date: formatDateDifference(distributed.blockTimestamp),
         dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
@@ -160,7 +172,7 @@ export default function ApplicationDetail(props: {
     {
       description: "Allocation Period",
       name: `${prettyTimestamp(
-        microGrant.allocationStartTime
+        microGrant.allocationStartTime,
       )} - ${prettyTimestamp(microGrant.allocationEndTime)}`,
     },
     {
@@ -229,7 +241,7 @@ export default function ApplicationDetail(props: {
                 statusColorsScheme[
                   application.status as keyof typeof statusColorsScheme
                 ],
-                "rounded-md py-1 px-2 text-sm font-medium ring-1 ring-inset"
+                "rounded-md py-1 px-2 text-sm font-medium ring-1 ring-inset",
               )}
             >
               {application.status.toString()}
@@ -248,7 +260,7 @@ export default function ApplicationDetail(props: {
             <dd
               className={classNames(
                 overview.color ? overview.color : "",
-                "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"
+                "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
               )}
             >
               {overview.name}
@@ -313,22 +325,24 @@ export default function ApplicationDetail(props: {
               <div className="-mx-4 px-4 py-4 lg:col-span-2 lg:row-span-2 lg:row-end-2">
                 <div className="lg:col-start-3 mt-1">
                   <ApplicationOverView />
-                  {isAllocator && application.status !== "Accepted" && (
-                    <div className="mt-5 mb-5">
-                      <button
-                        onClick={() => onAllocate(true)}
-                        className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => onAllocate(false)}
-                        className="mt-4 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:ring-offset-2"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  )}
+                  {isAllocator &&
+                    application.status !== "Accepted" &&
+                    !hasAllocated && (
+                      <div className="mt-5 mb-5">
+                        <button
+                          onClick={() => onAllocate(true)}
+                          className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => onAllocate(false)}
+                          className="mt-4 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:ring-offset-2"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
 
                   <div className="pt-4 border-t border-gray-100">
                     <Activity activity={generateActivity()} />

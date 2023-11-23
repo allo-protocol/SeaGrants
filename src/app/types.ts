@@ -114,6 +114,8 @@ export type TPoolData = {
     token: `0x${string}`;
     amount: string;
     metadataPointer: string;
+    poolBanner: string;
+    metadata: TPoolMetadata;
     profile: {
       profileId: `0x${string}`;
       name: string;
@@ -130,6 +132,7 @@ export type TApplicationData = {
     poolId: string;
     allocationStartTime: number;
     allocationEndTime: number;
+    maxRequestedAmount: string;
     blockTimestamp: string;
     pool: {
       strategy: string;
@@ -219,4 +222,10 @@ export type TActivity = {
   suffixText?: string;
   date: string;
   dateTime: string;
+};
+
+export type TFlyoutOptions = {
+  useFlyout: boolean;
+  label: string;
+  startIndex: number;
 };

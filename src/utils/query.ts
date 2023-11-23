@@ -118,6 +118,7 @@ export const getMicroGrantRecipientQuery = gql`
         chainId
         allocationStartTime
         allocationEndTime
+        maxRequestedAmount
         blockTimestamp
         pool {
           strategy

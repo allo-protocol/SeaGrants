@@ -1,20 +1,18 @@
-import { IApplication, TNewApplicationResponse, TPoolData } from "@/app/types";
-import { classNames, humanReadableAmount, prettyTimestamp, statusColorsScheme, stringToColor } from "@/utils/common";
-import Image from "next/image";
+import { TNewApplicationResponse, TPoolData } from "@/app/types";
+import {
+  classNames,
+  humanReadableAmount,
+  prettyTimestamp,
+  statusColorsScheme,
+} from "@/utils/common";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useRef, useState } from "react";
 import Banner from "../shared/Banner";
 
 export default function ApplicationCard(props: {
-  pool: TPoolData,
+  pool: TPoolData;
   application: TNewApplicationResponse;
 }) {
-  const bannerRef = useRef<any>(null);
-  const [bannerSize, setBannerSize] = useState({
-    width: 0,
-    height: 0,
-  });
   const params = useParams();
   const application = props.application;
   const navLink = `/${params.chainId}/${
@@ -24,12 +22,14 @@ export default function ApplicationCard(props: {
   const pool = props.pool.pool;
 
   const amount = humanReadableAmount(
-    application.requestedAmount,
+    application.requestedAmount === "0"
+      ? props.pool.maxRequestedAmount
+      : application.requestedAmount,
     pool.tokenMetadata.decimals || 18,
   );
 
- const token = pool.tokenMetadata.symbol ?? "ETH";
- const time = new Date(application.blockTimestamp).getTime()/1000;
+  const token = pool.tokenMetadata.symbol ?? "ETH";
+  const time = new Date(application.blockTimestamp).getTime() / 1000;
 
   return (
     <Link href={navLink}>
