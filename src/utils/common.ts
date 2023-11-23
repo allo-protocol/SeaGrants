@@ -2,6 +2,7 @@ import { EPoolStatus } from "@/app/types";
 import { formatUnits } from "viem";
 import { graphqlEndpoint } from "./query";
 import request from "graphql-request";
+import { getIPFSClient } from "@/services/ipfs";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -53,10 +54,7 @@ export function humanReadableAmount(amount: string, decimals?: number) {
   return 0;
 }
 
-export function isPoolActive(
-  allocationStartTime: number,
-  allocationEndTime: number
-) {
+export function isPoolActive(allocationStartTime: number, allocationEndTime: number) {
   const now = Date.now() / 1000;
   return now >= allocationStartTime && now <= allocationEndTime;
 }
@@ -69,7 +67,10 @@ export const prettyTimestamp = (timestamp: number) => {
 
 export const ethereumAddressRegExp = /^(0x)?[0-9a-fA-F]{40}$/;
 
-export const getPoolStatus = (startDate: number, endDate: number): EPoolStatus => {
+export const getPoolStatus = (
+  startDate: number,
+  endDate: number,
+): EPoolStatus => {
   const now = new Date().getTime() / 1000;
   const start = new Date(startDate).getTime();
   const end = new Date(endDate).getTime();
@@ -83,11 +84,31 @@ export const getPoolStatus = (startDate: number, endDate: number): EPoolStatus =
   }
 };
 
+export const pollUntilMetadataIsAvailable = async (
+  pointer: string,
+): Promise<boolean> => {
+  const ipfsClient = getIPFSClient();
+  let counter = 0;
+  const fetchMetadata: any = async () => {
+    const metadata = await ipfsClient.fetchJson(pointer);
+    if (metadata) {
+      return true;
+    } else {
+      counter++;
+      if (counter > 20) return false;
+      return await new Promise((resolve) => setTimeout(resolve, 2000)).then(
+        fetchMetadata,
+      );
+    }
+  };
+  return false;
+};
+
 export const pollUntilDataIsIndexed = async (
   QUERY_ENDPOINT: any,
   data: any,
-  propToCheck: string
-) => {
+  propToCheck: string,
+): Promise<boolean> => {
   let counter = 0;
   const fetchData: any = async () => {
     const response: any = await request(graphqlEndpoint, QUERY_ENDPOINT, data);
@@ -103,8 +124,8 @@ export const pollUntilDataIsIndexed = async (
       if (counter > 20) return false;
 
       // If the data is not indexed, schedule the next fetch after 2 seconds
-      return new Promise((resolve) => setTimeout(resolve, 2000)).then(
-        fetchData
+      return await new Promise((resolve) => setTimeout(resolve, 2000)).then(
+        fetchData,
       );
     }
   };
@@ -135,7 +156,7 @@ export const formatDateDifference = (dateString: string): string => {
   const daysDifference = Math.floor(hoursDifference / 24);
 
   if (secondsDifference < 60) {
-    return 'now';
+    return "now";
   } else if (minutesDifference < 60) {
     return `${minutesDifference}m ago`;
   } else if (hoursDifference < 24) {
@@ -143,4 +164,4 @@ export const formatDateDifference = (dateString: string): string => {
   } else {
     return `${daysDifference}d ago`;
   }
-}
+};
