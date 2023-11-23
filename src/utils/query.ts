@@ -44,6 +44,32 @@ export const getMicroGrantsQuery = gql`
   }
 `;
 
+export const getMicroGrantQuery = gql`
+  query getMicroGrantQuery(
+    $chainId: String!
+    $poolId: String!
+  ) {
+    microGrant(
+      chainId: $chainId
+      poolId: $poolId
+    ) {
+      poolId
+      chainId
+      strategy
+      allocationStartTime
+      allocationEndTime
+      approvalThreshold
+      maxRequestedAmount
+      blockTimestamp
+      pool {
+        tokenMetadata
+        token
+        amount
+      }
+    }
+  }
+`;
+
 export const getMicroGrantsRecipientsQuery = gql`
   query getMicroGrantsRecipientsQuery($chainId: String!, $poolId: String!) {
     microGrant(chainId: $chainId, poolId: $poolId) {

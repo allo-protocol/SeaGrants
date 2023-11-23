@@ -6,31 +6,42 @@ import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useParams } from "next/navigation";
-import { TNewApplication } from "@/app/types";
+import { TNewApplication, TPoolData } from "@/app/types";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import ImageUpload from "../shared/ImageUpload";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
+import { humanReadableAmount } from "@/utils/common";
 
-const schema = yup.object({
-  name: yup.string().required().min(6, "Must be at least 6 characters"),
-  website: yup.string().required().url("Must be a valid website address"),
-  description: yup.string().required().min(10, "Must be at least 150 words"),
-  email: yup.string().required().min(3).email("Must be a valid email address"),
-  requestedAmount: yup
-    .string()
-    .test(
-      "is-number",
-      "Requested amount is required",
-      (value) => !isNaN(Number(value))
-    ),
-  recipientAddress: yup.string().required("Recipient address is required"),
-  profileOwner: yup.string().required("A profile owner is required"),
-  nonce: yup.number().required("A nonce is required").min(1),
-});
+export default function ApplicationForm(props: { microGrant: TPoolData }) {
+  
+  const maxRequestedAmount = Number(humanReadableAmount(
+    props.microGrant.maxRequestedAmount,
+    props.microGrant.pool.tokenMetadata.decimals || 18
+  ));
 
-export default function ApplicationForm() {
+  const schema = yup.object({
+    name: yup.string().required().min(6, "Must be at least 6 characters"),
+    website: yup.string().required().url("Must be a valid website address"),
+    description: yup.string().required().min(10, "Must be at least 150 words"),
+    email: yup.string().required().min(3).email("Must be a valid email address"),
+    requestedAmount: yup
+      .string()
+      .test(
+        "is-number",
+        "Requested amount is required",
+        (value) => !isNaN(Number(value))
+      ).test(
+        "max-amount",
+        `Amount must be less than ${maxRequestedAmount}`,
+        (value) => Number(value) <= maxRequestedAmount
+      ),
+    recipientAddress: yup.string().required("Recipient address is required"),
+    profileOwner: yup.string().required("A profile owner is required"),
+    nonce: yup.number().required("A nonce is required").min(1),
+  });
+
   const { steps, createApplication } = useContext(ApplicationContext);
   const [base64Image, setBase64Image] = useState<string>("");
 
