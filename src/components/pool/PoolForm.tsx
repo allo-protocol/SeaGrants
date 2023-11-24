@@ -200,10 +200,11 @@ export default function PoolForm() {
                         setCreateNewProfile(e.target.value === "0x0");
                       }}
                     >
-                      {profiles.map((profile) => (
+                      {profiles.map((profile, index) => (
                         <option
                           key={profile.profileId}
                           value={profile.profileId}
+                          selected={index === 0}
                         >
                           {`${profile.name} ${
                             profile.profileId === "0x0" ? "" : profile.profileId

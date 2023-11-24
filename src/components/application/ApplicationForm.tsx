@@ -163,83 +163,6 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     fetchProfiles();
   }, [address]);
 
-  const profileSection = () => {
-    return (
-      <>
-        <div className="sm:col-span-full">
-          <label
-            htmlFor="profileId"
-            className="block text-sm font-medium leading-6 text-gray-900"
-          >
-            Registry Profile ID
-          </label>
-          <div className="mt-2">
-            <div className="sm:col-span-4">
-              {profiles.length > 0 && (
-                <select
-                  {...register("profileId")}
-                  id="profileId"
-                  name="profileId"
-                  className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={profiles[0].profileId}
-                  onChange={(e) => {
-                    setCreateNewProfile(e.target.value === "0x0");
-                  }}
-                >
-                  {profiles.map((profile) => (
-                    <option key={profile.profileId} value={profile.profileId}>
-                      {`${profile.name} ${
-                        profile.profileId === "0x0" ? "" : profile.profileId
-                      }`}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <p className="text-xs leading-5 text-gray-600 mt-2">
-              The registry profile id of you organization your pool will be
-              linked to
-            </p>
-            <div>
-              {errors.profileId && (
-                <Error message={errors.profileId?.message!} />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {createNewProfile && (
-          <div className="sm:col-span-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Profile Name
-            </label>
-            <div className="mt-2">
-              <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
-                <input
-                  {...register("profilename")}
-                  type="text"
-                  name="profilename"
-                  id="profilename"
-                  className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  placeholder="Allo Protocol"
-                />
-              </div>
-            </div>
-            <div>
-              {errors.profilename && (
-                <Error message={errors.profilename?.message!} />
-              )}
-            </div>
-          </div>
-        )}
-      </>
-    );
-  };
-
   return (
     <form onSubmit={handleSubmit(onHandleSubmit)}>
       <div className="space-y-12">
@@ -446,10 +369,11 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                         setCreateNewProfile(e.target.value === "0x0");
                       }}
                     >
-                      {profiles.map((profile) => (
+                      {profiles.map((profile, index) => (
                         <option
                           key={profile.profileId}
                           value={profile.profileId}
+                          selected={index === 0}
                         >
                           {`${profile.name} ${
                             profile.profileId === "0x0" ? "" : profile.profileId
