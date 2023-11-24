@@ -24,11 +24,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const stagingChains = [
-  celoAlfajores,
+  // celoAlfajores,
   goerli,
-  sepolia,
-  polygonMumbai,
-  arbitrumGoerli,
+  // sepolia,
+  // polygonMumbai,
+  // arbitrumGoerli,
 ];
 
 const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
