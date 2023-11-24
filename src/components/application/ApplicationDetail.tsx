@@ -156,7 +156,7 @@ export default function ApplicationDetail(props: {
           distributed.transactionHash,
         ),
         suffixText: `Distributed to ${convertAddressToShortString(
-          microGrantRecipient.recipientId,
+          microGrantRecipient.recipientAddress,
         )}`,
         date: formatDateDifference(distributed.blockTimestamp),
         dateTime: prettyTimestamp(Number(distributed.blockTimestamp)),
