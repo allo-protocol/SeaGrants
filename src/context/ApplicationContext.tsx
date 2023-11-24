@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MicroGrantsStrategy, Registry } from "@allo-team/allo-v2-sdk/";
 
 import { getIPFSClient } from "@/services/ipfs";
@@ -37,6 +37,12 @@ export interface IApplicationContextProps {
 }
 
 const initialSteps: TProgressStep[] = [
+  {
+    content: "Using profile ",
+    target: "",
+    href: "",
+    status: EProgressStatus.IN_PROGRESS,
+  },
   {
     content: "Saving your application to ",
     target: ETarget.IPFS,
@@ -105,34 +111,18 @@ export const ApplicationContextProvider = (props: {
     setSteps(newSteps);
   };
 
+  const updateStepContent = (index: number, content: string) => {
+    const newSteps = [...steps];
+    newSteps[index].content = content;
+    setSteps(newSteps);
+  };
+
   const createApplication = async (
     data: TNewApplication,
     chain: number,
     poolId: number,
   ): Promise<string> => {
     const chainInfo = getChain(chain);
-
-    // if data.profileName set a new step at index 0 of steps
-    if (data.profileName) {
-      const newSteps = [...steps];
-      newSteps.unshift({
-        content: "Creating new profile on ",
-        target: ETarget.CHAIN,
-        href: "",
-        status: EProgressStatus.NOT_STARTED,
-      });
-      setSteps(newSteps);
-    }
-
-    // update step 0 to in progress
-    setSteps((prevSteps) => {
-      const newSteps = [...prevSteps];
-      newSteps[0] = {
-        ...newSteps[0],
-        status: EProgressStatus.IN_PROGRESS,
-      };
-      return newSteps;
-    });
 
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
@@ -145,7 +135,32 @@ export const ApplicationContextProvider = (props: {
       return newSteps;
     });
 
+
     let stepIndex = 0;
+
+    let profileContent = steps[0].content;
+    let profileTarget = steps[0].target;
+
+    // if data.profileName set a new step at index 0 of steps
+    if (data.profileName) {
+
+      profileContent = "Creating new profile ";
+      profileTarget = data.profileName;
+      
+    } else {
+      const profile = (
+        await getProfileById({
+          chainId: chain.toString(),
+          profileId: data.profileId!.toLowerCase(),
+        })
+      );
+
+      profileTarget = profile.name;
+    }
+  
+    updateStepContent(stepIndex, profileContent);
+    updateStepTarget(stepIndex, profileTarget);
+    updateStepHref(stepIndex, "");
 
     let profileId = data.profileId;
     const registry = new Registry({ chain: chain });
@@ -189,15 +204,17 @@ export const ApplicationContextProvider = (props: {
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
         );
 
-        updateStepStatus(stepIndex, true);
       } catch (e) {
         updateStepStatus(stepIndex, false);
         console.log("Creating Profile", e);
       }
 
       await new Promise((resolve) => setTimeout(resolve, 10000));
-      stepIndex++;
     }
+
+    updateStepStatus(stepIndex, true);
+
+    stepIndex++;
 
     // 2. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
