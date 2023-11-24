@@ -2,22 +2,23 @@
 
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { TNewPool } from "@/app/types";
-import { useNetwork } from "wagmi";
+import { TNewPool, TProfilesByOwnerResponse } from "@/app/types";
+import { useAccount, useNetwork } from "wagmi";
 import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";
 import ImageUpload from "../shared/ImageUpload";
 import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
+import getProfilesByOwner from "@/utils/request";
 
 const schema = yup.object({
   profileId: yup
     .string()
-    .required("Recipient address is required")
+    .required("Profile ID is required")
     .test(
       "address-check",
       "Must start with 0x",
@@ -44,22 +45,27 @@ const schema = yup.object({
   startDate: yup.date().required("Start time is required"),
   endDate: yup.date().required("End time is required"),
   tokenAddress: yup.string().notRequired(),
-  useRegistryAnchor: yup.boolean().required("Registry anchor is required"),
+  useRegistryAnchor: yup.string().required("Registry anchor is required"),
+  //todo: fix this
+  // profilename: yup.string().when("profileId", {
+  //   is: (profileId: string) => profileId.trim() === "0x0",
+  //   then: yup
+  //     .string()
+  //     .required("Profile name is required"),
+  //   otherwise: yup.string(),
+  // }),
+  profilename: yup.string().notRequired(),
 });
 
 export default function PoolForm() {
   const [base64Image, setBase64Image] = useState<string>("");
-  const nowPlus10Minutes = new Date();
-  nowPlus10Minutes.setMinutes(nowPlus10Minutes.getMinutes() + 10);
-  const minDate = nowPlus10Minutes.toISOString().slice(0, -8);
-
-  const router = useRouter();
-  const { steps, createNewPool } = useContext(NewPoolContext);
-
-  const { chain } = useNetwork();
-  const chainId = chain?.id;
-
   const [isOpen, setIsOpen] = useState(false);
+  const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
+  const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
+  const { steps, createNewPool } = useContext(NewPoolContext);
+  const router = useRouter();
+  const { chain } = useNetwork();
+  const { address } = useAccount();
   const {
     register,
     handleSubmit,
@@ -69,12 +75,26 @@ export default function PoolForm() {
     resolver: yupResolver(schema),
   });
 
+  const nowPlus10Minutes = new Date();
+  nowPlus10Minutes.setMinutes(nowPlus10Minutes.getMinutes() + 10);
+  const minDate = nowPlus10Minutes.toISOString().slice(0, -8);
+
+  const chainId = chain?.id;
+
   const handleCancel = () => {
     setIsOpen(false);
   };
 
   const onHandleSubmit = async (data: any) => {
     setIsOpen(true);
+
+    // if no new profile is created set undefined
+    // else set profile name if available else set pool name instead
+    const newProfileName = !createNewProfile
+      ? undefined
+      : data.profilename
+      ? data.profilename
+      : data.name;
 
     const newPoolData: TNewPool = {
       profileId: data.profileId,
@@ -92,22 +112,47 @@ export default function PoolForm() {
       useRegistryAnchor: data.useRegistryAnchor === "true" ? true : false,
       managers: [],
       base64Image: base64Image,
+      profileName: newProfileName,
     };
 
-    const { address, poolId } = await createNewPool(
-      newPoolData,
-      Number(chainId),
-    );
+    const { poolId } = await createNewPool(newPoolData, Number(chainId));
 
     setTimeout(() => {
       setIsOpen(false);
-      router.push(`/${chainId}/${poolId}`);
-    }, 1000);
+      router.push(`/${chain}/${poolId}`);
+      router.refresh();
+    }, 5000);
   };
 
   const setText = (text: string) => {
     setValue("description", text);
   };
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      if (chainId && address) {
+        const customProfile: TProfilesByOwnerResponse = {
+          name: "New Profile",
+          profileId: "0x0",
+          owner: address.toLocaleLowerCase(),
+          createdAt: "0",
+          anchor: "0x",
+        };
+
+        const profiles: TProfilesByOwnerResponse[] = await getProfilesByOwner({
+          chainId: chainId.toString(),
+          account: address.toLocaleLowerCase(),
+        });
+
+        if (profiles.length === 0) setCreateNewProfile(true);
+        profiles.push(customProfile);
+
+        setProfiles(profiles);
+      }
+    };
+
+    fetchProfiles();
+  }, [chain, address]);
 
   return (
     <form onSubmit={handleSubmit(onHandleSubmit)}>
@@ -143,42 +188,72 @@ export default function PoolForm() {
                 Registry Profile ID
               </label>
               <div className="mt-2">
-                <input
-                  {...register("profileId")}
-                  type="text"
-                  name="profileId"
-                  id="profileId"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
+                <div className="sm:col-span-4">
+                  {profiles.length > 0 && (
+                    <select
+                      {...register("profileId")}
+                      id="profileId"
+                      name="profileId"
+                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      defaultValue={profiles[0].profileId}
+                      onChange={(e) => {
+                        setCreateNewProfile(e.target.value === "0x0");
+                      }}
+                    >
+                      {profiles.map((profile, index) => (
+                        <option
+                          key={profile.profileId}
+                          value={profile.profileId}
+                          selected={index === 0}
+                        >
+                          {`${profile.name} ${
+                            profile.profileId === "0x0" ? "" : profile.profileId
+                          }`}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <p className="text-xs leading-5 text-gray-600 mt-2">
+                  The registry profile id of you organization your pool will be
+                  linked to
+                </p>
                 <div>
                   {errors.profileId && (
                     <Error message={errors.profileId?.message!} />
                   )}
                 </div>
-                {/* <div className="sm:col-span-4">
-                  <label
-                    htmlFor="useRegistryAnchor"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    Registry Profile ID
-                  </label>
-                  <select
-                    {...register("profileId")}
-                    id="profileId"
-                    name="profileId"
-                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    defaultValue="false"
-                  >
-                    <option>0x1234</option>
-                    <option>0x456</option>
-                  </select>
-                </div> */}
-                <p className="text-xs leading-5 text-gray-600 mt-2">
-                  The registry profile id of you organization your pool will be
-                  linked to
-                </p>
               </div>
             </div>
+
+            {createNewProfile && (
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Profile Name
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                    <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
+                    <input
+                      {...register("profilename")}
+                      type="text"
+                      name="profilename"
+                      id="profilename"
+                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                      placeholder="Allo Protocol"
+                    />
+                  </div>
+                </div>
+                <div>
+                  {errors.profilename && (
+                    <Error message={errors.profilename?.message!} />
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="sm:col-span-4">
               <label
@@ -196,7 +271,7 @@ export default function PoolForm() {
                     name="name"
                     id="name"
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="sporkdao"
+                    placeholder="Gitcoin Micro Grants"
                   />
                 </div>
               </div>

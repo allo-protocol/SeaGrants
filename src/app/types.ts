@@ -49,13 +49,13 @@ export type TApplicationMetadata = {
   description: string;
   email: string;
   base64Image: string;
-  profileOwner: `0x${string}`;
 };
 
 export type TNewApplication = TApplicationMetadata & {
   requestedAmount: bigint;
   recipientAddress: `0x${string}`;
-  nonce?: number;
+  profileId?: `0x${string}`;
+  profileName?: string;
 };
 
 export type TNewApplicationResponse = {
@@ -88,6 +88,7 @@ export type TNewPool = TPoolMetadata & {
   endDate: string;
   approvalThreshold: number;
   useRegistryAnchor: boolean;
+  profileName?: string;
 };
 
 export type TNewPoolResponse = {
@@ -104,6 +105,7 @@ export type TPoolData = {
   approvalThreshold: number;
   maxRequestedAmount: string;
   blockTimestamp: string;
+  useRegistryAnchor: boolean;
   pool: {
     strategy: string;
     tokenMetadata: {
@@ -200,7 +202,7 @@ export enum EProgressStatus {
 }
 
 export type TProgressStep = {
-  id: number;
+  id?: number; // todo: remove id everywhere
   content: string;
   target?: string;
   href?: string;
@@ -228,4 +230,23 @@ export type TFlyoutOptions = {
   useFlyout: boolean;
   label: string;
   startIndex: number;
+};
+
+export type TProfilesByOwnerResponse = {
+  profileId: string;
+  name: string;
+  owner: string;
+  createdAt: string;
+  anchor: string;
+};
+
+export type TProfileResponse = {
+  profileId: string;
+  nonce: number;
+  name: string;
+  metadataPointer: string;
+  owner: string;
+  anchor: string;
+  creator: string;
+  createdAt: string;
 };

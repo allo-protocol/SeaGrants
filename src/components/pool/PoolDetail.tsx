@@ -88,6 +88,10 @@ export const PoolDetail = (props: {
       name: props.pool.microGrantRecipients.length || 0,
       color: "text-green-700",
     },
+    {
+      description: "Profile Required",
+      name: props.pool.useRegistryAnchor ? "Yes" : "No",
+    },
   ];
 
   return (

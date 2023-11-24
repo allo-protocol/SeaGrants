@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import { MicroGrantsStrategy } from "@allo-team/allo-v2-sdk/";
+import React, { useEffect, useState } from "react";
+import { MicroGrantsStrategy, Registry } from "@allo-team/allo-v2-sdk/";
 
 import { getIPFSClient } from "@/services/ipfs";
 import {
@@ -14,12 +14,17 @@ import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { decodeEventLog } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
 import {
+  ethereumHashRegExp,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
 import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
-import { truncatedStringWithoutStyle } from "@/components/shared/Address";
-import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
+import {
+  TransactionData,
+  ZERO_ADDRESS,
+} from "@allo-team/allo-v2-sdk/dist/Common/types";
+import { getProfileById } from "@/utils/request";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -32,28 +37,30 @@ export interface IApplicationContextProps {
 
 const initialSteps: TProgressStep[] = [
   {
-    id: 0,
-    content: "Saving your application to ",
-    target: ETarget.IPFS,
+    content: "Using profile ",
+    target: "",
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
-    id: 1,
+    content: "Saving your application to ",
+    target: ETarget.IPFS,
+    href: "",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
     content: "Registering your application on ",
     target: ETarget.POOL,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 2,
     content: "Indexing your application on ",
     target: ETarget.SPEC,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
-    id: 3,
     content: "Indexing application metadata on ",
     target: ETarget.IPFS,
     href: "",
@@ -61,18 +68,20 @@ const initialSteps: TProgressStep[] = [
   },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>({
-  steps: initialSteps,
-  createApplication: async () => {
-    return "";
+export const ApplicationContext = React.createContext<IApplicationContextProps>(
+  {
+    steps: [],
+    createApplication: async () => {
+      return "";
+    },
   },
-});
+);
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
 }) => {
   const [steps, setSteps] = useState<TProgressStep[]>(initialSteps);
-  const router = useRouter();
+  const { address } = useAccount();
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
@@ -80,15 +89,30 @@ export const ApplicationContextProvider = (props: {
     setSteps(newSteps);
   };
 
-  const updateStepStatus = (index: number, status: EProgressStatus) => {
+  const updateStepStatus = (index: number, flag: boolean) => {
     const newSteps = [...steps];
-    newSteps[index].status = status;
+    if (flag) {
+      newSteps[index].status = EProgressStatus.IS_SUCCESS;
+    } else {
+      newSteps[index].status = EProgressStatus.IS_ERROR;
+    }
+
+    if (steps.length > index + 1)
+      newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
+
     setSteps(newSteps);
+    return newSteps;
   };
 
   const updateStepHref = (index: number, href: string) => {
     const newSteps = [...steps];
     newSteps[index].href = href;
+    setSteps(newSteps);
+  };
+
+  const updateStepContent = (index: number, content: string) => {
+    const newSteps = [...steps];
+    newSteps[index].content = content;
     setSteps(newSteps);
   };
 
@@ -99,9 +123,89 @@ export const ApplicationContextProvider = (props: {
   ): Promise<string> => {
     const chainInfo = getChain(chain);
 
-    updateStepTarget(2, `${chainInfo.name}`);
+    const newSteps = [...steps];
+    newSteps.map((step, index) => {
+      if (step.target === ETarget.CHAIN) {
+        updateStepTarget(index, chainInfo.name);
+      }
+    });
 
-    // 1. Save metadata to IPFS
+    let stepIndex = 0;
+
+    let profileContent = steps[0].content;
+    let profileTarget = steps[0].target;
+
+    // if data.profileName set a new step at index 0 of steps
+    if (data.profileName) {
+      profileContent = "Creating new profile ";
+      profileTarget = data.profileName;
+    } else {
+      const profile = await getProfileById({
+        chainId: chain.toString(),
+        profileId: data.profileId!.toLowerCase(),
+      });
+
+      profileTarget = profile.name;
+    }
+
+    updateStepContent(stepIndex, profileContent);
+    updateStepTarget(stepIndex, profileTarget);
+    updateStepHref(stepIndex, "");
+
+    let profileId = data.profileId;
+    const registry = new Registry({ chain: chain });
+
+    // 1. if profileName is set, create profile
+    if (data.profileName && address) {
+      const randomNumber = Math.floor(Math.random() * 10000000000);
+
+      const txCreateProfile: TransactionData = await registry.createProfile({
+        nonce: randomNumber,
+        name: data.profileName,
+        metadata: {
+          protocol: BigInt(0),
+          pointer: "",
+        },
+        owner: address,
+        members: [],
+      });
+
+      try {
+        const tx = await sendTransaction({
+          to: txCreateProfile.to as string,
+          data: txCreateProfile.data,
+          value: BigInt(txCreateProfile.value),
+        });
+
+        const receipt =
+          await wagmiConfigData.publicClient.waitForTransactionReceipt({
+            hash: tx.hash,
+          });
+
+        const { logs } = receipt;
+        profileId = logs[0].topics[1] || "0x";
+
+        if (profileId === "0x") {
+          throw new Error("Profile creation failed");
+        }
+
+        updateStepHref(
+          stepIndex,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        );
+      } catch (e) {
+        updateStepStatus(stepIndex, false);
+        console.log("Creating Profile", e);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+    }
+
+    updateStepStatus(stepIndex, true);
+
+    stepIndex++;
+
+    // 2. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
 
     const metadata = {
@@ -110,7 +214,6 @@ export const ApplicationContextProvider = (props: {
       description: data.description,
       email: data.email,
       base64Image: data.base64Image,
-      profileOwner: data.profileOwner,
     };
 
     let imagePointer;
@@ -125,23 +228,31 @@ export const ApplicationContextProvider = (props: {
       }
 
       pointer = await ipfsClient.pinJSON(metadata);
-      updateStepHref(0, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
-      updateStepStatus(0, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(1, EProgressStatus.IN_PROGRESS);
+      updateStepHref(stepIndex, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
+      updateStepStatus(stepIndex, true);
     } catch (e) {
       console.log("IPFS", e);
-      updateStepStatus(0, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
 
-    // 2. Create profile on registry
-    // TODO
+    stepIndex++;
 
     // 3. Register application to pool
     let recipientId;
-
     const strategy = new MicroGrantsStrategy({ chain, poolId });
+    let anchorAddress: string = ZERO_ADDRESS;
+
+    if (ethereumHashRegExp.test(profileId || "")) {
+      anchorAddress = (
+        await getProfileById({
+          chainId: chain.toString(),
+          profileId: profileId!.toLowerCase(),
+        })
+      ).anchor;
+    }
 
     const registerRecipientData = strategy.getRegisterRecipientData({
+      registryAnchor: anchorAddress as `0x${string}`,
       recipientAddress: data.recipientAddress as `0x${string}`,
       requestedAmount: data.requestedAmount,
       metadata: {
@@ -169,21 +280,23 @@ export const ApplicationContextProvider = (props: {
 
       recipientId = (decodedLogs[0].args as any)["recipientId"].toLowerCase();
 
-      console.log("Hash", tx.hash);
-      console.log("recipientId", recipientId);
+      updateStepTarget(
+        stepIndex,
+        `${chainInfo.name} at ${tx.hash.slice(0, 6)}`,
+      );
 
-      updateStepTarget(1, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
       updateStepHref(
-        1,
+        stepIndex,
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
-      updateStepStatus(1, EProgressStatus.IS_SUCCESS);
-      updateStepStatus(2, EProgressStatus.IN_PROGRESS);
+      updateStepStatus(stepIndex, true);
     } catch (e) {
       console.log("Registering Application", e);
-      updateStepStatus(1, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
+
+    stepIndex++;
 
     // 4. Poll indexer for recipientId
     const pollingData: any = {
@@ -198,30 +311,31 @@ export const ApplicationContextProvider = (props: {
     );
 
     if (pollingResult) {
-      updateStepStatus(2, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(stepIndex, true);
     } else {
       console.log("Polling ERROR");
-      updateStepStatus(2, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
 
-    updateStepStatus(3, EProgressStatus.IN_PROGRESS);
+    stepIndex++;
 
     // 5. Index Metadata
 
+    console.log("pointer.IpfsHash", pointer.IpfsHash);
     const pollingMetadataResult = await pollUntilMetadataIsAvailable(
       pointer.IpfsHash,
     );
 
+    console.log("pollingMetadataResult", pollingMetadataResult);
+
     if (pollingMetadataResult) {
-      updateStepStatus(3, EProgressStatus.IS_SUCCESS);
+      updateStepStatus(stepIndex, true);
     } else {
       console.log("Polling ERROR");
-      updateStepStatus(3, EProgressStatus.IS_ERROR);
+      updateStepStatus(stepIndex, false);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    router.push(`/${chain}/${poolId}/${recipientId}`);
 
     return recipientId;
   };

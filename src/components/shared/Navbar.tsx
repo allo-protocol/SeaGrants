@@ -48,21 +48,26 @@ export default function Navbar() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
               <div className="flex">
-                <div className="flex flex-shrink-0 items-center cursor-pointer">
+                <div
+                  className="flex flex-shrink-0 items-center cursor-pointer"
+                  onClick={() => {
+                    window.location.href = "/";
+                  }}
+                >
                   <Image
                     className="h-8 w-auto"
                     src={logo}
                     alt="Allo"
                     height={32}
                     width={32}
-                    onClick={() => {
-                      window.location.href = "/";
-                    }}
                   />
+                  <h2 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl py-4 px-2">
+                    !MicroGrants
+                  </h2>
                 </div>
               </div>
               <div className="flex items-center">
-                { isConnected && 
+                {isConnected && (
                   <div className="top-16 w-auto max-w-sm">
                     <Popover className="relative">
                       {({ open }) => (
@@ -122,7 +127,7 @@ export default function Navbar() {
                       )}
                     </Popover>
                   </div>
-                }
+                )}
 
                 <div className="flex-shrink-0">
                   <ConnectButton
