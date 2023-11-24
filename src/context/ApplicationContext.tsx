@@ -123,15 +123,11 @@ export const ApplicationContextProvider = (props: {
   ): Promise<string> => {
     const chainInfo = getChain(chain);
 
-    // if step target is CHAIN update target to chainInfo.name
-    setSteps((prevSteps) => {
-      const newSteps = [...prevSteps];
-      newSteps.map((step) => {
-        if (step.target === ETarget.CHAIN) {
-          step.target = chainInfo.name;
-        }
-      });
-      return newSteps;
+    const newSteps = [...steps];
+    newSteps.map((step, index) => {
+      if (step.target === ETarget.CHAIN) {
+        updateStepTarget(index, chainInfo.name);
+      }
     });
 
     let stepIndex = 0;
