@@ -97,14 +97,18 @@ export const pollUntilMetadataIsAvailable = async (
   const fetchMetadata: any = async () => {
     const metadata = await ipfsClient.fetchJson(pointer);
 
+    console.log("metadata", metadata);
+    console.log("counter", counter);
     if (metadata) {
+      console.log("metadata true");
       return true;
     } else {
+      console.log("metadata false");
       counter++;
       if (counter > 20) return false;
       // Corrected: Return the result of the recursive call
       return await new Promise((resolve) => setTimeout(resolve, 2000)).then(
-        () => fetchMetadata(),
+        fetchMetadata,
       );
     }
   };

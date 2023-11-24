@@ -19,7 +19,6 @@ import {
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
 import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
-import { truncatedStringWithoutStyle } from "@/components/shared/Address";
 import { useAccount } from "wagmi";
 import {
   TransactionData,
@@ -69,12 +68,14 @@ const initialSteps: TProgressStep[] = [
   },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>({
-  steps: [],
-  createApplication: async () => {
-    return "";
+export const ApplicationContext = React.createContext<IApplicationContextProps>(
+  {
+    steps: [],
+    createApplication: async () => {
+      return "";
+    },
   },
-});
+);
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
@@ -96,7 +97,7 @@ export const ApplicationContextProvider = (props: {
       newSteps[index].status = EProgressStatus.IS_ERROR;
     }
 
-    if (steps.length > index)
+    if (steps.length > index + 1)
       newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
 
     setSteps(newSteps);
@@ -324,9 +325,12 @@ export const ApplicationContextProvider = (props: {
 
     // 5. Index Metadata
 
+    console.log("pointer.IpfsHash", pointer.IpfsHash);
     const pollingMetadataResult = await pollUntilMetadataIsAvailable(
       pointer.IpfsHash,
     );
+
+    console.log("pollingMetadataResult", pollingMetadataResult);
 
     if (pollingMetadataResult) {
       updateStepStatus(stepIndex, true);

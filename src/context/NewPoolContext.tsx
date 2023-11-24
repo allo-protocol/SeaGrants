@@ -23,6 +23,7 @@ import {
 import { checkIfPoolIsIndexedQuery } from "@/utils/query";
 import { useAccount } from "wagmi";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
+import { getProfileById } from "@/utils/request";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -30,6 +31,12 @@ export interface INewPoolContextProps {
 }
 
 const initialSteps: TProgressStep[] = [
+  {
+    content: "Using profile ",
+    target: "",
+    href: "",
+    status: EProgressStatus.IN_PROGRESS,
+  },
   {
     content: "Saving your application to ",
     target: ETarget.IPFS,
@@ -63,7 +70,7 @@ const initialSteps: TProgressStep[] = [
 ];
 
 export const NewPoolContext = React.createContext<INewPoolContextProps>({
-  steps: initialSteps,
+  steps: [],
   createNewPool: async () => {
     return {
       poolId: 0,
@@ -92,6 +99,12 @@ export const NewPoolContextProvider = (props: {
     setSteps(newSteps);
   };
 
+  const updateStepContent = (index: number, content: string) => {
+    const newSteps = [...steps];
+    newSteps[index].content = content;
+    setSteps(newSteps);
+  };
+
   const updateStepStatus = (index: number, flag: boolean) => {
     const newSteps = [...steps];
     if (flag) {
@@ -100,7 +113,7 @@ export const NewPoolContextProvider = (props: {
       newSteps[index].status = EProgressStatus.IS_ERROR;
     }
 
-    if (steps.length > index)
+    if (steps.length > index + 1)
       newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
 
     setSteps(newSteps);
@@ -112,28 +125,6 @@ export const NewPoolContextProvider = (props: {
     chain: number,
   ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
-
-    // if data.profileName set a new step at index 0 of steps
-    if (data.profileName) {
-      const newSteps = [...steps];
-      newSteps.unshift({
-        content: "Creating new profile on ",
-        target: ETarget.CHAIN,
-        href: "",
-        status: EProgressStatus.NOT_STARTED,
-      });
-      setSteps(newSteps);
-    }
-
-    // update step 0 to in progress
-    setSteps((prevSteps) => {
-      const newSteps = [...prevSteps];
-      newSteps[0] = {
-        ...newSteps[0],
-        status: EProgressStatus.IN_PROGRESS,
-      };
-      return newSteps;
-    });
 
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
@@ -147,6 +138,25 @@ export const NewPoolContextProvider = (props: {
     });
 
     let stepIndex = 0;
+
+    let profileContent = steps[0].content;
+    let profileTarget = steps[0].target;
+
+    if (data.profileName) {
+      profileContent = "Creating new profile ";
+      profileTarget = data.profileName;
+    } else {
+      const profile = await getProfileById({
+        chainId: chain.toString(),
+        profileId: data.profileId!.toLowerCase(),
+      });
+
+      profileTarget = profile.name;
+    }
+
+    updateStepContent(stepIndex, profileContent);
+    updateStepTarget(stepIndex, profileTarget);
+    updateStepHref(stepIndex, "");
 
     // return values
     let strategyAddress: string = "0x";
@@ -194,15 +204,14 @@ export const NewPoolContextProvider = (props: {
           stepIndex,
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
         );
-
-        updateStepStatus(stepIndex, true);
       } catch (e) {
         updateStepStatus(stepIndex, false);
         console.log("Creating Profile", e);
       }
-
-      stepIndex++;
     }
+
+    updateStepStatus(stepIndex, true);
+    stepIndex++;
 
     // 1. Save metadata to IPFS
     const ipfsClient = getIPFSClient();
