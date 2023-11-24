@@ -69,14 +69,12 @@ const initialSteps: TProgressStep[] = [
   },
 ];
 
-export const ApplicationContext = React.createContext<IApplicationContextProps>(
-  {
-    steps: initialSteps,
-    createApplication: async () => {
-      return "";
-    },
+export const ApplicationContext = React.createContext<IApplicationContextProps>({
+  steps: [],
+  createApplication: async () => {
+    return "";
   },
-);
+});
 
 export const ApplicationContextProvider = (props: {
   children: JSX.Element | JSX.Element[];
@@ -135,7 +133,6 @@ export const ApplicationContextProvider = (props: {
       return newSteps;
     });
 
-
     let stepIndex = 0;
 
     let profileContent = steps[0].content;
@@ -143,21 +140,17 @@ export const ApplicationContextProvider = (props: {
 
     // if data.profileName set a new step at index 0 of steps
     if (data.profileName) {
-
       profileContent = "Creating new profile ";
       profileTarget = data.profileName;
-      
     } else {
-      const profile = (
-        await getProfileById({
-          chainId: chain.toString(),
-          profileId: data.profileId!.toLowerCase(),
-        })
-      );
+      const profile = await getProfileById({
+        chainId: chain.toString(),
+        profileId: data.profileId!.toLowerCase(),
+      });
 
       profileTarget = profile.name;
     }
-  
+
     updateStepContent(stepIndex, profileContent);
     updateStepTarget(stepIndex, profileTarget);
     updateStepHref(stepIndex, "");
@@ -203,7 +196,6 @@ export const ApplicationContextProvider = (props: {
           stepIndex,
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
         );
-
       } catch (e) {
         updateStepStatus(stepIndex, false);
         console.log("Creating Profile", e);
@@ -293,8 +285,9 @@ export const ApplicationContextProvider = (props: {
 
       updateStepTarget(
         stepIndex,
-        `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`,
+        `${chainInfo.name} at ${tx.hash.slice(0, 6)}`,
       );
+
       updateStepHref(
         stepIndex,
         `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
