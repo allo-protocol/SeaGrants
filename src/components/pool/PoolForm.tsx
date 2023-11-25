@@ -119,7 +119,7 @@ export default function PoolForm() {
 
     setTimeout(() => {
       setIsOpen(false);
-      router.push(`/${chain}/${poolId}`);
+      router.push(`/${chainId}/${poolId}`);
       router.refresh();
     }, 5000);
   };
