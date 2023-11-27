@@ -22,12 +22,6 @@ export default function PoolOverview(props: {
 }) {
   const { isPoolManager } = useContext(PoolContext);
 
-  const bannerRef = useRef<any>(null);
-  const [bannerSize, setBannerSize] = useState({
-    width: 0,
-    height: 0,
-  });
-
   const [tabs, setTabs] = useState([
     { name: "Pool Details", current: true },
     { name: "Applications", current: false },
@@ -54,15 +48,6 @@ export default function PoolOverview(props: {
   };
 
   useEffect(() => {
-    if (bannerRef.current) {
-      setBannerSize({
-        width: bannerRef.current.offsetWidth,
-        height: Math.ceil(bannerRef.current.offsetWidth / aspectRatio),
-      });
-    }
-  }, [bannerRef]);
-
-  useEffect(() => {
     if (isPoolManager) {
       setTabs([
         { name: "Pool Details", current: true },
@@ -77,7 +62,7 @@ export default function PoolOverview(props: {
 
   return (
     <div className="bg-white">
-      <div ref={bannerRef} className="pt-6 w-full">
+      <div className="pt-6 w-full">
         <Breadcrumb breadcrumbs={breadcrumbs} />
 
         {/* Banner */}
@@ -136,7 +121,10 @@ export default function PoolOverview(props: {
           />
         )}
         {currentTab == "Applications" && (
-          <ApplicationList pool={props.pool} applications={props.applications}  />
+          <ApplicationList
+            pool={props.pool}
+            applications={props.applications}
+          />
         )}
         {/* {currentTab == "Reviews" && (
           <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-10">
