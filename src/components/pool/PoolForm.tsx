@@ -129,7 +129,7 @@ export default function PoolForm() {
 
   const createPoolData = (): TPoolData => {
     return {
-      poolId: "99999999999",
+      poolId: "0",
       chainId: chainId!.toString(),
       strategy: "0x",
       allocationStartTime: Number(newPoolData!.startDate),
@@ -565,7 +565,7 @@ export default function PoolForm() {
       ) : (
         <PoolOverview
           chainId={chainId!.toString()}
-          poolId={"99999999999"}
+          poolId={"0"}
           pool={createPoolData()}
           metadata={createPoolData().pool.metadata}
           poolBanner={newPoolData!.base64Image!}
