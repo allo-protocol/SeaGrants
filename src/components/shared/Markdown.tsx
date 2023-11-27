@@ -3,7 +3,6 @@ import ReactMde, { Preview } from "react-mde";
 import ReactMarkdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import { getIPFSClient } from "@/services/ipfs";
-import remarkGfm from "remark-gfm";
 
 const buttonStyles = `
   .mde-tabs button {
@@ -12,8 +11,11 @@ const buttonStyles = `
     }
   `;
 
-export const MarkdownEditor = (props: { setText: (text: string) => void }) => {
-  const [value, setValue] = useState("");
+export const MarkdownEditor = (props: {
+  setText: (text: string) => void;
+  value?: string;
+}) => {
+  const [value, setValue] = useState(props.value || "");
   const [selectedTab, setSelectedTab] = useState<
     "write" | "preview" | undefined
   >("write");
