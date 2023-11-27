@@ -180,7 +180,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       recipientAddress: newApplicationData!.recipientAddress,
       requestedAmount: newApplicationData!.requestedAmount.toString(),
       metadataPointer: "pointer",
-      blockTimestamp: (new Date().getTime() / 1000).toString(),
+      blockTimestamp: new Date().toISOString(),
       isUsingRegistryAnchor: isUsingRegistryAnchor,
       status: "Pending",
     };
