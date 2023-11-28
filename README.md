@@ -1,9 +1,10 @@
-# 🪴 Allo Micro Grants
+# 🌊 Allo SeaGrants
 
 ## Getting Started
 
-This is a micro grants application for Allo. It is built using
-[Bun](https://bun.sh/) and [Next.js](https://nextjs.org/).
+This is a grants application for Allo. It is built using
+[Spec](https://spec.dev), [Bun](https://bun.sh/) and
+[Next.js](https://nextjs.org/).
 
 ### Prerequisites
 
