@@ -4,6 +4,8 @@ import request from "graphql-request";
 import { EPoolStatus, TPoolData, TPoolMetadata } from "@/app/types";
 import { getIPFSClient } from "@/services/ipfs";
 import { getPoolStatus } from "@/utils/common";
+import logo from "./assets/logo.svg";
+import Image from "next/image";
 
 export default async function Home() {
   const ipfsClient = getIPFSClient();
@@ -63,8 +65,15 @@ export default async function Home() {
           className="absolute inset-0 -z-10 h-full w-full object-cover"
         />
         <div className="text-center">
+          <Image
+            className="mx-auto mb-3"
+            src={logo}
+            alt="Sea Grants"
+            width={128}
+          />
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            !MicroGrants
+            <span className="text-sky-400">Sea</span>
+            <span className="text-sky-600">Grants</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             Micro-grant programs, common in web3 communities like Gitcoin, Celo,
@@ -88,7 +97,9 @@ export default async function Home() {
         flyoutOptions={{
           useFlyout: true,
           startIndex: 2,
-          label: `Show all active pools (${activePools.length > 2 ? activePools.length - 2 : activePools.length})`,
+          label: `Show all active pools (${
+            activePools.length > 2 ? activePools.length - 2 : activePools.length
+          })`,
         }}
       />
       <PoolList

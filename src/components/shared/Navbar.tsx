@@ -55,14 +55,15 @@ export default function Navbar() {
                   }}
                 >
                   <Image
-                    className="h-8 w-auto"
+                    className="h-10 w-auto"
                     src={logo}
                     alt="Allo"
                     height={32}
                     width={32}
                   />
-                  <h2 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl py-4 px-2">
-                    !MicroGrants
+                  <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl py-4 px-2">
+                    <span className="text-sky-400">Sea</span>
+                    <span className="text-sky-600">Grants</span>
                   </h2>
                 </div>
               </div>
