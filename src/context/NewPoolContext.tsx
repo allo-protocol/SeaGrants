@@ -248,12 +248,13 @@ export const NewPoolContextProvider = (props: {
 
     // 2. Deploy new pool strategy
 
-    // TODO: UPDATE THIS 
+    // TODO: UPDATE THIS
     const strategy = new MicroGrantsStrategy({
       chain: chain,
     });
 
-    const deployParams = strategy.getDeployParams();
+    console.log("STRATEGY TYPE", data.strategyType);
+    const deployParams = strategy.getDeployParams(data.strategyType);
 
     try {
       const hash = await walletClient!.deployContract({
@@ -286,7 +287,7 @@ export const NewPoolContextProvider = (props: {
       new Date(data.endDate).getTime() / 1000,
     );
 
-    const initParams = {
+    const initParams: any = {
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
       allocationEndTime: BigInt(endDateInSeconds),
@@ -296,15 +297,30 @@ export const NewPoolContextProvider = (props: {
 
     // TODO: FIX THIS
     if (data.strategyType == StrategyType.Hats) {
+      initParams["hats"] = "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137";
       initParams["hatId"] = data.hatId;
     } else if (data.strategyType == StrategyType.Gov) {
+      const ref = Math.floor(
+        new Date(data!.snapshotReference!).getTime() / 1000,
+      );
       initParams["gov"] = data.gov;
-      initParams["minVotePower"] = BigInt(data.minVotePower);
-      initParams["snapshotReference"] = BigInt(data.snapshotReference);
+      initParams["minVotePower"] = BigInt(data!.minVotePower!);
+      initParams["snapshotReference"] = BigInt(ref);
     }
 
-    // create new pool
-    const initStrategyData = await strategy.getInitializeData(initParams);
+    console.log("INIT PARAMS", initParams);
+
+    let initStrategyData;
+
+    if (StrategyType.MicroGrants) {
+      initStrategyData = await strategy.getInitializeData(initParams);
+    } else if (StrategyType.Hats) {
+      initStrategyData = await strategy.getInitializeDataHats(initParams);
+    } else if (StrategyType.Gov) {
+      initStrategyData = await strategy.getInitializeDataGov(initParams);
+    } else {
+      throw new Error("Invalid strategy type");
+    }
 
     const poolCreationData = {
       profileId: profileId,

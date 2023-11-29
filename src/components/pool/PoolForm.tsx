@@ -15,14 +15,14 @@ import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
 import getProfilesByOwner from "@/utils/request";
 import PoolOverview from "./PoolOverview";
-import { TStrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
+import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 
 const schema = yup.object({
   profileId: yup
     .string()
     .required("Profile ID is required")
     .test("address-check", "Must start with 0x", (value) =>
-      value?.toLowerCase()?.startsWith("0x")
+      value?.toLowerCase()?.startsWith("0x"),
     ),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
@@ -32,14 +32,14 @@ const schema = yup.object({
     .test(
       "is-number",
       "fund pool amount is required",
-      (value) => !isNaN(Number(value))
+      (value) => !isNaN(Number(value)),
     ),
   maxAmount: yup
     .string()
     .test(
       "is-number",
       "max amount is required",
-      (value) => !isNaN(Number(value))
+      (value) => !isNaN(Number(value)),
     ),
   approvalThreshold: yup.number().required("approval threshold is required"),
   startDate: yup.date().required("Start time is required"),
@@ -116,7 +116,7 @@ export default function PoolForm() {
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [newPoolData, setNewPoolData] = useState<TNewPool | undefined>(
-    undefined
+    undefined,
   );
 
   const nowPlus10Minutes = new Date();
@@ -161,6 +161,11 @@ export default function PoolForm() {
       managers: [],
       base64Image: base64Image,
       profileName: newProfileName,
+      strategyType: strategy,
+      hatId: data?.hatId,
+      gov: data?.gov,
+      snapshotReference: data?.snapshotReference,
+      minVotePower: data?.minVotePower,
     };
 
     setNewPoolData(_newPoolData);
@@ -478,7 +483,9 @@ export default function PoolForm() {
                       </p>
                     </div>
                     <div>
-                      {errors.snapshotReference && <Error message={errors.snapshotReference?.message!} />}
+                      {errors.snapshotReference && (
+                        <Error message={errors.snapshotReference?.message!} />
+                      )}
                     </div>
                   </div>
 
@@ -502,7 +509,9 @@ export default function PoolForm() {
                       </p>
                     </div>
                     <div>
-                      {errors.minVotePower && <Error message={errors.minVotePower?.message!} />}
+                      {errors.minVotePower && (
+                        <Error message={errors.minVotePower?.message!} />
+                      )}
                     </div>
                   </div>
                 </>
