@@ -89,7 +89,7 @@ export default async function Home() {
         title={"Upcoming Pools"}
         flyoutOptions={{
           useFlyout: true,
-          startIndex: 1,
+          startIndex: 2,
           label: `Show all upcoming pools (${upcomingPools.length})`,
         }}
       />
