@@ -17,6 +17,7 @@ import {
 } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
+  NATIVE,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
@@ -25,6 +26,8 @@ import { useAccount } from "wagmi";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
 import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import { abi } from "@/utils/erc20.abi";
+import { encodeFunctionData } from "viem";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -48,6 +51,12 @@ const initialSteps: TProgressStep[] = [
     content: "Deploying new pool strategy to ",
     target: ETarget.CHAIN,
     href: "#",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    content: "Approve token on ",
+    target: ETarget.ALLO,
+    href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
@@ -127,6 +136,10 @@ export const NewPoolContextProvider = (props: {
   ): Promise<TNewPoolResponse> => {
     const chainInfo = getChain(chain);
 
+    const allo = new Allo({
+      chain: chain,
+    });
+
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
       const newSteps = [...prevSteps];
@@ -192,6 +205,7 @@ export const NewPoolContextProvider = (props: {
         const receipt =
           await wagmiConfigData.publicClient.waitForTransactionReceipt({
             hash: tx.hash,
+            confirmations: 2,
           });
 
         const { logs } = receipt;
@@ -279,6 +293,57 @@ export const NewPoolContextProvider = (props: {
 
     stepIndex++;
 
+    if (data.tokenAddress !== NATIVE) {
+      const allowance = await wagmiConfigData.publicClient.readContract({
+        address: data.tokenAddress,
+        abi: abi,
+        functionName: "allowance",
+        args: [address, data.tokenAddress],
+      });
+
+      if ((allowance as bigint) <= BigInt(data.fundPoolAmount)) {
+        const approvalAmount =
+          BigInt(data.fundPoolAmount) - (allowance as bigint);
+
+        console.log("Approval AMount", approvalAmount);
+
+        const approveData = encodeFunctionData({
+          abi: abi,
+          functionName: "approve",
+          args: [allo.address(), approvalAmount],
+        });
+
+        try {
+          const tx = await sendTransaction({
+            to: data.tokenAddress,
+            data: approveData,
+            value: BigInt(0),
+          });
+
+          await wagmiConfigData.publicClient.waitForTransactionReceipt({
+            hash: tx.hash,
+            confirmations: 2,
+          });
+
+          updateStepHref(
+            stepIndex,
+            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          );
+          updateStepStatus(stepIndex, true);
+        } catch (e) {
+          updateStepStatus(stepIndex, false);
+          console.log("Approving Token", e);
+        }
+      } else {
+        updateStepContent(stepIndex, "Token already approved on ");
+        updateStepStatus(stepIndex, true);
+      }
+    } else {
+      updateStepContent(stepIndex, "Approval not needed on ");
+      updateStepStatus(stepIndex, true);
+    }
+
+    stepIndex++;
     const startDateInSeconds = Math.floor(
       new Date(data.startDate).getTime() / 1000,
     );
@@ -330,10 +395,6 @@ export const NewPoolContextProvider = (props: {
       managers: data.managers,
     };
 
-    const allo = new Allo({
-      chain: chain,
-    });
-
     const createPoolData = await allo.createPoolWithCustomStrategy(
       poolCreationData,
     );
@@ -348,6 +409,7 @@ export const NewPoolContextProvider = (props: {
       const reciept =
         await wagmiConfigData.publicClient.waitForTransactionReceipt({
           hash: tx.hash,
+          confirmations: 2,
         });
 
       const { logs } = reciept;

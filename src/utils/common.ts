@@ -174,3 +174,6 @@ export const formatDateDifference = (dateString: string): string => {
     return `${daysDifference}d ago`;
   }
 };
+
+export const NATIVE =
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE".toLowerCase();

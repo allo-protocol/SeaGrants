@@ -3,7 +3,7 @@
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
 import { useContext, useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
@@ -21,9 +21,8 @@ import { parseUnits } from "viem";
 import getProfilesByOwner from "@/utils/request";
 import PoolOverview from "./PoolOverview";
 import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
-import { getBytecode } from "viem/actions";
 import { wagmiConfigData } from "@/services/wagmi";
-import { ethereumAddressRegExp } from "@/utils/common";
+import { NATIVE, ethereumAddressRegExp } from "@/utils/common";
 import {
   getPastVotesAddressUint256,
   getPriorVotesAddressUint,
@@ -180,9 +179,7 @@ export default function PoolForm() {
       name: data.name,
       website: data.website,
       description: data.description,
-      tokenAddress: data.tokenAddress
-        ? data.tokenAddress
-        : "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      tokenAddress: data.tokenAddress ? data.tokenAddress : NATIVE,
       fundPoolAmount: parseUnits(data.fundPoolAmount, decimals).toString(),
       maxAmount: parseUnits(data.maxAmount, decimals).toString(),
       approvalThreshold: data.approvalThreshold,
@@ -278,7 +275,6 @@ export default function PoolForm() {
   };
 
   useEffect(() => {
-    console.log("use effect");
     const fetchProfiles = async () => {
       if (chainId && address) {
         const customProfile: TProfilesByOwnerResponse = {
