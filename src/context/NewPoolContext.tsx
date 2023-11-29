@@ -308,15 +308,13 @@ export const NewPoolContextProvider = (props: {
       initParams["snapshotReference"] = BigInt(ref);
     }
 
-    console.log("INIT PARAMS", initParams);
-
     let initStrategyData;
 
-    if (StrategyType.MicroGrants) {
+    if (data.strategyType === StrategyType.MicroGrants) {
       initStrategyData = await strategy.getInitializeData(initParams);
-    } else if (StrategyType.Hats) {
+    } else if (data.strategyType === StrategyType.Hats) {
       initStrategyData = await strategy.getInitializeDataHats(initParams);
-    } else if (StrategyType.Gov) {
+    } else if (data.strategyType === StrategyType.Gov) {
       initStrategyData = await strategy.getInitializeDataGov(initParams);
     } else {
       throw new Error("Invalid strategy type");
