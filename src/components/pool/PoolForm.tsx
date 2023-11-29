@@ -449,7 +449,7 @@ export default function PoolForm() {
                       </p>
                     </div>
                     <div>
-                      {errors.hatId && <Error message={errors.gov?.message!} />}
+                      {errors.gov && <Error message={errors.gov?.message!} />}
                     </div>
                   </div>
 

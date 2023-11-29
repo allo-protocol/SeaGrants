@@ -126,7 +126,14 @@ export type TPoolData = {
   allocateds: TAllocatedData[];
   distributeds: TDistributedData[];
   microGrantRecipients: any[]; // todo: set type
+  // Hat
+  hatId?: number;
+  // Gov
+  gov?: string;
+  minVotePower?: number;
+  snapshotReference?: number;
 };
+
 
 export type TApplicationData = {
   microGrant: {
