@@ -1,4 +1,5 @@
 import { Status } from "@allo-team/allo-v2-sdk/dist/strategies/types";
+import { StrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
 
 type ApplicationStatus = "Accepted" | "Rejected" | "Pending" | "Paid";
 
@@ -89,6 +90,13 @@ export type TNewPool = TPoolMetadata & {
   approvalThreshold: number;
   useRegistryAnchor: boolean;
   profileName?: string;
+  strategyType: StrategyType;
+  // Hat
+  hatId?: number;
+  // Gov
+  gov?: string;
+  minVotePower?: number;
+  snapshotReference?: number;
 };
 
 export type TNewPoolResponse = {
@@ -126,6 +134,7 @@ export type TPoolData = {
   allocateds: TAllocatedData[];
   distributeds: TDistributedData[];
   microGrantRecipients: any[]; // todo: set type
+  strategyType: StrategyType;
   // Hat
   hatId?: number;
   // Gov

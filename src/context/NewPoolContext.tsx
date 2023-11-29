@@ -24,6 +24,7 @@ import { checkIfPoolIsIndexedQuery } from "@/utils/query";
 import { useAccount } from "wagmi";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
+import { StrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -247,6 +248,7 @@ export const NewPoolContextProvider = (props: {
 
     // 2. Deploy new pool strategy
 
+    // TODO: UPDATE THIS 
     const strategy = new MicroGrantsStrategy({
       chain: chain,
     });
@@ -291,6 +293,15 @@ export const NewPoolContextProvider = (props: {
       approvalThreshold: BigInt(data.approvalThreshold),
       maxRequestedAmount: BigInt(data.maxAmount),
     };
+
+    // TODO: FIX THIS
+    if (data.strategyType == StrategyType.Hats) {
+      initParams["hatId"] = data.hatId;
+    } else if (data.strategyType == StrategyType.Gov) {
+      initParams["gov"] = data.gov;
+      initParams["minVotePower"] = BigInt(data.minVotePower);
+      initParams["snapshotReference"] = BigInt(data.snapshotReference);
+    }
 
     // create new pool
     const initStrategyData = await strategy.getInitializeData(initParams);

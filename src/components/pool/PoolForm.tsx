@@ -203,6 +203,11 @@ export default function PoolForm() {
       allocateds: [],
       distributeds: [],
       microGrantRecipients: [],
+      strategyType: newPoolData!.strategyType,
+      hatId: newPoolData?.hatId,
+      gov: newPoolData?.gov,
+      snapshotReference: newPoolData?.snapshotReference,
+      minVotePower: newPoolData?.minVotePower,
     };
   };
 
