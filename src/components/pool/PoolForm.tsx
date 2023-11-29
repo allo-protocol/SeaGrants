@@ -3,11 +3,16 @@
 import Error from "@/components/shared/Error";
 import Modal from "../shared/Modal";
 import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { TNewPool, TPoolData, TProfilesByOwnerResponse } from "@/app/types";
-import { useAccount, useNetwork } from "wagmi";
+import {
+  TNewPool,
+  TPoolData,
+  TProfilesByOwnerResponse,
+  TStrategyType,
+} from "@/app/types";
+import { useAccount, useNetwork, useToken } from "wagmi";
 import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";
 import ImageUpload from "../shared/ImageUpload";
@@ -16,6 +21,14 @@ import { parseUnits } from "viem";
 import getProfilesByOwner from "@/utils/request";
 import PoolOverview from "./PoolOverview";
 import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import { getBytecode } from "viem/actions";
+import { wagmiConfigData } from "@/services/wagmi";
+import { ethereumAddressRegExp } from "@/utils/common";
+import {
+  getPastVotesAddressUint256,
+  getPriorVotesAddressUint,
+  getPriorVotesAddressUint256,
+} from "@/utils/4byte";
 
 const schema = yup.object({
   profileId: yup
@@ -99,12 +112,24 @@ export default function PoolForm() {
   const [base64Image, setBase64Image] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
-  const [strategy, setStrategy] = useState<string>("");
+  const [strategy, setStrategy] = useState<TStrategyType>("MicroGrants");
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
+  const [poolToken, setPoolToken] = useState("");
+  const [govToken, setGovToken] = useState("");
+  const [govType, setGovType] = useState<
+    "prior" | "past" | "error" | "loading" | undefined
+  >(undefined);
   const { steps, createNewPool } = useContext(NewPoolContext);
   const router = useRouter();
   const { chain } = useNetwork();
   const { address } = useAccount();
+  const poolTokenInstance = useToken({
+    address: poolToken as `0x${string}`,
+  });
+  const govTokenInstance = useToken({
+    address: govToken as `0x${string}`,
+  });
+
   const {
     register,
     handleSubmit,
@@ -138,6 +163,12 @@ export default function PoolForm() {
   const onHandlePreview = async (data: any) => {
     // if no new profile is created set undefined
     // else set profile name if available else set pool name instead
+    let decimals = 18;
+    if (data.tokenAddress) {
+      setPoolToken(data.tokenAddress);
+      decimals = poolTokenInstance?.data?.decimals || 18;
+    }
+
     const newProfileName = !createNewProfile
       ? undefined
       : data.profilename
@@ -152,8 +183,8 @@ export default function PoolForm() {
       tokenAddress: data.tokenAddress
         ? data.tokenAddress
         : "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      fundPoolAmount: parseUnits(data.fundPoolAmount, 18).toString(),
-      maxAmount: parseUnits(data.maxAmount, 18).toString(),
+      fundPoolAmount: parseUnits(data.fundPoolAmount, decimals).toString(),
+      maxAmount: parseUnits(data.maxAmount, decimals).toString(),
       approvalThreshold: data.approvalThreshold,
       startDate: data.startDate,
       endDate: data.endDate,
@@ -164,12 +195,26 @@ export default function PoolForm() {
       strategyType: strategy,
       hatId: data?.hatId,
       gov: data?.gov,
-      snapshotReference: data?.snapshotReference,
-      minVotePower: data?.minVotePower,
+      snapshotReference: getSnapshotReference(data?.snapshotReference),
+      minVotePower: data?.minVotePower
+        ? parseUnits(
+            data?.minVotePower,
+            govTokenInstance?.data?.decimals || 18,
+          ).toString()
+        : "0",
     };
 
     setNewPoolData(_newPoolData);
     setIsPreview(true);
+  };
+
+  const getSnapshotReference = (ref: string): BigInt | undefined => {
+    if (govType === "past") {
+      return BigInt(Math.floor(new Date(ref).getTime() / 1000));
+    } else if (govType === "prior") {
+      return BigInt(ref);
+    }
+    return undefined;
   };
 
   const createPoolData = (): TPoolData => {
@@ -233,6 +278,7 @@ export default function PoolForm() {
   };
 
   useEffect(() => {
+    console.log("use effect");
     const fetchProfiles = async () => {
       if (chainId && address) {
         const customProfile: TProfilesByOwnerResponse = {
@@ -257,6 +303,34 @@ export default function PoolForm() {
 
     fetchProfiles();
   }, [chain, address]);
+
+  useEffect(() => {
+    const fetchGovToken = async () => {
+      setGovType("loading");
+      const bytecode = await wagmiConfigData.publicClient.getBytecode({
+        address: govToken as `0x${string}`,
+      });
+
+      if (
+        bytecode?.includes(getPriorVotesAddressUint256) ||
+        bytecode?.includes(getPriorVotesAddressUint)
+      ) {
+        setGovType("prior");
+      } else if (bytecode?.includes(getPastVotesAddressUint256)) {
+        setGovType("past");
+      } else {
+        setGovType("error");
+      }
+    };
+
+    if (govToken.match(ethereumAddressRegExp)) {
+      fetchGovToken();
+    } else if (govToken !== "") {
+      setGovType("error");
+    } else {
+      setGovType(undefined);
+    }
+  }, [govToken]);
 
   return (
     <form onSubmit={handleSubmit(onHandlePreview)}>
@@ -379,7 +453,9 @@ export default function PoolForm() {
                         name="strategyType"
                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         defaultValue={strategyTypes[0].type}
-                        onChange={(e) => setStrategy(e.target.value)}
+                        onChange={(e) =>
+                          setStrategy(e.target.value as TStrategyType)
+                        }
                       >
                         {strategyTypes.map((strategyType, index) => (
                           <option
@@ -453,9 +529,10 @@ export default function PoolForm() {
                         name="gov"
                         type="text"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        onChange={(e) => setGovToken(e.target.value as any)}
                       />
                       <p className="text-xs leading-5 text-gray-600 mt-2">
-                        The governance token
+                        The Governance Token
                       </p>
                     </div>
                     <div>
@@ -464,29 +541,73 @@ export default function PoolForm() {
                   </div>
 
                   <div className="sm:col-span-4">
-                    <label
-                      htmlFor="snapshotReference"
-                      className="block text-sm font-medium leading-6 text-gray-900"
-                    >
-                      Balance Snapshot Date
-                    </label>
-                    <div className="mt-2">
-                      <input
-                        {...register("snapshotReference")}
-                        id="snapshotReference"
-                        name="snapshotReference"
-                        type="datetime-local"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                    {govType === "past" && (
+                      <>
+                        <label
+                          htmlFor="snapshotReference"
+                          className="block text-sm font-medium leading-6 text-gray-900"
+                        >
+                          Balance Snapshot Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            {...register("snapshotReference")}
+                            id="snapshotReference"
+                            name="snapshotReference"
+                            type="datetime-local"
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                          <p className="text-xs leading-5 text-gray-600 mt-2">
+                            The date when token balances will be queried from
+                          </p>
+                        </div>
+                        <div>
+                          {errors.snapshotReference && (
+                            <Error
+                              message={errors.snapshotReference?.message!}
+                            />
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {govType === "loading" && (
                       <p className="text-xs leading-5 text-gray-600 mt-2">
-                        The date when token balances will be queried from
+                        Loading Token Data...
                       </p>
-                    </div>
-                    <div>
-                      {errors.snapshotReference && (
-                        <Error message={errors.snapshotReference?.message!} />
-                      )}
-                    </div>
+                    )}
+                    {govType === "prior" && (
+                      <>
+                        <label
+                          htmlFor="snapshotReference"
+                          className="block text-sm font-medium leading-6 text-gray-900"
+                        >
+                          Balance Snapshot Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            {...register("snapshotReference")}
+                            id="snapshotReference"
+                            name="snapshotReference"
+                            type="text"
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                          <p className="text-xs leading-5 text-gray-600 mt-2">
+                            The block number when token balances will be queried
+                            from
+                          </p>
+                        </div>
+                        <div>
+                          {errors.snapshotReference && (
+                            <Error
+                              message={errors.snapshotReference?.message!}
+                            />
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {govType === "error" && (
+                      <Error message={"Token not supported!"} />
+                    )}
                   </div>
 
                   <div className="sm:col-span-4">
@@ -497,13 +618,30 @@ export default function PoolForm() {
                       Minimum Token Balance
                     </label>
                     <div className="mt-2">
-                      <input
-                        {...register("minVotePower")}
-                        id="minVotePower"
-                        name="minVotePower"
-                        type="text"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                      <div className="relative">
+                        <input
+                          {...register("minVotePower")}
+                          id="minVotePower"
+                          name="minVotePower"
+                          type="text"
+                          aria-describedby="price-currency"
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                        {(govType === "prior" ||
+                          govType === "past" ||
+                          true) && (
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span
+                              className="text-gray-500 sm:text-sm"
+                              id="price-currency"
+                            >
+                              {govTokenInstance.data
+                                ? govTokenInstance.data?.symbol
+                                : ""}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                       <p className="text-xs leading-5 text-gray-600 mt-2">
                         The minimum token balance to be eligible to allocate
                       </p>
@@ -610,7 +748,9 @@ export default function PoolForm() {
                     name="tokenAddress"
                     id="tokenAddress"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    onChange={(e) => setPoolToken(e.target.value as any)}
                   />
+
                   <p className="text-xs leading-5 text-gray-600 mt-2">
                     The address of the token that will be used to fund the pool.
                     Leave blank to use the native currency.
@@ -626,13 +766,25 @@ export default function PoolForm() {
                   Fund Pool Amount
                 </label>
                 <div className="mt-2">
-                  <input
-                    {...register("fundPoolAmount")}
-                    id="fundPoolAmount"
-                    name="fundPoolAmount"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
+                  <div className="relative">
+                    <input
+                      {...register("fundPoolAmount")}
+                      id="fundPoolAmount"
+                      name="fundPoolAmount"
+                      type="text"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      aria-describedby="pool-currency"
+                    />
+
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <span
+                        className="text-gray-500 sm:text-sm"
+                        id="pool-currency"
+                      >
+                        {poolTokenInstance?.data?.symbol || "ETH"}
+                      </span>
+                    </div>
+                  </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
                     The amount of tokens to fund the pool with.
                   </p>
@@ -652,13 +804,25 @@ export default function PoolForm() {
                   Max Grant Amount
                 </label>
                 <div className="mt-2">
-                  <input
-                    {...register("maxAmount")}
-                    id="maxAmount"
-                    name="maxAmount"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
+                  <div className="relative">
+                    <input
+                      {...register("maxAmount")}
+                      id="maxAmount"
+                      name="maxAmount"
+                      type="text"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      aria-describedby="pool-currency"
+                    />
+
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <span
+                        className="text-gray-500 sm:text-sm"
+                        id="pool-currency"
+                      >
+                        {poolTokenInstance?.data?.symbol || "ETH"}
+                      </span>
+                    </div>
+                  </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
                     The max amount that can be requested by an applicant.
                   </p>

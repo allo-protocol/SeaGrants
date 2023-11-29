@@ -300,12 +300,9 @@ export const NewPoolContextProvider = (props: {
       initParams["hats"] = "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137";
       initParams["hatId"] = data.hatId;
     } else if (data.strategyType == StrategyType.Gov) {
-      const ref = Math.floor(
-        new Date(data!.snapshotReference!).getTime() / 1000,
-      );
       initParams["gov"] = data.gov;
       initParams["minVotePower"] = BigInt(data!.minVotePower!);
-      initParams["snapshotReference"] = BigInt(ref);
+      initParams["snapshotReference"] = data!.snapshotReference!;
     }
 
     let initStrategyData;
