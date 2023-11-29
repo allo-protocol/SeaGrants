@@ -59,10 +59,12 @@ export default async function Home() {
   return (
     <main>
       <div className="mx-auto max-w-2xl py-16 sm:py-32">
-        <img
-          src=" https://tailwindui.com/img/beams-basic.png"
+        <Image
+          src="https://tailwindui.com/img/beams-basic.png"
           alt=""
           className="absolute inset-0 -z-10 h-full w-full object-cover"
+          width={100}
+          height={100}
         />
         <div className="text-center">
           <Image

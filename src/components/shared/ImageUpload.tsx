@@ -2,6 +2,7 @@ import { PhotoIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import CropModal from "./CropModal";
 import { aspectRatio } from "@/utils/config";
+import Image from "next/image";
 
 const ImageUpload = (props: {
   setBase64Image: (base64Image: string) => void;
@@ -53,10 +54,12 @@ const ImageUpload = (props: {
             />
           )}
           {(preview !== "" || props.previewImage) && (
-            <img
+            <Image
               className="mx-auto"
-              style={{ maxWidth: "300px" }}
-              src={preview || props.previewImage}
+              width={300}
+              height={100}
+              src={preview || props.previewImage || ""}
+              alt="preview"
             />
           )}
           <div className="mt-4 text-sm leading-6 text-gray-600">
