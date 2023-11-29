@@ -15,7 +15,7 @@ import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
 import getProfilesByOwner from "@/utils/request";
 import PoolOverview from "./PoolOverview";
-import { StrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
+import { TStrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
 
 const schema = yup.object({
   profileId: yup

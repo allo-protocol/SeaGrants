@@ -24,7 +24,7 @@ import { checkIfPoolIsIndexedQuery } from "@/utils/query";
 import { useAccount } from "wagmi";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
-import { StrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
+import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
