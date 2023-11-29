@@ -305,8 +305,6 @@ export const NewPoolContextProvider = (props: {
         const approvalAmount =
           BigInt(data.fundPoolAmount) - (allowance as bigint);
 
-        console.log("Approval AMount", approvalAmount);
-
         const approveData = encodeFunctionData({
           abi: abi,
           functionName: "approve",
