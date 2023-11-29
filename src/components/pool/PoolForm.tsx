@@ -15,13 +15,14 @@ import { MarkdownEditor } from "../shared/Markdown";
 import { parseUnits } from "viem";
 import getProfilesByOwner from "@/utils/request";
 import PoolOverview from "./PoolOverview";
+import { StrategyType } from "@allo-team/allo-v2-sdk/src/strategies/MicroGrantsStrategy/types";
 
 const schema = yup.object({
   profileId: yup
     .string()
     .required("Profile ID is required")
     .test("address-check", "Must start with 0x", (value) =>
-      value?.toLowerCase()?.startsWith("0x"),
+      value?.toLowerCase()?.startsWith("0x")
     ),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
@@ -31,14 +32,14 @@ const schema = yup.object({
     .test(
       "is-number",
       "fund pool amount is required",
-      (value) => !isNaN(Number(value)),
+      (value) => !isNaN(Number(value))
     ),
   maxAmount: yup
     .string()
     .test(
       "is-number",
       "max amount is required",
-      (value) => !isNaN(Number(value)),
+      (value) => !isNaN(Number(value))
     ),
   approvalThreshold: yup.number().required("approval threshold is required"),
   startDate: yup.date().required("Start time is required"),
@@ -54,12 +55,51 @@ const schema = yup.object({
   //   otherwise: yup.string(),
   // }),
   profilename: yup.string().notRequired(),
+  strategyType: yup
+    .string()
+    .required("Mode of managing allocators is required"),
+  hatId: yup.string().when("strategyType", {
+    is: (strategyType: string) => strategyType === StrategyType.Hats,
+    then: () => yup.string().required(),
+    otherwise: () => yup.string().notRequired(),
+  }),
+  gov: yup.string().when("strategyType", {
+    is: (strategyType: string) => strategyType === StrategyType.Gov,
+    then: () => yup.string().required(),
+    otherwise: () => yup.string().notRequired(),
+  }),
+  snapshotReference: yup.date().when("strategyType", {
+    is: (strategyType: string) => strategyType === StrategyType.Gov,
+    then: () => yup.date().required(),
+    otherwise: () => yup.date().notRequired(),
+  }),
+  minVotePower: yup.string().when("strategyType", {
+    is: (strategyType: string) => strategyType === StrategyType.Gov,
+    then: () => yup.string().required(),
+    otherwise: () => yup.string().notRequired(),
+  }),
 });
+
+const strategyTypes = [
+  {
+    name: "Manual",
+    type: StrategyType.MicroGrants,
+  },
+  {
+    name: "Governance Token",
+    type: StrategyType.Gov,
+  },
+  {
+    name: "Hats Protocol",
+    type: StrategyType.Hats,
+  },
+];
 
 export default function PoolForm() {
   const [base64Image, setBase64Image] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
+  const [strategy, setStrategy] = useState<string>("");
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const { steps, createNewPool } = useContext(NewPoolContext);
   const router = useRouter();
@@ -76,7 +116,7 @@ export default function PoolForm() {
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [newPoolData, setNewPoolData] = useState<TNewPool | undefined>(
-    undefined,
+    undefined
   );
 
   const nowPlus10Minutes = new Date();
@@ -310,6 +350,157 @@ export default function PoolForm() {
                     )}
                   </div>
                 </div>
+              )}
+
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="strategyType"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Manage Allocators
+                </label>
+
+                <div className="mt-2">
+                  <div className="sm:col-span-4">
+                    {strategyTypes.length > 0 && (
+                      <select
+                        {...register("strategyType")}
+                        id="strategyType"
+                        name="strategyType"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        defaultValue={strategyTypes[0].type}
+                        onChange={(e) => setStrategy(e.target.value)}
+                      >
+                        {strategyTypes.map((strategyType, index) => (
+                          <option
+                            key={strategyType.type}
+                            value={strategyType.type}
+                            selected={index === 0}
+                          >
+                            {strategyType.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                  <p className="text-xs leading-5 text-gray-600 mt-2">
+                    {strategy == StrategyType.MicroGrants &&
+                      "Allocators will be manually added (CSV) by the pool manager after creation"}
+                    {strategy == StrategyType.Gov &&
+                      "Anyone who holds a token balance > threshold will be eligible to allocate on applications"}
+                    {strategy == StrategyType.Hats &&
+                      "Anyone who is wearer of Hat <INSERT-HATID> will be eligible to allocate on applications"}
+                  </p>
+                  <div>
+                    {errors.strategyType && (
+                      <Error message={errors.strategyType?.message!} />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Hats */}
+              {strategy == StrategyType.Hats && (
+                <div className="sm:col-span-4">
+                  <label
+                    htmlFor="fundPoolAmount"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Hat ID
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      {...register("hatId")}
+                      id="hatId"
+                      name="hatId"
+                      type="text"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    <p className="text-xs leading-5 text-gray-600 mt-2">
+                      The ID of the hat to use for allocation
+                    </p>
+                  </div>
+                  <div>
+                    {errors.hatId && <Error message={errors.hatId?.message!} />}
+                  </div>
+                </div>
+              )}
+
+              {/* Gov */}
+              {strategy == StrategyType.Gov && (
+                <>
+                  <div className="sm:col-span-4">
+                    <label
+                      htmlFor="gov"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Governance Token
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        {...register("gov")}
+                        id="gov"
+                        name="gov"
+                        type="text"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <p className="text-xs leading-5 text-gray-600 mt-2">
+                        The governance token
+                      </p>
+                    </div>
+                    <div>
+                      {errors.hatId && <Error message={errors.gov?.message!} />}
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label
+                      htmlFor="snapshotReference"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Balance Snapshot Date
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        {...register("snapshotReference")}
+                        id="snapshotReference"
+                        name="snapshotReference"
+                        type="datetime-local"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <p className="text-xs leading-5 text-gray-600 mt-2">
+                        The date when token balances will be queried from
+                      </p>
+                    </div>
+                    <div>
+                      {errors.snapshotReference && <Error message={errors.snapshotReference?.message!} />}
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label
+                      htmlFor="minVotePower"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Minimum Token Balance
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        {...register("minVotePower")}
+                        id="minVotePower"
+                        name="minVotePower"
+                        type="text"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <p className="text-xs leading-5 text-gray-600 mt-2">
+                        The minimum token balance to be eligible to allocate
+                      </p>
+                    </div>
+                    <div>
+                      {errors.minVotePower && <Error message={errors.minVotePower?.message!} />}
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="sm:col-span-4">
