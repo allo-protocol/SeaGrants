@@ -27,8 +27,8 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   const maxRequestedAmount = Number(
     humanReadableAmount(
       props.microGrant.maxRequestedAmount,
-      props.microGrant.pool.tokenMetadata.decimals || 18,
-    ),
+      props.microGrant.pool.tokenMetadata.decimals || 18
+    )
   );
 
   const schema = yup.object({
@@ -45,18 +45,18 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       .test(
         "is-number",
         "Requested amount is required",
-        (value) => !isNaN(Number(value)),
+        (value) => !isNaN(Number(value))
       )
       .test(
         "max-amount",
         `Amount must be less than ${maxRequestedAmount}`,
-        (value) => Number(value) <= maxRequestedAmount,
+        (value) => Number(value) <= maxRequestedAmount
       ),
     recipientAddress: yup
       .string()
       .required("Recipient address is required")
       .test("address-check", "Must start with 0x", (value) =>
-        value?.toLowerCase()?.startsWith("0x"),
+        value?.toLowerCase()?.startsWith("0x")
       ),
     profilename: yup.string().when("profileId", {
       is: (profileId: string) => profileId.trim() === "0x0",
@@ -100,7 +100,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       return;
     } else {
       setIsOpen(false);
-      window.location.assign(`/${poolId}`);
+      window.location.assign(`/${chainId}/${poolId}`);
     }
   };
 
@@ -135,7 +135,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),
-      Number(poolId),
+      Number(poolId)
     );
 
     setTimeout(() => {
@@ -404,10 +404,10 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
               </h2>
               <p className="mt-1 text-sm leading-6 text-gray-600">
                 A registry profile is created to manage your project.
-                Optionally, you can use an existing profile.
-                An anchor wallet, controlled by the profile and requiring
-                a unique owner nonce, is generated. Utilize the anchor wallet
-                to receive funds, gather attestations, and build project reputation.
+                Optionally, you can use an existing profile. An anchor wallet,
+                controlled by the profile and requiring a unique owner nonce, is
+                generated. Utilize the anchor wallet to receive funds, gather
+                attestations, and build project reputation.
               </p>
             </div>
 
@@ -449,7 +449,8 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                     )}
                   </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
-                  The registry profile ID for your organization, linked to your pool.
+                    The registry profile ID for your organization, linked to
+                    your pool.
                   </p>
                   <div>
                     {errors.profileId && (
