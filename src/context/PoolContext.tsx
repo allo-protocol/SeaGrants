@@ -88,7 +88,7 @@ export const PoolContextProvider = (props: {
 
         setStrategy(microGrants);
 
-        const _isAllocator = await microGrants.allocator(address);
+        const _isAllocator = await microGrants.isValidAllocator(address);
         setIsAllocator(_isAllocator);
 
         const recipient: Recipient = await microGrants.getRecipient(address);
