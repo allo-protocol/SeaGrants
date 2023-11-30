@@ -3,6 +3,7 @@ import { EPoolStatus, TPoolData } from "@/app/types";
 import {
   classNames,
   getPoolStatus,
+  getStrategyTypeFromStrategyName,
   humanReadableAmount,
   prettyTimestamp,
   statusColorsScheme,
@@ -45,7 +46,7 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
   return (
     <Link href={`/${pool.chainId}/${pool.poolId}`}>
       <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50">
-        <Banner image={poolDetail.poolBanner} alt={metadata.name} />
+        <Banner image={poolDetail.poolBanner} alt={metadata.name} minHeight="6rem"/>
       </div>
       <dl className="-my-3 divide-y divide-gray-100 px-6 py-6 text-sm leading-6">
         <div className="flex justify-between gap-x-4 py-3">
@@ -97,6 +98,14 @@ const PoolCard = ({ pool }: { pool: TPoolData }) => {
             <time dateTime={pool.allocationEndTime.toString()}>
               {prettyTimestamp(pool.allocationEndTime)}
             </time>
+          </dd>
+        </div>
+        <div className="flex justify-between gap-x-4 py-3">
+          <dt className="text-sm font-medium leading-6 text-gray-900">
+            Strategy Type
+          </dt>
+          <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
+            {getStrategyTypeFromStrategyName(pool.pool.strategyName)}
           </dd>
         </div>
         <div className="flex justify-between gap-x-4 py-3 text-gray-500">

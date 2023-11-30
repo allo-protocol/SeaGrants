@@ -39,6 +39,7 @@ export const getMicroGrantsQuery = gql`
       blockTimestamp
       pool {
         strategy
+        strategyName
         tokenMetadata
         token
         amount

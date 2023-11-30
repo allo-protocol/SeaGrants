@@ -7,7 +7,7 @@ const ApplicationList = (props: {
 }) => {
 
   return (
-    <div className="flex flex-col pt-10 px-10">
+    <div className="flex flex-col pt-10 sm:px-10">
       {props.applications.length > 0 ? (
         <div>
           <ul
