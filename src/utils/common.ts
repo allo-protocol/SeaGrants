@@ -3,6 +3,7 @@ import { formatUnits } from "viem";
 import { graphqlEndpoint } from "./query";
 import request from "graphql-request";
 import { getIPFSClient } from "@/services/ipfs";
+import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -177,3 +178,11 @@ export const formatDateDifference = (dateString: string): string => {
 
 export const NATIVE =
   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE".toLowerCase();
+
+export const getStrategyTypeFromStrategyName = (strategyName: string): string => {
+  if (strategyName === "allov2.MicroGrantsStrategy") return "Manual";
+  if (strategyName === "allov2.MicroGrantsGovStrategy") return "Governance";
+  if (strategyName === "allov2.MicroGrantsHatsStrategy") return "Hats";
+
+  return "N/A";
+}

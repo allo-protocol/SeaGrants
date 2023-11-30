@@ -117,6 +117,7 @@ export type TPoolData = {
   useRegistryAnchor: boolean;
   pool: {
     strategy: string;
+    strategyName: string;
     tokenMetadata: {
       name?: string;
       symbol?: string;

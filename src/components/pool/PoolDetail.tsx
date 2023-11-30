@@ -2,6 +2,7 @@ import { EPoolStatus, TPoolData, TPoolMetadata } from "@/app/types";
 import {
   classNames,
   getPoolStatus,
+  getStrategyTypeFromStrategyName,
   humanReadableAmount,
   statusColorsScheme,
 } from "@/utils/common";
@@ -40,6 +41,10 @@ export const PoolDetail = (props: {
 
   const tokenMetadata = props.pool.pool.tokenMetadata;
   const overviews = [
+    {
+      description: "Strategy Type",
+      name: getStrategyTypeFromStrategyName(props.pool.pool.strategyName),
+    },
     {
       description: "Website",
       name: (

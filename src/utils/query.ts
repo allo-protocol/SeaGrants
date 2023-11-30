@@ -86,6 +86,7 @@ export const getMicroGrantsRecipientsQuery = gql`
       useRegistryAnchor
       pool {
         strategy
+        strategyName
         tokenMetadata
         token
         amount
