@@ -223,6 +223,7 @@ export default function PoolForm() {
       useRegistryAnchor: newPoolData!.useRegistryAnchor,
       pool: {
         strategy: "0x",
+        strategyName: "",
         tokenMetadata: {
           name: "",
           symbol: "",
@@ -258,6 +259,8 @@ export default function PoolForm() {
     if (!newPoolData) return;
     setIsOpen(true);
     const { poolId } = await createNewPool(newPoolData, Number(chainId));
+
+    console.log("poolId", poolId);
 
     setTimeout(() => {
       setIsOpen(false);

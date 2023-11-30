@@ -100,7 +100,7 @@ export const PoolDetail = (props: {
   ];
 
   return (
-    <div className="mx-auto max-w-2xl md:px-4 pb-16 pt-10 md:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-10">
+    <div className="mx-auto max-w-2xl pb-16 pt-10 md:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-10">
       <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
         <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
           {props.metadata.name}
@@ -149,7 +149,7 @@ export const PoolDetail = (props: {
           <button
             disabled={status !== "Active" || !isLoaded || isRecipient}
             type="submit"
-            className={`mt-10 flex w-full items-center justify-center rounded-md border border-transparent ${
+            className={`mt-10 flex w-full items-center justify-center rounded-md border border-transparent disabled:cursor-not-allowed ${
               status === "Active" && !isRecipient
                 ? "bg-indigo-600 text-white hover:bg-indigo-700"
                 : "bg-indigo-100 text-white hover:bg-indigo-200"

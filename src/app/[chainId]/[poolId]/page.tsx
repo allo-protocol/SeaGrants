@@ -5,21 +5,31 @@ import { PoolContextProvider } from "@/context/PoolContext";
 import { getIPFSClient } from "@/services/ipfs";
 import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
 import request from "graphql-request";
+import { Suspense } from "react";
 
 export default async function Pool({
   params,
 }: {
   params: { chainId: string; poolId: string };
 }) {
+  // TODO: MAKE SURE POOL ID IS VALID
+  // NOTE: Not sure how to handle this other than creating a middleware.ts file, we can't 
+  // make this a client component because it needs to use the async data fetching.
+  // if (!params.poolId.startsWith(`0x`)) {
+  //   // todo: send to home page?
+  //   console.log(`invalid pool id: ${params.poolId}`);
+  //   return;
+  // }
   const response: any = await request(
     graphqlEndpoint,
     getMicroGrantsRecipientsQuery,
-    { chainId: params.chainId, poolId: params.poolId },
+    { chainId: params.chainId, poolId: params.poolId }
   );
 
   const pool: TPoolData = response.microGrant;
+
   const poolMetadata: TPoolMetadata = await getIPFSClient().fetchJson(
-    pool.pool.metadataPointer,
+    pool.pool.metadataPointer
   );
 
   let poolBanner = undefined;
@@ -37,7 +47,7 @@ export default async function Pool({
     const application = pool.microGrantRecipients[i];
     if (application.metadataPointer !== "") {
       const metadata = await getIPFSClient().fetchJson(
-        application.metadataPointer,
+        application.metadataPointer
       );
       application.metadata = metadata;
       if (metadata.base64Image) {
@@ -51,14 +61,16 @@ export default async function Pool({
   return (
     <Container>
       <PoolContextProvider chainId={params.chainId} poolId={params.poolId}>
-        <PoolOverview
-          applications={applications}
-          poolBanner={poolBanner}
-          chainId={params.chainId}
-          poolId={params.poolId}
-          pool={pool}
-          metadata={poolMetadata}
-        />
+        <Suspense fallback={<div>Loading Pool Details...</div>}>
+          <PoolOverview
+            applications={applications}
+            poolBanner={poolBanner}
+            chainId={params.chainId}
+            poolId={params.poolId}
+            pool={pool}
+            metadata={poolMetadata}
+          />
+        </Suspense>
       </PoolContextProvider>
     </Container>
   );

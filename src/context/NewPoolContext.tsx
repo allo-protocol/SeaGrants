@@ -134,7 +134,7 @@ export const NewPoolContextProvider = (props: {
     data: TNewPool,
     chain: number,
   ): Promise<TNewPoolResponse> => {
-    const chainInfo = getChain(chain);
+    const chainInfo: any = getChain(chain);
 
     const allo = new Allo({
       chain: chain,
@@ -207,6 +207,8 @@ export const NewPoolContextProvider = (props: {
             hash: tx.hash,
             confirmations: 2,
           });
+
+        console.log("RECEIPT", { receipt });
 
         const { logs } = receipt;
         profileId = logs[0].topics[1] || "0x";

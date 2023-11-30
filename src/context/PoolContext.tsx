@@ -57,7 +57,7 @@ export const PoolContextProvider = (props: {
   const [isPoolManager, setIsPoolManager] = useState(false);
   const [isRecipient, setIsRecipient] = useState(false);
   const [strategy, setStrategy] = useState<MicroGrantsStrategy | undefined>(
-    undefined,
+    undefined
   );
 
   const { isConnected, address } = useAccount();
@@ -74,7 +74,7 @@ export const PoolContextProvider = (props: {
 
         const _isPoolManager = await allo.isPoolManager(
           Number(props.poolId),
-          address,
+          address
         );
 
         setIsPoolManager(_isPoolManager);
@@ -88,8 +88,12 @@ export const PoolContextProvider = (props: {
 
         setStrategy(microGrants);
 
-        const _isAllocator = await microGrants.isValidAllocator(address);
-        setIsAllocator(_isAllocator);
+        try {
+          const _isAllocator = await microGrants.isValidAllocator(address);
+          setIsAllocator(_isAllocator);
+        } catch (error) {
+          console.log("Error checking allocator", error);
+        }
 
         const recipient: Recipient = await microGrants.getRecipient(address);
 
@@ -139,7 +143,7 @@ export const PoolContextProvider = (props: {
         updateStepTarget(0, ` at ${trucateString(tx.hash.toString())}`);
         updateStepHref(
           0,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);
@@ -169,7 +173,7 @@ export const PoolContextProvider = (props: {
 
       const txData: TransactionData = strategy.getAllocationData(
         data.recipientId,
-        data.status,
+        data.status
       );
 
       try {
@@ -186,7 +190,7 @@ export const PoolContextProvider = (props: {
         updateStepTarget(0, `${chainInfo.name} at ${trucateString(tx.hash)}`);
         updateStepHref(
           0,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);

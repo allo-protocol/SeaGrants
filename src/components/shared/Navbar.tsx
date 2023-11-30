@@ -2,14 +2,11 @@
 
 import { Fragment } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Disclosure, Menu, Popover, Transition } from "@headlessui/react";
-import {
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
+import { Disclosure, Popover, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import logo from "../../app/assets/logo.svg";
 import { useParams } from "next/navigation";
-// import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { NewApplicationIcon, NewPoolIcon } from "./Icons";
 import { useAccount, useNetwork } from "wagmi";
 import Link from "next/link";

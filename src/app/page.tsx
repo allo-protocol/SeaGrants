@@ -6,6 +6,7 @@ import { getIPFSClient } from "@/services/ipfs";
 import { getPoolStatus } from "@/utils/common";
 import logo from "./assets/logo.svg";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export default async function Home() {
   const ipfsClient = getIPFSClient();
@@ -58,7 +59,7 @@ export default async function Home() {
 
   return (
     <main>
-      <div className="mx-auto max-w-2xl py-16 sm:py-32">
+      <div className="mx-auto max-w-2xl py-4 sm:py-32">
         <Image
           src="https://tailwindui.com/img/beams-basic.png"
           alt=""
@@ -78,43 +79,63 @@ export default async function Home() {
             <span className="text-sky-600">Grants</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Micro Grant programs are a common way for web3 communities like Gitcoin,
-            Celo, and ENS to engage their members and encourage them to
+            Micro Grant programs are a common way for web3 communities like
+            Gitcoin, Celo, and ENS to engage their members and encourage them to
             contribute to projects that align with a community's goals. However,
             these programs often face challenges in making sure that everyone
             has the opportunity to participate.
           </p>
         </div>
       </div>
-      <PoolList
-        pools={upcomingPools}
-        title={"Upcoming Pools"}
-        flyoutOptions={{
-          useFlyout: true,
-          startIndex: 2,
-          label: `Show all upcoming pools (${upcomingPools.length})`,
-        }}
-      />
-      <PoolList
-        pools={activePools}
-        title={"Active Pools"}
-        flyoutOptions={{
-          useFlyout: true,
-          startIndex: 2,
-          label: `Show all active pools (${
-            activePools.length > 2 ? activePools.length - 2 : activePools.length
-          })`,
-        }}
-      />
-      <PoolList
-        pools={endedPools}
-        title={"Ended Pools"}
-        flyoutOptions={{
-          useFlyout: true,
-          startIndex: 0,
-          label: `Show all ended pools (${endedPools.length})`,
-        }}
-      />
+      <Suspense
+        fallback={
+          <div className="text-center mt-4">Loading Upcoming Pools...</div>
+        }
+      >
+        <PoolList
+          pools={upcomingPools}
+          title={"Upcoming Pools"}
+          flyoutOptions={{
+            useFlyout: true,
+            startIndex: 2,
+            label: `Show all upcoming pools (${upcomingPools.length})`,
+          }}
+        />
+      </Suspense>
+      <Suspense
+        fallback={
+          <div className="text-center mt-4">Loading Active Pools...</div>
+        }
+      >
+        <PoolList
+          pools={activePools}
+          title={"Active Pools"}
+          flyoutOptions={{
+            useFlyout: true,
+            startIndex: 2,
+            label: `Show all active pools (${
+              activePools.length > 2
+                ? activePools.length - 2
+                : activePools.length
+            })`,
+          }}
+        />
+      </Suspense>
+      <Suspense
+        fallback={
+          <div className="text-center mt-4">Loading Ended Pools...</div>
+        }
+      >
+        <PoolList
+          pools={endedPools}
+          title={"Ended Pools"}
+          flyoutOptions={{
+            useFlyout: true,
+            startIndex: 0,
+            label: `Show all ended pools (${endedPools.length})`,
+          }}
+        />
+      </Suspense>
     </main>
   );
 }
