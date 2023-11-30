@@ -12,13 +12,13 @@ import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { useRouter } from "next/navigation";
-import { truncatedStringWithoutStyle } from "@/components/shared/Address";
+import { trucateString } from "@/components/shared/Address";
 
 const initialSteps: TProgressStep[] = [
   {
     id: 0,
-    content: "Updating allocators on ",
-    target: ETarget.POOL,
+    content: "Updating allocators",
+    target: "",
     href: "#",
     status: EProgressStatus.IN_PROGRESS,
   },
@@ -136,7 +136,7 @@ export const PoolContextProvider = (props: {
           hash: tx.hash,
         });
 
-        updateStepTarget(0, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
+        updateStepTarget(0, ` at ${trucateString(tx.hash.toString())}`);
         updateStepHref(
           0,
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
@@ -183,7 +183,7 @@ export const PoolContextProvider = (props: {
           hash: tx.hash,
         });
 
-        updateStepTarget(0, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
+        updateStepTarget(0, `${chainInfo.name} at ${trucateString(tx.hash)}`);
         updateStepHref(
           0,
           `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,

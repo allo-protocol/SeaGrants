@@ -169,3 +169,12 @@ export const getAddressExplorerLink = (chainId: number, hash: string) => {
 export const getTxnExplorerLink = (chainId: number, hash: string) => {
   return getChain(chainId).blockExplorers.default.url + "/tx/" + hash;
 }
+
+export function trucateString(inputStr: string): string {
+  if (inputStr.length <= 10) {
+      return inputStr;
+  } else {
+      const result: string = `${inputStr.slice(0, 6)}...${inputStr.slice(-4)}`;
+      return result;
+  }
+}
