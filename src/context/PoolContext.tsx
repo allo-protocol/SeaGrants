@@ -190,6 +190,10 @@ export const PoolContextProvider = (props: {
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+
+        setTimeout(() => {
+          router.refresh();
+        }, 3000);
       } catch (e) {
         console.log("Allocating", e);
         updateStepStatus(0, EProgressStatus.IS_ERROR);
