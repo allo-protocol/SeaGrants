@@ -34,7 +34,7 @@ const schema = yup.object({
     .string()
     .required("Profile ID is required")
     .test("address-check", "Must start with 0x", (value) =>
-      value?.toLowerCase()?.startsWith("0x"),
+      value?.toLowerCase()?.startsWith("0x")
     ),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
@@ -44,29 +44,25 @@ const schema = yup.object({
     .test(
       "is-number",
       "fund pool amount is required",
-      (value) => !isNaN(Number(value)),
+      (value) => !isNaN(Number(value))
     ),
   maxAmount: yup
     .string()
     .test(
       "is-number",
       "max amount is required",
-      (value) => !isNaN(Number(value)),
+      (value) => !isNaN(Number(value))
     ),
   approvalThreshold: yup.number().required("approval threshold is required"),
   startDate: yup.date().required("Start time is required"),
   endDate: yup.date().required("End time is required"),
   tokenAddress: yup.string().notRequired(),
   useRegistryAnchor: yup.string().required("Registry anchor is required"),
-  //todo: fix this
-  // profilename: yup.string().when("profileId", {
-  //   is: (profileId: string) => profileId.trim() === "0x0",
-  //   then: yup
-  //     .string()
-  //     .required("Profile name is required"),
-  //   otherwise: yup.string(),
-  // }),
-  profilename: yup.string().notRequired(),
+  profilename: yup.string().when("profileId", {
+    is: (profileId: string) => profileId.trim() === "0x0",
+    then: () => yup.string().required("Profile name is required"),
+    otherwise: () => yup.string().notRequired(),
+  }),
   strategyType: yup
     .string()
     .required("Mode of managing allocators is required"),
@@ -111,7 +107,7 @@ export default function PoolForm() {
   const [base64Image, setBase64Image] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
-  const [strategy, setStrategy] = useState<TStrategyType>("MicroGrants");
+  const [strategy, setStrategy] = useState<TStrategyType>(StrategyType.MicroGrants);
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const [poolToken, setPoolToken] = useState("");
   const [govToken, setGovToken] = useState("");
@@ -140,7 +136,7 @@ export default function PoolForm() {
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [newPoolData, setNewPoolData] = useState<TNewPool | undefined>(
-    undefined,
+    undefined
   );
 
   const nowPlus10Minutes = new Date();
@@ -196,7 +192,7 @@ export default function PoolForm() {
       minVotePower: data?.minVotePower
         ? parseUnits(
             data?.minVotePower,
-            govTokenInstance?.data?.decimals || 18,
+            govTokenInstance?.data?.decimals || 18
           ).toString()
         : "0",
     };
@@ -341,103 +337,32 @@ export default function PoolForm() {
                 This information will be stored on IPFS and added as metadata to
                 the pool.
               </p>
+
+              <p className="mt-8 text-sm leading-6 text-gray-600">
+                {strategy == StrategyType.MicroGrants &&
+                  "Applications are reviewed by a finite list of Allocators, manually managed by the pool manager through CSV updates. You can add/remove Allocators after pool creation"}
+                {strategy == StrategyType.Gov &&
+                  "Allocators are determined by setting the governance token, threshold balance, and snapshot day. Anyone with a balance exceeding the snapshot balance is eligible to allocate. This allocation method cannot be updated after pool creation."}
+                {strategy == StrategyType.Hats &&
+                  "Allocators are designated by setting the hatId. Wearers of the Hat Id (managed via https://www.hatsprotocol.xyz/) can allocate. Once the pool is created, this allocation method cannot be updated."}
+              </p>
             </div>
 
             <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
-              <div className="sm:col-span-full">
-                <label className="block text-sm font-medium leading-6 text-gray-900">
+
+              <div className="sm:col-span-4 mt-2">
+                <p className="block text-sm font-medium leading-6 text-gray-900">
                   Selected Chain
-                </label>
-                <div className="mt-2">
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    {chain?.name} ({chain?.id})
-                  </p>
-                </div>
+                </p>
+                <p className="text-sm text-gray-600">{chain?.name} ({chain?.id})</p>
               </div>
-
-              <div className="sm:col-span-full">
-                <label
-                  htmlFor="profileId"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Registry Profile ID
-                </label>
-                <div className="mt-2">
-                  <div className="sm:col-span-4">
-                    {profiles.length > 0 && (
-                      <select
-                        {...register("profileId")}
-                        id="profileId"
-                        name="profileId"
-                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        defaultValue={profiles[0].profileId}
-                        onChange={(e) => {
-                          setCreateNewProfile(e.target.value === "0x0");
-                        }}
-                      >
-                        {profiles.map((profile, index) => (
-                          <option
-                            key={profile.profileId}
-                            value={profile.profileId}
-                            selected={index === 0}
-                          >
-                            {`${profile.name} ${
-                              profile.profileId === "0x0"
-                                ? ""
-                                : profile.profileId
-                            }`}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    The registry profile id of you organization your pool will
-                    be linked to
-                  </p>
-                  <div>
-                    {errors.profileId && (
-                      <Error message={errors.profileId?.message!} />
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {createNewProfile && (
-                <div className="sm:col-span-4">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    Profile Name
-                  </label>
-                  <div className="mt-2">
-                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                      <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
-                      <input
-                        {...register("profilename")}
-                        type="text"
-                        name="profilename"
-                        id="profilename"
-                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        placeholder="Allo Protocol"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    {errors.profilename && (
-                      <Error message={errors.profilename?.message!} />
-                    )}
-                  </div>
-                </div>
-              )}
 
               <div className="sm:col-span-4">
                 <label
                   htmlFor="strategyType"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Manage Allocators
+                  Strategy Type
                 </label>
 
                 <div className="mt-2">
@@ -465,14 +390,6 @@ export default function PoolForm() {
                       </select>
                     )}
                   </div>
-                  <p className="text-xs leading-5 text-gray-600 mt-2">
-                    {strategy == StrategyType.MicroGrants &&
-                      "Allocators will be manually added (CSV) by the pool manager after creation"}
-                    {strategy == StrategyType.Gov &&
-                      "Anyone who holds a token balance > threshold will be eligible to allocate on applications"}
-                    {strategy == StrategyType.Hats &&
-                      "Anyone who is wearer of Hat <INSERT-HATID> will be eligible to allocate on applications"}
-                  </p>
                   <div>
                     {errors.strategyType && (
                       <Error message={errors.strategyType?.message!} />
@@ -535,77 +452,77 @@ export default function PoolForm() {
                       {errors.gov && <Error message={errors.gov?.message!} />}
                     </div>
                   </div>
-
-                  <div className="sm:col-span-4">
-                    {govType === "past" && (
-                      <>
-                        <label
-                          htmlFor="snapshotReference"
-                          className="block text-sm font-medium leading-6 text-gray-900"
-                        >
-                          Balance Snapshot Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            {...register("snapshotReference")}
-                            id="snapshotReference"
-                            name="snapshotReference"
-                            type="datetime-local"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          />
-                          <p className="text-xs leading-5 text-gray-600 mt-2">
-                            The date when token balances will be queried from
-                          </p>
-                        </div>
-                        <div>
-                          {errors.snapshotReference && (
-                            <Error
-                              message={errors.snapshotReference?.message!}
+                  {(govType === "past" || govType === "prior" || govType === "loading") &&
+                    <div className="sm:col-span-4">
+                      {govType === "past" && (
+                        <>
+                          <label
+                            htmlFor="snapshotReference"
+                            className="block text-sm font-medium leading-6 text-gray-900"
+                          >
+                            Balance Snapshot Date
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              {...register("snapshotReference")}
+                              id="snapshotReference"
+                              name="snapshotReference"
+                              type="datetime-local"
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
-                          )}
-                        </div>
-                      </>
-                    )}
-                    {govType === "loading" && (
-                      <p className="text-xs leading-5 text-gray-600 mt-2">
-                        Loading Token Data...
-                      </p>
-                    )}
-                    {govType === "prior" && (
-                      <>
-                        <label
-                          htmlFor="snapshotReference"
-                          className="block text-sm font-medium leading-6 text-gray-900"
-                        >
-                          Balance Snapshot Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            {...register("snapshotReference")}
-                            id="snapshotReference"
-                            name="snapshotReference"
-                            type="text"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          />
-                          <p className="text-xs leading-5 text-gray-600 mt-2">
-                            The block number when token balances will be queried
-                            from
-                          </p>
-                        </div>
-                        <div>
-                          {errors.snapshotReference && (
-                            <Error
-                              message={errors.snapshotReference?.message!}
+                            <p className="text-xs leading-5 text-gray-600 mt-2">
+                              The date when token balances will be queried from
+                            </p>
+                          </div>
+                          <div>
+                            {errors.snapshotReference && (
+                              <Error
+                                message={errors.snapshotReference?.message!}
+                              />
+                            )}
+                          </div>
+                        </>
+                      )}
+                      {govType === "loading" && (
+                        <p className="text-xs leading-5 text-gray-600 mt-2">
+                          Loading Token Data...
+                        </p>
+                      )}
+                      {govType === "prior" && (
+                        <>
+                          <label
+                            htmlFor="snapshotReference"
+                            className="block text-sm font-medium leading-6 text-gray-900"
+                          >
+                            Balance Snapshot Date
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              {...register("snapshotReference")}
+                              id="snapshotReference"
+                              name="snapshotReference"
+                              type="text"
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
-                          )}
-                        </div>
-                      </>
-                    )}
-                    {govType === "error" && (
-                      <Error message={"Token not supported!"} />
-                    )}
-                  </div>
-
+                            <p className="text-xs leading-5 text-gray-600 mt-2">
+                              The block number when token balances will be queried
+                              from
+                            </p>
+                          </div>
+                          <div>
+                            {errors.snapshotReference && (
+                              <Error
+                                message={errors.snapshotReference?.message!}
+                              />
+                            )}
+                          </div>
+                        </>
+                      )}
+                      {govType === "error" && (
+                        <Error message={"Token not supported!"} />
+                      )}
+                    </div>
+                  }
                   <div className="sm:col-span-4">
                     <label
                       htmlFor="minVotePower"
@@ -706,7 +623,7 @@ export default function PoolForm() {
               <div className="col-span-full">
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium leading-6 text-gray-900"
+                  className="block text-sm font-medium leading-6 text-gray-900 mb-2"
                 >
                   Description
                 </label>
@@ -730,7 +647,7 @@ export default function PoolForm() {
                 </div>
               </div>
 
-              <div className="sm:col-span-full">
+              <div className="sm:col-span-4">
                 <label
                   htmlFor="tokenAddress"
                   className="block text-sm font-medium leading-6 text-gray-900"
@@ -748,8 +665,7 @@ export default function PoolForm() {
                   />
 
                   <p className="text-xs leading-5 text-gray-600 mt-2">
-                    The address of the token that will be used to fund the pool.
-                    Leave blank to use the native currency.
+                    For pool funding, enter the token address. Leave blank for native currency
                   </p>
                 </div>
               </div>
@@ -907,7 +823,7 @@ export default function PoolForm() {
                   htmlFor="useRegistryAnchor"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Registry Profile Required
+                  Is a registry profile mandatory for applicants?
                 </label>
                 <select
                   {...register("useRegistryAnchor")}
@@ -926,6 +842,97 @@ export default function PoolForm() {
               />
             </div>
           </div>
+
+          <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+            <div>
+              <h2 className="text-base font-semibold leading-7 text-gray-900">
+                Profile Information
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-gray-600">
+                To maintain a pool on Allo, create or use an existing profile.
+                Creating a new profile generates a user-controlled anchor wallet
+                with a unique nonce. Utilize the anchor wallet for receiving
+                funds, collecting attestations, and building project reputation
+              </p>
+            </div>
+            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+              <div className="sm:col-span-full">
+                <label
+                  htmlFor="profileId"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Registry Profile ID
+                </label>
+                <div className="mt-2">
+                  <div className="sm:col-span-4">
+                    {profiles.length > 0 && (
+                      <select
+                        {...register("profileId")}
+                        id="profileId"
+                        name="profileId"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        defaultValue={profiles[0].profileId}
+                        onChange={(e) => {
+                          setCreateNewProfile(e.target.value === "0x0");
+                        }}
+                      >
+                        {profiles.map((profile, index) => (
+                          <option
+                            key={profile.profileId}
+                            value={profile.profileId}
+                            selected={index === 0}
+                          >
+                            {`${profile.name} ${
+                              profile.profileId === "0x0"
+                                ? ""
+                                : profile.profileId
+                            }`}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                  <p className="text-xs leading-5 text-gray-600 mt-2">
+                    The registry profile ID for your organization, linked to your pool.
+                  </p>
+                  <div>
+                    {errors.profileId && (
+                      <Error message={errors.profileId?.message!} />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {createNewProfile && (
+                <div className="sm:col-span-4">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Profile Name
+                  </label>
+                  <div className="mt-2">
+                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                      <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
+                      <input
+                        {...register("profilename")}
+                        type="text"
+                        name="profilename"
+                        id="profilename"
+                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        placeholder="Allo Protocol"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    {errors.profilename && (
+                      <Error message={errors.profilename?.message!} />
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         <PoolOverview
@@ -941,7 +948,7 @@ export default function PoolForm() {
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button
           type="button"
-          className="bg-red-700 hover:bg-red-500 text-sm font-semibold leading-6 text-white rounded-md px-3 py-2"
+          className="bg-red-700 hover:bg-red-500 text-sm font-semibold leading-6 text-white rounded-md px-4 py-2"
           onClick={handleCancel}
         >
           Cancel

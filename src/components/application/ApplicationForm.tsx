@@ -58,15 +58,11 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       .test("address-check", "Must start with 0x", (value) =>
         value?.toLowerCase()?.startsWith("0x"),
       ),
-    //todo: fix this
-    // profilename: yup.string().when("profileId", {
-    //   is: (profileId: string) => profileId.trim() === "0x0",
-    //   then: yup
-    //     .string()
-    //     .required("Profile name is required"),
-    //   otherwise: yup.string(),
-    // }),
-    profilename: yup.string().notRequired(),
+    profilename: yup.string().when("profileId", {
+      is: (profileId: string) => profileId.trim() === "0x0",
+      then: () => yup.string().required("Profile name is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
     profileId: yup.string().notRequired(), //todo: required("Profile ID is required"),
   });
 
@@ -293,7 +289,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
               <div className="col-span-full">
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium leading-6 text-gray-900"
+                  className="block text-sm font-medium leading-6 text-gray-900 mb-2"
                 >
                   Description
                 </label>
@@ -406,14 +402,12 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
               <h2 className="text-base font-semibold leading-7 text-gray-900">
                 Profile Information
               </h2>
-              {/* todo: fix text */}
               <p className="mt-1 text-sm leading-6 text-gray-600">
-                A profile will be created on the registry to maintain your
-                project. Additonally an anchor wallet would be created which
-                will be controlled by the profile. The anchor creation requires
-                a nonce unique to the owner. You can use the anchor wallet to
-                recive funds , gather attestations and generate reputation for
-                your project.
+                A registry profile is created to manage your project.
+                Optionally, you can use an existing profile.
+                An anchor wallet, controlled by the profile and requiring
+                a unique owner nonce, is generated. Utilize the anchor wallet
+                to receive funds, gather attestations, and build project reputation.
               </p>
             </div>
 
@@ -455,8 +449,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                     )}
                   </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
-                    The registry profile id of you organization your pool will
-                    be linked to
+                  The registry profile ID for your organization, linked to your pool.
                   </p>
                   <div>
                     {errors.profileId && (
