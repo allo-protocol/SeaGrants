@@ -15,7 +15,7 @@ export default async function Home() {
     const response: any = await request(
       graphqlEndpoint,
       getMicroGrantsQuery,
-      {},
+      {}
     );
     pools = response["microGrants"];
     for (const pool of pools) {
@@ -41,19 +41,19 @@ export default async function Home() {
   const upcomingPools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.UPCOMING,
+      EPoolStatus.UPCOMING
   );
 
   const activePools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.ACTIVE,
+      EPoolStatus.ACTIVE
   );
 
   const endedPools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.ENDED,
+      EPoolStatus.ENDED
   );
 
   return (
@@ -78,9 +78,11 @@ export default async function Home() {
             <span className="text-sky-600">Grants</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Micro-grant programs, common in web3 communities like Gitcoin, Celo,
-            and ENS to engage members and empower project contributions aligned
-            with their mission, often present challenges in accessibility.
+            Micro Grant programs are a common way for web3 communities like Gitcoin,
+            Celo, and ENS to engage their members and encourage them to
+            contribute to projects that align with a community's goals. However,
+            these programs often face challenges in making sure that everyone
+            has the opportunity to participate.
           </p>
         </div>
       </div>
