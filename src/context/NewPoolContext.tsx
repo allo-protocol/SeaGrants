@@ -17,6 +17,9 @@ import {
 } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
+  NATIVE,
+  extractLogByEventName,
+  getEventValues,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
@@ -24,6 +27,11 @@ import { checkIfPoolIsIndexedQuery } from "@/utils/query";
 import { useAccount } from "wagmi";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
+import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import { abi } from "@/utils/erc20.abi";
+import { decodeEventLog, encodeFunctionData } from "viem";
+import { AlloABI } from "@/abi/Allo";
+import { MicroGrantsABI } from "@/abi/Microgrants";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -32,36 +40,49 @@ export interface INewPoolContextProps {
 
 const initialSteps: TProgressStep[] = [
   {
+    id: "pool-0",
     content: "Using profile ",
     target: "",
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
+    id: "pool-1",
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-2",
     content: "Deploying new pool strategy to ",
     target: ETarget.CHAIN,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-3",
+    content: "Approve token on ",
+    target: ETarget.ALLO,
+    href: "",
+    status: EProgressStatus.NOT_STARTED,
+  },
+  {
+    id: "pool-4",
     content: "Creating new pool on ",
     target: ETarget.ALLO,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-5",
     content: "Indexing your pool on ",
     target: ETarget.SPEC,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-6",
     content: "Indexing pool metadata on ",
     target: ETarget.IPFS,
     href: "",
@@ -124,7 +145,13 @@ export const NewPoolContextProvider = (props: {
     data: TNewPool,
     chain: number,
   ): Promise<TNewPoolResponse> => {
-    const chainInfo = getChain(chain);
+    const chainInfo: any = getChain(chain);
+
+    const allo = new Allo({
+      chain: chain,
+    });
+
+    console.log("DATA", data);
 
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
@@ -191,7 +218,10 @@ export const NewPoolContextProvider = (props: {
         const receipt =
           await wagmiConfigData.publicClient.waitForTransactionReceipt({
             hash: tx.hash,
+            confirmations: 2,
           });
+
+        console.log("RECEIPT", { receipt });
 
         const { logs } = receipt;
         profileId = logs[0].topics[1] || "0x";
@@ -251,7 +281,7 @@ export const NewPoolContextProvider = (props: {
       chain: chain,
     });
 
-    const deployParams = strategy.getDeployParams();
+    const deployParams = strategy.getDeployParams(data.strategyType);
 
     try {
       const hash = await walletClient!.deployContract({
@@ -276,6 +306,59 @@ export const NewPoolContextProvider = (props: {
 
     stepIndex++;
 
+    if (data.tokenAddress !== NATIVE) {
+      const allowance = await wagmiConfigData.publicClient.readContract({
+        address: data.tokenAddress,
+        abi: abi,
+        functionName: "allowance",
+        args: [address, allo.address()],
+      });
+
+      console.log("Allowance", allowance as bigint);
+      console.log("Fund Pool Amount", data.fundPoolAmount);
+      console.log("diff", (allowance as bigint) - BigInt(data.fundPoolAmount));
+
+      if ((allowance as bigint) <= BigInt(data.fundPoolAmount)) {
+        const approvalAmount =
+          BigInt(data.fundPoolAmount) - (allowance as bigint);
+
+        const approveData = encodeFunctionData({
+          abi: abi,
+          functionName: "approve",
+          args: [allo.address(), approvalAmount],
+        });
+
+        try {
+          const tx = await sendTransaction({
+            to: data.tokenAddress,
+            data: approveData,
+            value: BigInt(0),
+          });
+
+          await wagmiConfigData.publicClient.waitForTransactionReceipt({
+            hash: tx.hash,
+            confirmations: 2,
+          });
+
+          updateStepHref(
+            stepIndex,
+            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          );
+          updateStepStatus(stepIndex, true);
+        } catch (e) {
+          updateStepStatus(stepIndex, false);
+          console.log("Approving Token", e);
+        }
+      } else {
+        updateStepContent(stepIndex, "Token already approved on ");
+        updateStepStatus(stepIndex, true);
+      }
+    } else {
+      updateStepContent(stepIndex, "Approval not needed on ");
+      updateStepStatus(stepIndex, true);
+    }
+
+    stepIndex++;
     const startDateInSeconds = Math.floor(
       new Date(data.startDate).getTime() / 1000,
     );
@@ -284,7 +367,7 @@ export const NewPoolContextProvider = (props: {
       new Date(data.endDate).getTime() / 1000,
     );
 
-    const initParams = {
+    const initParams: any = {
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
       allocationEndTime: BigInt(endDateInSeconds),
@@ -292,8 +375,26 @@ export const NewPoolContextProvider = (props: {
       maxRequestedAmount: BigInt(data.maxAmount),
     };
 
-    // create new pool
-    const initStrategyData = await strategy.getInitializeData(initParams);
+    if (data.strategyType == StrategyType.Hats) {
+      initParams["hats"] = "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137";
+      initParams["hatId"] = data.hatId;
+    } else if (data.strategyType == StrategyType.Gov) {
+      initParams["gov"] = data.gov;
+      initParams["minVotePower"] = BigInt(data!.minVotePower!);
+      initParams["snapshotReference"] = data!.snapshotReference!;
+    }
+
+    let initStrategyData;
+
+    if (data.strategyType === StrategyType.MicroGrants) {
+      initStrategyData = await strategy.getInitializeData(initParams);
+    } else if (data.strategyType === StrategyType.Hats) {
+      initStrategyData = await strategy.getInitializeDataHats(initParams);
+    } else if (data.strategyType === StrategyType.Gov) {
+      initStrategyData = await strategy.getInitializeDataGov(initParams);
+    } else {
+      throw new Error("Invalid strategy type");
+    }
 
     const poolCreationData = {
       profileId: profileId,
@@ -308,10 +409,6 @@ export const NewPoolContextProvider = (props: {
       managers: data.managers,
     };
 
-    const allo = new Allo({
-      chain: chain,
-    });
-
     const createPoolData = await allo.createPoolWithCustomStrategy(
       poolCreationData,
     );
@@ -323,13 +420,14 @@ export const NewPoolContextProvider = (props: {
         value: BigInt(createPoolData.value),
       });
 
-      const reciept =
+      const receipt =
         await wagmiConfigData.publicClient.waitForTransactionReceipt({
           hash: tx.hash,
+          confirmations: 2,
         });
 
-      const { logs } = reciept;
-      poolId = Number(logs[6].topics[1]);
+      const logValues = getEventValues(receipt, MicroGrantsABI, "Initialized");
+      poolId = logValues.poolId;
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(

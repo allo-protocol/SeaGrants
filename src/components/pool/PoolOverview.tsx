@@ -4,7 +4,7 @@ import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
 import { useContext, useEffect, useRef, useState } from "react";
 import Breadcrumb from "../shared/Breadcrumb";
 import { aspectRatio } from "@/utils/config";
-import { classNames } from "@/utils/common";
+import { classNames, getStrategyTypeFromStrategyName } from "@/utils/common";
 import PoolDetail from "./PoolDetail";
 import ApplicationList from "../application/ApplicationList";
 import { PoolContext } from "@/context/PoolContext";
@@ -48,7 +48,7 @@ export default function PoolOverview(props: {
   };
 
   useEffect(() => {
-    if (isPoolManager) {
+    if (isPoolManager && getStrategyTypeFromStrategyName(props.pool.pool.strategyName) === "Manual") {
       setTabs([
         { name: "Pool Details", current: true },
         { name: "Applications", current: false },

@@ -1,11 +1,5 @@
 "use client";
 
-import Error from "@/components/shared/Error";
-import Modal from "../shared/Modal";
-import { useContext, useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
-import * as yup from "yup";
-import { useParams, useRouter } from "next/navigation";
 import {
   TApplicationData,
   TApplicationMetadata,
@@ -13,22 +7,31 @@ import {
   TPoolData,
   TProfilesByOwnerResponse,
 } from "@/app/types";
+import Error from "@/components/shared/Error";
 import { ApplicationContext } from "@/context/ApplicationContext";
-import ImageUpload from "../shared/ImageUpload";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { MarkdownEditor } from "../shared/Markdown";
-import { parseUnits } from "viem";
 import { humanReadableAmount } from "@/utils/common";
-import { useAccount } from "wagmi";
 import getProfilesByOwner from "@/utils/request";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useParams, useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { parseUnits } from "viem";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import * as yup from "yup";
+import ImageUpload from "../shared/ImageUpload";
+import { MarkdownEditor } from "../shared/Markdown";
+import Modal from "../shared/Modal";
 import ApplicationDetail from "./ApplicationDetail";
 
 export default function ApplicationForm(props: { microGrant: TPoolData }) {
+  const { chain } = useNetwork();
+  const { chains, error, isLoading, pendingChainId, switchNetwork } =
+    useSwitchNetwork();
   const maxRequestedAmount = Number(
     humanReadableAmount(
       props.microGrant.maxRequestedAmount,
-      props.microGrant.pool.tokenMetadata.decimals || 18,
-    ),
+      props.microGrant.pool.tokenMetadata.decimals || 18
+    )
   );
 
   const schema = yup.object({
@@ -45,29 +48,25 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       .test(
         "is-number",
         "Requested amount is required",
-        (value) => !isNaN(Number(value)),
+        (value) => !isNaN(Number(value))
       )
       .test(
         "max-amount",
         `Amount must be less than ${maxRequestedAmount}`,
-        (value) => Number(value) <= maxRequestedAmount,
+        (value) => Number(value) <= maxRequestedAmount
       ),
     recipientAddress: yup
       .string()
       .required("Recipient address is required")
       .test("address-check", "Must start with 0x", (value) =>
-        value?.toLowerCase()?.startsWith("0x"),
+        value?.toLowerCase()?.startsWith("0x")
       ),
-    //todo: fix this
-    // profilename: yup.string().when("profileId", {
-    //   is: (profileId: string) => profileId.trim() === "0x0",
-    //   then: yup
-    //     .string()
-    //     .required("Profile name is required"),
-    //   otherwise: yup.string(),
-    // }),
-    profilename: yup.string().notRequired(),
-    profileId: yup.string().notRequired(), //todo: required("Profile ID is required"),
+    profilename: yup.string().when("profileId", {
+      is: (profileId: string) => profileId.trim() === "0x0",
+      then: () => yup.string().required("Profile name is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    profileId: yup.string().notRequired(),
   });
 
   const { steps, createApplication } = useContext(ApplicationContext);
@@ -80,12 +79,9 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   >(undefined);
   const { address } = useAccount();
   const router = useRouter();
-
   const params = useParams();
-
   const chainId = params["chainId"];
   const poolId = params["poolId"];
-
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -95,8 +91,13 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   } = useForm({
     resolver: yupResolver(schema),
   });
-
   const isUsingRegistryAnchor = props.microGrant.useRegistryAnchor;
+
+  const handleSwitchNetwork = async () => {
+    switchNetwork?.(5);
+
+    // todo: update steps...
+  };
 
   const handleCancel = () => {
     if (isPreview) {
@@ -104,11 +105,18 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       return;
     } else {
       setIsOpen(false);
-      window.location.assign(`/${poolId}`);
+      window.location.assign(`/${chainId}/${poolId}`);
     }
   };
 
   const onHandlePreview = async (data: any) => {
+    if (Number(chain!.id) !== 5) {
+      setIsPreview(false);
+      await handleSwitchNetwork();
+
+      // return;
+    }
+
     const newProfileName = !createNewProfile
       ? undefined
       : data.profilename
@@ -135,11 +143,10 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     if (!newApplicationData) return;
 
     setIsOpen(true);
-
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),
-      Number(poolId),
+      Number(poolId)
     );
 
     setTimeout(() => {
@@ -220,7 +227,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     };
 
     fetchProfiles();
-  }, [address]);
+  }, [address, chainId]);
 
   return (
     <form onSubmit={handleSubmit(onHandlePreview)}>
@@ -293,7 +300,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
               <div className="col-span-full">
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium leading-6 text-gray-900"
+                  className="block text-sm font-medium leading-6 text-gray-900 mb-2"
                 >
                   Description
                 </label>
@@ -406,14 +413,12 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
               <h2 className="text-base font-semibold leading-7 text-gray-900">
                 Profile Information
               </h2>
-              {/* todo: fix text */}
               <p className="mt-1 text-sm leading-6 text-gray-600">
-                A profile will be created on the registry to maintain your
-                project. Additonally an anchor wallet would be created which
-                will be controlled by the profile. The anchor creation requires
-                a nonce unique to the owner. You can use the anchor wallet to
-                recive funds , gather attestations and generate reputation for
-                your project.
+                A registry profile is created to manage your project.
+                Optionally, you can use an existing profile. An anchor wallet,
+                controlled by the profile and requiring a unique owner nonce, is
+                generated. Utilize the anchor wallet to receive funds, gather
+                attestations, and build project reputation.
               </p>
             </div>
 
@@ -455,8 +460,8 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
                     )}
                   </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
-                    The registry profile id of you organization your pool will
-                    be linked to
+                    The registry profile ID for your organization, linked to
+                    your pool.
                   </p>
                   <div>
                     {errors.profileId && (

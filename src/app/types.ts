@@ -1,4 +1,6 @@
-import { Status } from "@allo-team/allo-v2-sdk/dist/strategies/types";
+import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+
+export type TStrategyType = keyof typeof StrategyType;
 
 type ApplicationStatus = "Accepted" | "Rejected" | "Pending" | "Paid";
 
@@ -8,7 +10,6 @@ export type TApplication = {
   description?: string;
   status: ApplicationStatus;
   base64Image: string;
-  // name: string;
   recipientAddress: `0x${string}`;
   amountRequested: string;
 };
@@ -78,6 +79,18 @@ export type TPoolMetadata = {
   base64Image?: string;
 };
 
+export type TMicroGrantRecipient = {
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  requestedAmount: string;
+  metadataPointer: string;
+  blockTimestamp: string;
+  isUsingRegistryAnchor: boolean;
+  status: ApplicationStatus;
+  metadata?: any;
+  applicationBanner?: string;
+}
+
 export type TNewPool = TPoolMetadata & {
   // chain info
   tokenAddress: `0x${string}`;
@@ -89,6 +102,13 @@ export type TNewPool = TPoolMetadata & {
   approvalThreshold: number;
   useRegistryAnchor: boolean;
   profileName?: string;
+  strategyType: TStrategyType;
+  // Hat
+  hatId?: number;
+  // Gov
+  gov?: string;
+  minVotePower?: string;
+  snapshotReference?: string;
 };
 
 export type TNewPoolResponse = {
@@ -108,6 +128,7 @@ export type TPoolData = {
   useRegistryAnchor: boolean;
   pool: {
     strategy: string;
+    strategyName: string;
     tokenMetadata: {
       name?: string;
       symbol?: string;
@@ -125,7 +146,14 @@ export type TPoolData = {
   };
   allocateds: TAllocatedData[];
   distributeds: TDistributedData[];
-  microGrantRecipients: any[]; // todo: set type
+  microGrantRecipients: TMicroGrantRecipient[];
+  strategyType: TStrategyType;
+  // Hat
+  hatId?: number;
+  // Gov
+  gov?: string;
+  minVotePower?: string;
+  snapshotReference?: string;
 };
 
 export type TApplicationData = {
@@ -202,7 +230,7 @@ export enum EProgressStatus {
 }
 
 export type TProgressStep = {
-  id?: number; // todo: remove id everywhere
+  id?: string;
   content: string;
   target?: string;
   href?: string;
@@ -250,3 +278,33 @@ export type TProfileResponse = {
   creator: string;
   createdAt: string;
 };
+
+type AbiItem = {
+  type: string; // 'function', 'event', 'constructor', etc.
+  name?: string; // Function or event name
+  anonymous?: boolean; // true if the function is anonymous
+  inputs?: Array<{
+    name: string;
+    type: string;
+    internalType?: string;
+    indexed?: boolean;
+  }>; // Function or event parameters
+  outputs?: Array<{
+    name: string;
+    type: string;
+    internalType?: string;
+    components?: Array<{
+      internalType?: string;
+      name?: string;
+      type?: string;
+      components?: Array<{
+        internalType?: string;
+        name?: string;
+        type?: string;
+      }>;
+    }>;
+  }>; // Function outputs
+  stateMutability?: "pure" | "view" | "nonpayable" | "payable"; // Function state mutability
+};
+
+export type ContractAbi = Array<AbiItem>;

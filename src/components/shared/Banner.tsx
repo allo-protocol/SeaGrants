@@ -3,7 +3,7 @@ import { aspectRatio } from "@/utils/config";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-const Banner = (props: { image: string | undefined | null; alt: string }) => {
+const Banner = (props: { image: string | undefined | null; alt: string; minHeight?: string }) => {
   const bannerRef = useRef<any>(null);
   const [bannerSize, setBannerSize] = useState({
     width: 0,
@@ -36,6 +36,9 @@ return (
         src={props.image}
         alt={props.alt}
         className="h-full w-full object-cover object-center"
+        style={{
+          minHeight: props.minHeight,
+        }}
         width={bannerSize.width}
         height={bannerSize.height}
         onLoad={() =>
@@ -52,6 +55,7 @@ return (
         style={{
           width: `100%`,
           height: `${bannerSize.height}px`,
+          minHeight: props.minHeight,
           backgroundColor: stringToColor(
             props.alt ?? (Math.random() * 10000).toString(),
           ),

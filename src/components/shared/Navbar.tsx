@@ -2,16 +2,14 @@
 
 import { Fragment } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Disclosure, Menu, Popover, Transition } from "@headlessui/react";
-import {
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
+import { Disclosure, Popover, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import logo from "../../app/assets/logo.svg";
 import { useParams } from "next/navigation";
-// import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { NewApplicationIcon, NewPoolIcon } from "./Icons";
 import { useAccount, useNetwork } from "wagmi";
+import Link from "next/link";
 
 export default function Navbar() {
   const params = useParams();
@@ -102,7 +100,7 @@ export default function Navbar() {
                                   {creations
                                     .filter((item) => item.show)
                                     .map((item) => (
-                                      <a
+                                      <Link
                                         key={item.name}
                                         href={item.href}
                                         className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-black-500/50"
@@ -118,7 +116,7 @@ export default function Navbar() {
                                             {item.description}
                                           </p>
                                         </div>
-                                      </a>
+                                      </Link>
                                     ))}
                                 </div>
                               </div>

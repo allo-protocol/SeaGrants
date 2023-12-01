@@ -13,25 +13,25 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "www.mikeduran.com",
-      }
+      },
     ],
   },
   async headers() {
     return [
       {
-        source: '/graphql',
+        source: "/graphql",
         headers: [
           {
-            key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:5555',
+            key: "Access-Control-Allow-Origin",
+            value: "http://localhost:5555",
           },
           {
-            key: 'Access-Control-Allow-Methods',
-            value: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
+            key: "Access-Control-Allow-Methods",
+            value: "OPTIONS, GET, POST, PUT, PATCH, DELETE",
           },
           {
-            key: 'Access-Control-Allow-Headers',
-            value: 'X-Requested-With, Content-Type, Authorization',
+            key: "Access-Control-Allow-Headers",
+            value: "X-Requested-With, Content-Type, Authorization",
           },
         ],
       },

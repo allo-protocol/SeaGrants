@@ -1,4 +1,5 @@
 "use client";
+
 import { EProgressStatus, ETarget, TProgressStep } from "@/app/types";
 import { Allo, MicroGrantsStrategy } from "@allo-team/allo-v2-sdk";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
@@ -12,13 +13,13 @@ import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import { useRouter } from "next/navigation";
-import { truncatedStringWithoutStyle } from "@/components/shared/Address";
+import { trucateString } from "@/components/shared/Address";
 
 const initialSteps: TProgressStep[] = [
   {
-    id: 0,
-    content: "Updating allocators on ",
-    target: ETarget.POOL,
+    id: 'allocator-0',
+    content: "Updating allocators",
+    target: "",
     href: "#",
     status: EProgressStatus.IN_PROGRESS,
   },
@@ -57,13 +58,12 @@ export const PoolContextProvider = (props: {
   const [isPoolManager, setIsPoolManager] = useState(false);
   const [isRecipient, setIsRecipient] = useState(false);
   const [strategy, setStrategy] = useState<MicroGrantsStrategy | undefined>(
-    undefined,
+    undefined
   );
 
   const { isConnected, address } = useAccount();
   const router = useRouter();
 
-  // todo: replace contract queries with spec
   useEffect(() => {
     const checkAllocator = async () => {
       if (isConnected && address) {
@@ -74,7 +74,7 @@ export const PoolContextProvider = (props: {
 
         const _isPoolManager = await allo.isPoolManager(
           Number(props.poolId),
-          address,
+          address
         );
 
         setIsPoolManager(_isPoolManager);
@@ -88,8 +88,12 @@ export const PoolContextProvider = (props: {
 
         setStrategy(microGrants);
 
-        const _isAllocator = await microGrants.allocator(address);
-        setIsAllocator(_isAllocator);
+        try {
+          const _isAllocator = await microGrants.isValidAllocator(address);
+          setIsAllocator(_isAllocator);
+        } catch (error) {
+          console.log("Error checking allocator", error);
+        }
 
         const recipient: Recipient = await microGrants.getRecipient(address);
 
@@ -121,7 +125,7 @@ export const PoolContextProvider = (props: {
 
   const batchSetAllocator = async (data: SetAllocatorData[]) => {
     if (strategy) {
-      const chainInfo = getChain(Number(props.chainId));
+      const chainInfo: any | unknown = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getBatchSetAllocatorData(data);
 
@@ -136,10 +140,10 @@ export const PoolContextProvider = (props: {
           hash: tx.hash,
         });
 
-        updateStepTarget(0, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
+        updateStepTarget(0, ` at ${trucateString(tx.hash.toString())}`);
         updateStepHref(
           0,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);
@@ -156,7 +160,7 @@ export const PoolContextProvider = (props: {
   const allocate = async (data: Allocation) => {
     setSteps([
       {
-        id: 0,
+        id: "0",
         content: "Allocating",
         target: ETarget.POOL,
         href: "#",
@@ -165,11 +169,11 @@ export const PoolContextProvider = (props: {
     ]);
 
     if (strategy) {
-      const chainInfo = getChain(Number(props.chainId));
+      const chainInfo: any | unknown = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getAllocationData(
         data.recipientId,
-        data.status,
+        data.status
       );
 
       try {
@@ -183,13 +187,17 @@ export const PoolContextProvider = (props: {
           hash: tx.hash,
         });
 
-        updateStepTarget(0, `${chainInfo.name} at ${truncatedStringWithoutStyle(tx.hash)}`);
+        updateStepTarget(0, `${chainInfo.name} at ${trucateString(tx.hash)}`);
         updateStepHref(
           0,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);
+
+        setTimeout(() => {
+          router.refresh();
+        }, 3000);
       } catch (e) {
         console.log("Allocating", e);
         updateStepStatus(0, EProgressStatus.IS_ERROR);

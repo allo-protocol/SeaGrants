@@ -15,7 +15,7 @@ export default async function Home() {
     const response: any = await request(
       graphqlEndpoint,
       getMicroGrantsQuery,
-      {},
+      {}
     );
     pools = response["microGrants"];
     for (const pool of pools) {
@@ -41,24 +41,24 @@ export default async function Home() {
   const upcomingPools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.UPCOMING,
+      EPoolStatus.UPCOMING
   );
 
   const activePools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.ACTIVE,
+      EPoolStatus.ACTIVE
   );
 
   const endedPools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.ENDED,
+      EPoolStatus.ENDED
   );
 
   return (
     <main>
-      <div className="mx-auto max-w-2xl py-16 sm:py-32">
+      <div className="mx-auto max-w-2xl py-4 sm:py-32">
         <Image
           src="https://tailwindui.com/img/beams-basic.png"
           alt=""
@@ -89,7 +89,7 @@ export default async function Home() {
         title={"Upcoming Pools"}
         flyoutOptions={{
           useFlyout: true,
-          startIndex: 1,
+          startIndex: 2,
           label: `Show all upcoming pools (${upcomingPools.length})`,
         }}
       />

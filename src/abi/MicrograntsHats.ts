@@ -1,6 +1,6 @@
 import { ContractAbi } from "@/app/types";
 
-export const MicroGrantsABI: ContractAbi = [
+export const MicroGrantsHatsABI: ContractAbi = [
   {
     inputs: [
       {
@@ -233,31 +233,6 @@ export const MicroGrantsABI: ContractAbi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "allocator",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "bool",
-        name: "_flag",
-        type: "bool",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-    ],
-    name: "AllocatorSet",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: false,
         internalType: "uint256",
         name: "approvalThreshold",
@@ -420,6 +395,19 @@ export const MicroGrantsABI: ContractAbi = [
   },
   {
     inputs: [],
+    name: "HATS_PROTOCOL",
+    outputs: [
+      {
+        internalType: "contract IHats",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "NATIVE",
     outputs: [
       {
@@ -500,25 +488,6 @@ export const MicroGrantsABI: ContractAbi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "allocators",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "approvalThreshold",
     outputs: [
@@ -529,24 +498,6 @@ export const MicroGrantsABI: ContractAbi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address[]",
-        name: "_allocators",
-        type: "address[]",
-      },
-      {
-        internalType: "bool[]",
-        name: "_flags",
-        type: "bool[]",
-      },
-    ],
-    name: "batchSetAllocator",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -697,7 +648,7 @@ export const MicroGrantsABI: ContractAbi = [
             type: "tuple",
           },
         ],
-        internalType: "struct MicroGrantsStrategy.Recipient",
+        internalType: "struct MicroGrantsBaseStrategy.Recipient",
         name: "",
         type: "tuple",
       },
@@ -732,6 +683,19 @@ export const MicroGrantsABI: ContractAbi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "hatId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -872,24 +836,6 @@ export const MicroGrantsABI: ContractAbi = [
       },
     ],
     stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_allocator",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "_flag",
-        type: "bool",
-      },
-    ],
-    name: "setAllocator",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {

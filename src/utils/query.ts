@@ -39,6 +39,7 @@ export const getMicroGrantsQuery = gql`
       blockTimestamp
       pool {
         strategy
+        strategyName
         tokenMetadata
         token
         amount
@@ -86,6 +87,7 @@ export const getMicroGrantsRecipientsQuery = gql`
       useRegistryAnchor
       pool {
         strategy
+        strategyName
         tokenMetadata
         token
         amount
@@ -119,7 +121,6 @@ export const getMicroGrantsRecipientsQuery = gql`
       }
       microGrantRecipients {
         recipientId
-        recipientAddress
         recipientAddress
         requestedAmount
         metadataPointer

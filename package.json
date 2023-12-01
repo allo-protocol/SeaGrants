@@ -13,7 +13,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@allo-team/allo-v2-sdk": "^1.0.22",
+    "@allo-team/allo-v2-sdk": "^1.0.33",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",
@@ -27,7 +27,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
     "react-icons": "^4.12.0",
-    "viem": "^1.19.1",
+    "viem": "^1.19.11",
     "wagmi": "^1.4.6",
     "yup": "^1.3.2"
   },
