@@ -1,5 +1,5 @@
 import { EPoolStatus } from "@/app/types";
-import { formatUnits } from "viem";
+import { Log, formatUnits } from "viem";
 import { graphqlEndpoint } from "./query";
 import request from "graphql-request";
 import { getIPFSClient } from "@/services/ipfs";
@@ -185,4 +185,8 @@ export const getStrategyTypeFromStrategyName = (strategyName: string): string =>
   if (strategyName === "allov2.MicroGrantsHatsStrategy") return "Hats";
 
   return "N/A";
+}
+
+export const extractLogByEventName = (logs: any[], eventName: string) => {
+  return logs.find((log) => log.eventName === eventName);
 }

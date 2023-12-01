@@ -18,6 +18,7 @@ import {
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
   NATIVE,
+  extractLogByEventName,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
@@ -27,7 +28,8 @@ import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
 import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { abi } from "@/utils/erc20.abi";
-import { encodeFunctionData } from "viem";
+import { decodeEventLog, encodeFunctionData } from "viem";
+import { AlloABI } from "@/abi/Allo";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -416,13 +418,13 @@ export const NewPoolContextProvider = (props: {
           confirmations: 2,
         });
 
-      // TODO: @0xKurt flagged that this may be an issue when creating a pool the redirect fails
-      // because of the pool ids format.
+      // TODO: FIX
       const { logs } = reciept;
-
-      console.log("LOGS", logs);
-
-      poolId = Number(logs[6].topics[1]);
+      const decodedLogs = logs.map((log) =>
+        decodeEventLog({ ...log, abi: AlloABI }),
+      );
+      const log = extractLogByEventName(decodedLogs, "PoolCreated");
+      poolId = log.args["poolId"];
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(

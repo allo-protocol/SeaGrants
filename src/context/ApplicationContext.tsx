@@ -13,6 +13,7 @@ import { getIPFSClient } from "@/services/ipfs";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
   ethereumHashRegExp,
+  extractLogByEventName,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
@@ -23,7 +24,7 @@ import {
   ZERO_ADDRESS,
 } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { sendTransaction } from "@wagmi/core";
-import { Abi, DecodeEventLogParameters, decodeEventLog } from "viem";
+import { decodeEventLog } from "viem";
 import { useAccount } from "wagmi";
 
 export interface IApplicationContextProps {
@@ -292,9 +293,12 @@ export const ApplicationContextProvider = (props: {
         decodeEventLog({ ...log, abi: MicroGrantsABI }),
       );
 
-      console.log("LOGS", logs);
+      let log = extractLogByEventName(decodedLogs, "Registered");
+      if (!log) {
+        log = extractLogByEventName(decodedLogs, "UpdatedRegistration");
+      }
 
-      recipientId = (decodedLogs[0].args as any)["recipientId"].toLowerCase();
+      recipientId = log.args["recipientId"].toLowerCase();
 
       updateStepTarget(
         stepIndex,
