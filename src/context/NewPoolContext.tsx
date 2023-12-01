@@ -420,13 +420,13 @@ export const NewPoolContextProvider = (props: {
         value: BigInt(createPoolData.value),
       });
 
-      const reciept =
+      const receipt =
         await wagmiConfigData.publicClient.waitForTransactionReceipt({
           hash: tx.hash,
           confirmations: 2,
         });
 
-      const logValues = getEventValues(reciept, MicroGrantsABI, "Initialized");
+      const logValues = getEventValues(receipt, MicroGrantsABI, "Initialized");
       poolId = logValues.poolId;
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);

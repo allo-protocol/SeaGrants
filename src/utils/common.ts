@@ -201,11 +201,11 @@ export const extractLogByEventName = (logs: any[], eventName: string) => {
 };
 
 export const getEventValues = (
-  reciept: TransactionReceipt,
+  receipt: TransactionReceipt,
   abi: ContractAbi,
   eventName: string,
 ) => {
-  const { logs } = reciept;
+  const { logs } = receipt;
   const events = abi.filter(
     (item) => item.type === "event" && item.name === eventName,
   );
