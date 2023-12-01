@@ -17,7 +17,7 @@ import { trucateString } from "@/components/shared/Address";
 
 const initialSteps: TProgressStep[] = [
   {
-    id: 0,
+    id: 'allocator-0',
     content: "Updating allocators",
     target: "",
     href: "#",
@@ -64,7 +64,6 @@ export const PoolContextProvider = (props: {
   const { isConnected, address } = useAccount();
   const router = useRouter();
 
-  // todo: replace contract queries with spec
   useEffect(() => {
     const checkAllocator = async () => {
       if (isConnected && address) {

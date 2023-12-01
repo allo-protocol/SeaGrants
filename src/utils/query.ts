@@ -122,7 +122,6 @@ export const getMicroGrantsRecipientsQuery = gql`
       microGrantRecipients {
         recipientId
         recipientAddress
-        recipientAddress
         requestedAmount
         metadataPointer
         blockTimestamp

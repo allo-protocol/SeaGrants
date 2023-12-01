@@ -66,7 +66,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
       then: () => yup.string().required("Profile name is required"),
       otherwise: () => yup.string().notRequired(),
     }),
-    profileId: yup.string().notRequired(), //todo: required("Profile ID is required"),
+    profileId: yup.string().notRequired(),
   });
 
   const { steps, createApplication } = useContext(ApplicationContext);

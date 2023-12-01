@@ -10,7 +10,6 @@ export type TApplication = {
   description?: string;
   status: ApplicationStatus;
   base64Image: string;
-  // name: string;
   recipientAddress: `0x${string}`;
   amountRequested: string;
 };
@@ -80,6 +79,16 @@ export type TPoolMetadata = {
   base64Image?: string;
 };
 
+export type TMicroGrantRecipient = {
+  recipientId: `0x${string}`;
+  recipientAddress: `0x${string}`;
+  requestedAmount: string;
+  metadataPointer: string;
+  blockTimestamp: string;
+  isUsingRegistryAnchor: boolean;
+  status: ApplicationStatus;
+}
+
 export type TNewPool = TPoolMetadata & {
   // chain info
   tokenAddress: `0x${string}`;
@@ -135,7 +144,7 @@ export type TPoolData = {
   };
   allocateds: TAllocatedData[];
   distributeds: TDistributedData[];
-  microGrantRecipients: any[]; // todo: set type
+  microGrantRecipients: TMicroGrantRecipient[];
   strategyType: TStrategyType;
   // Hat
   hatId?: number;
@@ -219,7 +228,7 @@ export enum EProgressStatus {
 }
 
 export type TProgressStep = {
-  id?: number; // todo: remove id everywhere
+  id?: string;
   content: string;
   target?: string;
   href?: string;

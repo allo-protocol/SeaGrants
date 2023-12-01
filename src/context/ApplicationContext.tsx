@@ -37,30 +37,35 @@ export interface IApplicationContextProps {
 
 const initialSteps: TProgressStep[] = [
   {
+    id: 'application-0',
     content: "Using profile ",
     target: "",
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
+    id: "application-1",
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "application-2",
     content: "Registering your application on ",
     target: ETarget.POOL,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "application-3",
     content: "Indexing your application on ",
     target: ETarget.SPEC,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "application-4",
     content: "Indexing application metadata on ",
     target: ETarget.IPFS,
     href: "",

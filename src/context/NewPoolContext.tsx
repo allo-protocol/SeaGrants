@@ -36,42 +36,49 @@ export interface INewPoolContextProps {
 
 const initialSteps: TProgressStep[] = [
   {
+    id: "pool-0",
     content: "Using profile ",
     target: "",
     href: "",
     status: EProgressStatus.IN_PROGRESS,
   },
   {
+    id: "pool-1",
     content: "Saving your application to ",
     target: ETarget.IPFS,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-2",
     content: "Deploying new pool strategy to ",
     target: ETarget.CHAIN,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-3",
     content: "Approve token on ",
     target: ETarget.ALLO,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-4",
     content: "Creating new pool on ",
     target: ETarget.ALLO,
     href: "#",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-5",
     content: "Indexing your pool on ",
     target: ETarget.SPEC,
     href: "",
     status: EProgressStatus.NOT_STARTED,
   },
   {
+    id: "pool-6",
     content: "Indexing pool metadata on ",
     target: ETarget.IPFS,
     href: "",
@@ -264,12 +271,10 @@ export const NewPoolContextProvider = (props: {
 
     // 2. Deploy new pool strategy
 
-    // TODO: UPDATE THIS
     const strategy = new MicroGrantsStrategy({
       chain: chain,
     });
 
-    console.log("STRATEGY TYPE", data.strategyType);
     const deployParams = strategy.getDeployParams(data.strategyType);
 
     try {
@@ -360,7 +365,6 @@ export const NewPoolContextProvider = (props: {
       maxRequestedAmount: BigInt(data.maxAmount),
     };
 
-    // TODO: FIX THIS
     if (data.strategyType == StrategyType.Hats) {
       initParams["hats"] = "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137";
       initParams["hatId"] = data.hatId;
