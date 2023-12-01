@@ -76,10 +76,10 @@ const schema = yup.object({
     then: () => yup.string().required(),
     otherwise: () => yup.string().notRequired(),
   }),
-  snapshotReference: yup.date().when("strategyType", {
+  snapshotReference: yup.string().when("strategyType", {
     is: (strategyType: string) => strategyType === StrategyType.Gov,
-    then: () => yup.date().required(),
-    otherwise: () => yup.date().notRequired(),
+    then: () => yup.number().required(),
+    otherwise: () => yup.number().notRequired(),
   }),
   minVotePower: yup.string().when("strategyType", {
     is: (strategyType: string) => strategyType === StrategyType.Gov,
@@ -113,6 +113,7 @@ export default function PoolForm() {
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const [poolToken, setPoolToken] = useState("");
   const [govToken, setGovToken] = useState("");
+  const [latestBlockNumber, setLatestBlockNumber] = useState("");
   const [govType, setGovType] = useState<
     "prior" | "past" | "error" | "loading" | undefined
   >(undefined);
@@ -190,7 +191,7 @@ export default function PoolForm() {
       strategyType: strategy,
       hatId: data?.hatId,
       gov: data?.gov,
-      snapshotReference: getSnapshotReference(data?.snapshotReference),
+      snapshotReference: data?.snapshotReference,
       minVotePower: data?.minVotePower
         ? parseUnits(
             data?.minVotePower,
@@ -201,15 +202,6 @@ export default function PoolForm() {
 
     setNewPoolData(_newPoolData);
     setIsPreview(true);
-  };
-
-  const getSnapshotReference = (ref: string): BigInt | undefined => {
-    if (govType === "past") {
-      return BigInt(Math.floor(new Date(ref).getTime() / 1000));
-    } else if (govType === "prior") {
-      return BigInt(ref);
-    }
-    return undefined;
   };
 
   const createPoolData = (): TPoolData => {
@@ -261,10 +253,7 @@ export default function PoolForm() {
     if (!newPoolData) return;
     setIsOpen(true);
 
-    // FIXME: this is the problematic poolId that is not coming back as a integer.
     const { poolId } = await createNewPool(newPoolData, Number(chainId));
-
-    console.log("poolId", poolId);
 
     setTimeout(() => {
       setIsOpen(false);
@@ -305,7 +294,12 @@ export default function PoolForm() {
 
   useEffect(() => {
     const fetchGovToken = async () => {
-      setGovType("loading");
+
+      setLatestBlockNumber(
+        (await wagmiConfigData.publicClient.getBlockNumber()).toString()
+      );
+
+      setGovType("loading");q
       const bytecode = await wagmiConfigData.publicClient.getBytecode({
         address: govToken as `0x${string}`,
       });
@@ -460,79 +454,36 @@ export default function PoolForm() {
                       {errors.gov && <Error message={errors.gov?.message!} />}
                     </div>
                   </div>
-                  {(govType === "past" ||
-                    govType === "prior" ||
-                    govType === "loading") && (
-                    <div className="sm:col-span-4">
-                      {govType === "past" && (
-                        <>
-                          <label
-                            htmlFor="snapshotReference"
-                            className="block text-sm font-medium leading-6 text-gray-900"
-                          >
-                            Balance Snapshot Date
-                          </label>
-                          <div className="mt-2">
-                            <input
-                              {...register("snapshotReference")}
-                              id="snapshotReference"
-                              name="snapshotReference"
-                              type="datetime-local"
-                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <p className="text-xs leading-5 text-gray-600 mt-2">
-                              The date when token balances will be queried from
-                            </p>
-                          </div>
-                          <div>
-                            {errors.snapshotReference && (
-                              <Error
-                                message={errors.snapshotReference?.message!}
-                              />
-                            )}
-                          </div>
-                        </>
-                      )}
-                      {govType === "loading" && (
-                        <p className="text-xs leading-5 text-gray-600 mt-2">
-                          Loading Token Data...
-                        </p>
-                      )}
-                      {govType === "prior" && (
-                        <>
-                          <label
-                            htmlFor="snapshotReference"
-                            className="block text-sm font-medium leading-6 text-gray-900"
-                          >
-                            Balance Snapshot Date
-                          </label>
-                          <div className="mt-2">
-                            <input
-                              {...register("snapshotReference")}
-                              id="snapshotReference"
-                              name="snapshotReference"
-                              type="text"
-                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <p className="text-xs leading-5 text-gray-600 mt-2">
-                              The block number when token balances will be
-                              queried from
-                            </p>
-                          </div>
-                          <div>
-                            {errors.snapshotReference && (
-                              <Error
-                                message={errors.snapshotReference?.message!}
-                              />
-                            )}
-                          </div>
-                        </>
-                      )}
-                      {govType === "error" && (
-                        <Error message={"Token not supported!"} />
+   
+                  <div className="sm:col-span-4">
+                    <label
+                      htmlFor="snapshotReference"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Snapshot Block Number
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        {...register("snapshotReference")}
+                        id="snapshotReference"
+                        name="snapshotReference"
+                        type="string"
+                        value={latestBlockNumber.toString()}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <p className="text-xs leading-5 text-gray-600 mt-2">
+                        Latest BlockNumber: {latestBlockNumber.toString()}
+                      </p>
+                    </div>
+                    <div>
+                      {errors.snapshotReference && (
+                        <Error
+                          message={errors.snapshotReference?.message!}
+                        />
                       )}
                     </div>
-                  )}
+                  </div>
+
                   <div className="sm:col-span-4">
                     <label
                       htmlFor="minVotePower"

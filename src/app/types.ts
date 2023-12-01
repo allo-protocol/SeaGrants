@@ -108,7 +108,7 @@ export type TNewPool = TPoolMetadata & {
   // Gov
   gov?: string;
   minVotePower?: string;
-  snapshotReference?: BigInt;
+  snapshotReference?: string;
 };
 
 export type TNewPoolResponse = {
@@ -153,7 +153,7 @@ export type TPoolData = {
   // Gov
   gov?: string;
   minVotePower?: string;
-  snapshotReference?: BigInt;
+  snapshotReference?: string;
 };
 
 export type TApplicationData = {
