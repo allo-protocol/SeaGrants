@@ -126,7 +126,7 @@ export const PoolContextProvider = (props: {
 
   const batchSetAllocator = async (data: SetAllocatorData[]) => {
     if (strategy) {
-      const chainInfo: any = getChain(Number(props.chainId));
+      const chainInfo: any | unknown = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getBatchSetAllocatorData(data);
 
@@ -170,7 +170,7 @@ export const PoolContextProvider = (props: {
     ]);
 
     if (strategy) {
-      const chainInfo: any = getChain(Number(props.chainId));
+      const chainInfo: any | unknown = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getAllocationData(
         data.recipientId,

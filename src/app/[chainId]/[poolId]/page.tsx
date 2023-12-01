@@ -13,13 +13,8 @@ export default async function Pool({
   params: { chainId: string; poolId: string };
 }) {
   // TODO: MAKE SURE POOL ID IS VALID
-  // NOTE: Not sure how to handle this other than creating a middleware.ts file, we can't 
+  // NOTE: Not sure how to handle this other than creating a middleware.ts file, we can't
   // make this a client component because it needs to use the async data fetching.
-  // if (!params.poolId.startsWith(`0x`)) {
-  //   // todo: send to home page?
-  //   console.log(`invalid pool id: ${params.poolId}`);
-  //   return;
-  // }
   const response: any = await request(
     graphqlEndpoint,
     getMicroGrantsRecipientsQuery,
@@ -61,16 +56,14 @@ export default async function Pool({
   return (
     <Container>
       <PoolContextProvider chainId={params.chainId} poolId={params.poolId}>
-        <Suspense fallback={<div>Loading Pool Details...</div>}>
-          <PoolOverview
-            applications={applications}
-            poolBanner={poolBanner}
-            chainId={params.chainId}
-            poolId={params.poolId}
-            pool={pool}
-            metadata={poolMetadata}
-          />
-        </Suspense>
+        <PoolOverview
+          applications={applications}
+          poolBanner={poolBanner}
+          chainId={params.chainId}
+          poolId={params.poolId}
+          pool={pool}
+          metadata={poolMetadata}
+        />
       </PoolContextProvider>
     </Container>
   );
