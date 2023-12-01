@@ -132,7 +132,7 @@ export const NewPoolContextProvider = (props: {
 
   const createNewPool = async (
     data: TNewPool,
-    chain: number,
+    chain: number
   ): Promise<TNewPoolResponse> => {
     const chainInfo: any = getChain(chain);
 
@@ -219,7 +219,7 @@ export const NewPoolContextProvider = (props: {
 
         updateStepHref(
           stepIndex,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
         );
       } catch (e) {
         updateStepStatus(stepIndex, false);
@@ -285,7 +285,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
+        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress
       );
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -327,7 +327,7 @@ export const NewPoolContextProvider = (props: {
 
           updateStepHref(
             stepIndex,
-            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
           );
           updateStepStatus(stepIndex, true);
         } catch (e) {
@@ -345,11 +345,11 @@ export const NewPoolContextProvider = (props: {
 
     stepIndex++;
     const startDateInSeconds = Math.floor(
-      new Date(data.startDate).getTime() / 1000,
+      new Date(data.startDate).getTime() / 1000
     );
 
     const endDateInSeconds = Math.floor(
-      new Date(data.endDate).getTime() / 1000,
+      new Date(data.endDate).getTime() / 1000
     );
 
     const initParams: any = {
@@ -396,7 +396,7 @@ export const NewPoolContextProvider = (props: {
     };
 
     const createPoolData = await allo.createPoolWithCustomStrategy(
-      poolCreationData,
+      poolCreationData
     );
 
     try {
@@ -412,13 +412,15 @@ export const NewPoolContextProvider = (props: {
           confirmations: 2,
         });
 
+      // TODO: @0xKurt flagged that this may be an issue when creating a pool the redirect fails
+      // because of the pool ids format.
       const { logs } = reciept;
       poolId = Number(logs[6].topics[1]);
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -436,7 +438,7 @@ export const NewPoolContextProvider = (props: {
     let pollingResult = await pollUntilDataIsIndexed(
       checkIfPoolIsIndexedQuery,
       pollingData,
-      "microGrant",
+      "microGrant"
     );
 
     if (pollingResult) {
@@ -451,7 +453,7 @@ export const NewPoolContextProvider = (props: {
     // 5. Index Metadata
 
     const pollingMetadataResult = await pollUntilMetadataIsAvailable(
-      pointer.IpfsHash,
+      pointer.IpfsHash
     );
 
     if (pollingMetadataResult) {

@@ -80,7 +80,7 @@ export default async function Home() {
           <p className="mt-6 text-lg leading-8 text-gray-600">
             Micro Grant programs are a common way for web3 communities like
             Gitcoin, Celo, and ENS to engage their members and encourage them to
-            contribute to projects that align with a community's goals. However,
+            contribute to projects that align with a community&apos;s goals. However,
             these programs often face challenges in making sure that everyone
             has the opportunity to participate.
           </p>

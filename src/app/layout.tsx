@@ -25,6 +25,7 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <WagmiConfig config={wagmiConfigData}>
           <RainbowKitProvider chains={chainData}>
+            {/* This works but breaks the build.. if it causes too much trouble we can just remove it 🐈 */}
             <ErrorBoundary fallback={<Error />}>
               <Navbar />
               <main className="px-6 md:px-0 mt-8">{children}</main>

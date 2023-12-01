@@ -107,7 +107,9 @@ export default function PoolForm() {
   const [base64Image, setBase64Image] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
-  const [strategy, setStrategy] = useState<TStrategyType>(StrategyType.MicroGrants);
+  const [strategy, setStrategy] = useState<TStrategyType>(
+    StrategyType.MicroGrants
+  );
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const [poolToken, setPoolToken] = useState("");
   const [govToken, setGovToken] = useState("");
@@ -258,6 +260,8 @@ export default function PoolForm() {
   const handleCreateNewPool = async () => {
     if (!newPoolData) return;
     setIsOpen(true);
+
+    // FIXME: this is the problematic poolId that is not coming back as a integer.
     const { poolId } = await createNewPool(newPoolData, Number(chainId));
 
     console.log("poolId", poolId);
@@ -352,12 +356,13 @@ export default function PoolForm() {
             </div>
 
             <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
-
               <div className="sm:col-span-4 mt-2">
                 <p className="block text-sm font-medium leading-6 text-gray-900 mb-2">
                   Selected Chain
                 </p>
-                <p className="text-sm text-gray-600">{chain?.name} ({chain?.id})</p>
+                <p className="text-sm text-gray-600">
+                  {chain?.name} ({chain?.id})
+                </p>
               </div>
 
               <div className="sm:col-span-4">
@@ -455,7 +460,9 @@ export default function PoolForm() {
                       {errors.gov && <Error message={errors.gov?.message!} />}
                     </div>
                   </div>
-                  {(govType === "past" || govType === "prior" || govType === "loading") &&
+                  {(govType === "past" ||
+                    govType === "prior" ||
+                    govType === "loading") && (
                     <div className="sm:col-span-4">
                       {govType === "past" && (
                         <>
@@ -508,8 +515,8 @@ export default function PoolForm() {
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                             <p className="text-xs leading-5 text-gray-600 mt-2">
-                              The block number when token balances will be queried
-                              from
+                              The block number when token balances will be
+                              queried from
                             </p>
                           </div>
                           <div>
@@ -525,7 +532,7 @@ export default function PoolForm() {
                         <Error message={"Token not supported!"} />
                       )}
                     </div>
-                  }
+                  )}
                   <div className="sm:col-span-4">
                     <label
                       htmlFor="minVotePower"
@@ -668,7 +675,8 @@ export default function PoolForm() {
                   />
 
                   <p className="text-xs leading-5 text-gray-600 mt-2">
-                    For pool funding, enter the token address. Leave blank for native currency
+                    For pool funding, enter the token address. Leave blank for
+                    native currency
                   </p>
                 </div>
               </div>
@@ -896,7 +904,8 @@ export default function PoolForm() {
                     )}
                   </div>
                   <p className="text-xs leading-5 text-gray-600 mt-2">
-                    The registry profile ID for your organization, linked to your pool.
+                    The registry profile ID for your organization, linked to
+                    your pool.
                   </p>
                   <div>
                     {errors.profileId && (
