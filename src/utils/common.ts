@@ -1,16 +1,17 @@
-import { ContractAbi, EPoolStatus } from "@/app/types";
+import { AbiComponent, AbiItem, ContractAbi, EPoolStatus } from "@/app/types";
 import {
-  Log,
   TransactionReceipt,
   decodeAbiParameters,
+  decodeEventLog,
   formatUnits,
   keccak256,
+  parseAbiParameters,
   stringToBytes,
 } from "viem";
 import { graphqlEndpoint } from "./query";
 import request from "graphql-request";
 import { getIPFSClient } from "@/services/ipfs";
-import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import { parse } from "path";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -204,34 +205,62 @@ export const getEventValues = (
   receipt: TransactionReceipt,
   abi: ContractAbi,
   eventName: string,
-) => {
+): any => {
   const { logs } = receipt;
-  const events = abi.filter(
+  const event = abi.filter(
     (item) => item.type === "event" && item.name === eventName,
-  );
+  )[0];
 
-  const event = events[0];
-  const inputTypes = event.inputs
-    ? event.inputs.map((input) => input.type)
-    : [];
-  const inputTypesString = inputTypes.join(",");
-  const eventString = `${event.name}(${inputTypesString})`;
+  console.log("event", event);
 
-  const eventTopic = keccak256(stringToBytes(eventString));
+  const eventTopic = getEventTopic(event);
 
   const log = logs.find(
     (log) => log.topics[0]?.toLowerCase() === eventTopic.toLowerCase(),
   );
 
-  const values = decodeAbiParameters(event.inputs!, log!.data!);
-  const logValuesObject: any = {};
-  if (values) {
-    values.forEach((value: any, index) => {
-      logValuesObject[event.inputs![index].name] = value.toString();
-    });
+  const { topics, data } = log as { topics: string[]; data: string };
+
+  const d = decodeEventLog({
+    abi: [event as any],
+    data: data as `0x${string}`,
+    topics: topics as any,
+  });
+
+  return d.args;
+};
+
+function getEventTopic(event: AbiItem): string {
+  const inputTypesString = getInputTypeString(event);
+  const eventString = `${event.name}(${inputTypesString})`;
+  const eventTopic = keccak256(stringToBytes(eventString));
+
+  return eventTopic;
+}
+
+function getInputTypeString(event: AbiItem): string {
+  const inputTypes = event.inputs ? flattenInputTypes(event.inputs) : [];
+  return inputTypes.join(",");
+}
+
+function flattenInputTypes(
+  inputs: Array<{
+    name: string;
+    type: string;
+    components?: Array<AbiComponent>;
+  }>,
+): string[] {
+  const result: string[] = [];
+
+  for (const input of inputs) {
+    if (input.components) {
+      const componentsString = flattenInputTypes(input.components).join(",");
+
+      result.push(`(${componentsString})`);
+    } else {
+      result.push(input.type);
+    }
   }
 
-  // returns a nice object with the values of the event
-  // example: {poolId: "42", data: "0x1234"}
-  return logValuesObject;
-};
+  return result;
+}
