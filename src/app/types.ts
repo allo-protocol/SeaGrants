@@ -87,6 +87,8 @@ export type TMicroGrantRecipient = {
   blockTimestamp: string;
   isUsingRegistryAnchor: boolean;
   status: ApplicationStatus;
+  metadata?: any;
+  applicationBanner?: string;
 }
 
 export type TNewPool = TPoolMetadata & {
