@@ -1,4 +1,6 @@
-export const MicroGrantsGovABI = [
+import { ContractAbi } from "@/app/types";
+
+export const MicroGrantsGovABI: ContractAbi = [
   {
     inputs: [
       {

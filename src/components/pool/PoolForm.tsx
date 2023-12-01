@@ -34,7 +34,7 @@ const schema = yup.object({
     .string()
     .required("Profile ID is required")
     .test("address-check", "Must start with 0x", (value) =>
-      value?.toLowerCase()?.startsWith("0x")
+      value?.toLowerCase()?.startsWith("0x"),
     ),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
@@ -44,14 +44,14 @@ const schema = yup.object({
     .test(
       "is-number",
       "fund pool amount is required",
-      (value) => !isNaN(Number(value))
+      (value) => !isNaN(Number(value)),
     ),
   maxAmount: yup
     .string()
     .test(
       "is-number",
       "max amount is required",
-      (value) => !isNaN(Number(value))
+      (value) => !isNaN(Number(value)),
     ),
   approvalThreshold: yup.number().required("approval threshold is required"),
   startDate: yup.date().required("Start time is required"),
@@ -108,7 +108,7 @@ export default function PoolForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
   const [strategy, setStrategy] = useState<TStrategyType>(
-    StrategyType.MicroGrants as TStrategyType
+    StrategyType.MicroGrants as TStrategyType,
   );
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const [poolToken, setPoolToken] = useState("");
@@ -135,11 +135,17 @@ export default function PoolForm() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    // defaultValues: {
+    //   snapshotReference:
+    //     strategy === StrategyType.Gov
+    //       ? latestBlockNumber.toString()
+    //       : undefined,
+    // },
   });
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [newPoolData, setNewPoolData] = useState<TNewPool | undefined>(
-    undefined
+    undefined,
   );
 
   const nowPlus10Minutes = new Date();
@@ -195,7 +201,7 @@ export default function PoolForm() {
       minVotePower: data?.minVotePower
         ? parseUnits(
             data?.minVotePower,
-            govTokenInstance?.data?.decimals || 18
+            govTokenInstance?.data?.decimals || 18,
           ).toString()
         : "0",
     };
@@ -294,12 +300,7 @@ export default function PoolForm() {
 
   useEffect(() => {
     const fetchGovToken = async () => {
-
-      setLatestBlockNumber(
-        (await wagmiConfigData.publicClient.getBlockNumber()).toString()
-      );
-
-      setGovType("loading");q
+      setGovType("loading");
       const bytecode = await wagmiConfigData.publicClient.getBytecode({
         address: govToken as `0x${string}`,
       });
@@ -324,6 +325,15 @@ export default function PoolForm() {
       setGovType(undefined);
     }
   }, [govToken]);
+
+  useEffect(() => {
+    const fetchLatestBlockNumber = async () => {
+      setLatestBlockNumber(
+        (await wagmiConfigData.publicClient.getBlockNumber()).toString(),
+      );
+    };
+    fetchLatestBlockNumber();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onHandlePreview)}>
@@ -454,7 +464,7 @@ export default function PoolForm() {
                       {errors.gov && <Error message={errors.gov?.message!} />}
                     </div>
                   </div>
-   
+
                   <div className="sm:col-span-4">
                     <label
                       htmlFor="snapshotReference"
@@ -467,8 +477,8 @@ export default function PoolForm() {
                         {...register("snapshotReference")}
                         id="snapshotReference"
                         name="snapshotReference"
-                        type="string"
-                        value={latestBlockNumber.toString()}
+                        type="text"
+                        defaultValue={latestBlockNumber.toString()}
                         className="pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <p className="text-xs leading-5 text-gray-600 mt-2">
@@ -477,9 +487,7 @@ export default function PoolForm() {
                     </div>
                     <div>
                       {errors.snapshotReference && (
-                        <Error
-                          message={errors.snapshotReference?.message!}
-                        />
+                        <Error message={errors.snapshotReference?.message!} />
                       )}
                     </div>
                   </div>
@@ -512,7 +520,6 @@ export default function PoolForm() {
                               : ""}
                           </span>
                         </div>
-
                       </div>
                       <p className="text-xs leading-5 text-gray-600 mt-2">
                         The minimum token balance to be eligible to allocate

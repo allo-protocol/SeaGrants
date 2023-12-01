@@ -1,5 +1,12 @@
-import { EPoolStatus } from "@/app/types";
-import { Log, formatUnits } from "viem";
+import { ContractAbi, EPoolStatus } from "@/app/types";
+import {
+  Log,
+  TransactionReceipt,
+  decodeAbiParameters,
+  formatUnits,
+  keccak256,
+  stringToBytes,
+} from "viem";
 import { graphqlEndpoint } from "./query";
 import request from "graphql-request";
 import { getIPFSClient } from "@/services/ipfs";
@@ -179,14 +186,52 @@ export const formatDateDifference = (dateString: string): string => {
 export const NATIVE =
   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE".toLowerCase();
 
-export const getStrategyTypeFromStrategyName = (strategyName: string): string => {
+export const getStrategyTypeFromStrategyName = (
+  strategyName: string,
+): string => {
   if (strategyName === "allov2.MicroGrantsStrategy") return "Manual";
   if (strategyName === "allov2.MicroGrantsGovStrategy") return "Governance";
   if (strategyName === "allov2.MicroGrantsHatsStrategy") return "Hats";
 
   return "N/A";
-}
+};
 
 export const extractLogByEventName = (logs: any[], eventName: string) => {
   return logs.find((log) => log.eventName === eventName);
-}
+};
+
+export const getEventValues = (
+  reciept: TransactionReceipt,
+  abi: ContractAbi,
+  eventName: string,
+) => {
+  const { logs } = reciept;
+  const events = abi.filter(
+    (item) => item.type === "event" && item.name === eventName,
+  );
+
+  const event = events[0];
+  const inputTypes = event.inputs
+    ? event.inputs.map((input) => input.type)
+    : [];
+  const inputTypesString = inputTypes.join(",");
+  const eventString = `${event.name}(${inputTypesString})`;
+
+  const eventTopic = keccak256(stringToBytes(eventString));
+
+  const log = logs.find(
+    (log) => log.topics[0]?.toLowerCase() === eventTopic.toLowerCase(),
+  );
+
+  const values = decodeAbiParameters(event.inputs!, log!.data!);
+  const logValuesObject: any = {};
+  if (values) {
+    values.forEach((value: any, index) => {
+      logValuesObject[event.inputs![index].name] = value.toString();
+    });
+  }
+
+  // returns a nice object with the values of the event
+  // example: {poolId: "42", data: "0x1234"}
+  return logValuesObject;
+};

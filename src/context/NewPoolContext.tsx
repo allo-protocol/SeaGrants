@@ -19,6 +19,7 @@ import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
   NATIVE,
   extractLogByEventName,
+  getEventValues,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
@@ -30,6 +31,7 @@ import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrants
 import { abi } from "@/utils/erc20.abi";
 import { decodeEventLog, encodeFunctionData } from "viem";
 import { AlloABI } from "@/abi/Allo";
+import { MicroGrantsABI } from "@/abi/Microgrants";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -141,13 +143,15 @@ export const NewPoolContextProvider = (props: {
 
   const createNewPool = async (
     data: TNewPool,
-    chain: number
+    chain: number,
   ): Promise<TNewPoolResponse> => {
     const chainInfo: any = getChain(chain);
 
     const allo = new Allo({
       chain: chain,
     });
+
+    console.log("DATA", data);
 
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
@@ -228,7 +232,7 @@ export const NewPoolContextProvider = (props: {
 
         updateStepHref(
           stepIndex,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
         );
       } catch (e) {
         updateStepStatus(stepIndex, false);
@@ -292,7 +296,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress
+        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
       );
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -307,8 +311,12 @@ export const NewPoolContextProvider = (props: {
         address: data.tokenAddress,
         abi: abi,
         functionName: "allowance",
-        args: [address, data.tokenAddress],
+        args: [address, allo.address()],
       });
+
+      console.log("Allowance", allowance as bigint);
+      console.log("Fund Pool Amount", data.fundPoolAmount);
+      console.log("diff", (allowance as bigint) - BigInt(data.fundPoolAmount));
 
       if ((allowance as bigint) <= BigInt(data.fundPoolAmount)) {
         const approvalAmount =
@@ -334,7 +342,7 @@ export const NewPoolContextProvider = (props: {
 
           updateStepHref(
             stepIndex,
-            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
           );
           updateStepStatus(stepIndex, true);
         } catch (e) {
@@ -352,11 +360,11 @@ export const NewPoolContextProvider = (props: {
 
     stepIndex++;
     const startDateInSeconds = Math.floor(
-      new Date(data.startDate).getTime() / 1000
+      new Date(data.startDate).getTime() / 1000,
     );
 
     const endDateInSeconds = Math.floor(
-      new Date(data.endDate).getTime() / 1000
+      new Date(data.endDate).getTime() / 1000,
     );
 
     const initParams: any = {
@@ -402,7 +410,7 @@ export const NewPoolContextProvider = (props: {
     };
 
     const createPoolData = await allo.createPoolWithCustomStrategy(
-      poolCreationData
+      poolCreationData,
     );
 
     try {
@@ -418,13 +426,13 @@ export const NewPoolContextProvider = (props: {
           confirmations: 2,
         });
 
-      const { logs } = reciept;
-      poolId = Number(logs[6].topics[1]);
+      const logValues = getEventValues(reciept, MicroGrantsABI, "Initialized");
+      poolId = logValues.poolId;
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -442,7 +450,7 @@ export const NewPoolContextProvider = (props: {
     let pollingResult = await pollUntilDataIsIndexed(
       checkIfPoolIsIndexedQuery,
       pollingData,
-      "microGrant"
+      "microGrant",
     );
 
     if (pollingResult) {
@@ -457,7 +465,7 @@ export const NewPoolContextProvider = (props: {
     // 5. Index Metadata
 
     const pollingMetadataResult = await pollUntilMetadataIsAvailable(
-      pointer.IpfsHash
+      pointer.IpfsHash,
     );
 
     if (pollingMetadataResult) {
