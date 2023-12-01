@@ -1,4 +1,5 @@
 "use client";
+
 import { EProgressStatus, ETarget, TProgressStep } from "@/app/types";
 import { Allo, MicroGrantsStrategy } from "@allo-team/allo-v2-sdk";
 import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
@@ -125,7 +126,7 @@ export const PoolContextProvider = (props: {
 
   const batchSetAllocator = async (data: SetAllocatorData[]) => {
     if (strategy) {
-      const chainInfo = getChain(Number(props.chainId));
+      const chainInfo: any = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getBatchSetAllocatorData(data);
 
@@ -169,7 +170,7 @@ export const PoolContextProvider = (props: {
     ]);
 
     if (strategy) {
-      const chainInfo = getChain(Number(props.chainId));
+      const chainInfo: any = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getAllocationData(
         data.recipientId,

@@ -6,7 +6,6 @@ import { getIPFSClient } from "@/services/ipfs";
 import { getPoolStatus } from "@/utils/common";
 import logo from "./assets/logo.svg";
 import Image from "next/image";
-import { Suspense } from "react";
 
 export default async function Home() {
   const ipfsClient = getIPFSClient();
@@ -87,55 +86,35 @@ export default async function Home() {
           </p>
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="text-center mt-4">Loading Upcoming Pools...</div>
-        }
-      >
-        <PoolList
-          pools={upcomingPools}
-          title={"Upcoming Pools"}
-          flyoutOptions={{
-            useFlyout: true,
-            startIndex: 2,
-            label: `Show all upcoming pools (${upcomingPools.length})`,
-          }}
-        />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="text-center mt-4">Loading Active Pools...</div>
-        }
-      >
-        <PoolList
-          pools={activePools}
-          title={"Active Pools"}
-          flyoutOptions={{
-            useFlyout: true,
-            startIndex: 2,
-            label: `Show all active pools (${
-              activePools.length > 2
-                ? activePools.length - 2
-                : activePools.length
-            })`,
-          }}
-        />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="text-center mt-4">Loading Ended Pools...</div>
-        }
-      >
-        <PoolList
-          pools={endedPools}
-          title={"Ended Pools"}
-          flyoutOptions={{
-            useFlyout: true,
-            startIndex: 0,
-            label: `Show all ended pools (${endedPools.length})`,
-          }}
-        />
-      </Suspense>
+      <PoolList
+        pools={upcomingPools}
+        title={"Upcoming Pools"}
+        flyoutOptions={{
+          useFlyout: true,
+          startIndex: 2,
+          label: `Show all upcoming pools (${upcomingPools.length})`,
+        }}
+      />
+      <PoolList
+        pools={activePools}
+        title={"Active Pools"}
+        flyoutOptions={{
+          useFlyout: true,
+          startIndex: 2,
+          label: `Show all active pools (${
+            activePools.length > 2 ? activePools.length - 2 : activePools.length
+          })`,
+        }}
+      />
+      <PoolList
+        pools={endedPools}
+        title={"Ended Pools"}
+        flyoutOptions={{
+          useFlyout: true,
+          startIndex: 0,
+          label: `Show all ended pools (${endedPools.length})`,
+        }}
+      />
     </main>
   );
 }
