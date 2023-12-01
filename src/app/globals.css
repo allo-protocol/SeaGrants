@@ -137,7 +137,7 @@ a {
 }
 .loader::after,
 .loader::before {
-  content: '';  
+  content: '';
   box-sizing: border-box;
   position: absolute;
   left: 0;
@@ -160,7 +160,7 @@ a {
   border-color: #38bdf8 #38bdf8 transparent transparent;
   animation: rotation 1.5s linear infinite;
 }
-    
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
@@ -168,7 +168,7 @@ a {
   100% {
     transform: rotate(360deg);
   }
-} 
+}
 @keyframes rotationBack {
   0% {
     transform: rotate(0deg);

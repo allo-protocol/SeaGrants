@@ -418,13 +418,8 @@ export const NewPoolContextProvider = (props: {
           confirmations: 2,
         });
 
-      // TODO: FIX
       const { logs } = reciept;
-      const decodedLogs = logs.map((log) =>
-        decodeEventLog({ ...log, abi: AlloABI }),
-      );
-      const log = extractLogByEventName(decodedLogs, "PoolCreated");
-      poolId = log.args["poolId"];
+      poolId = Number(logs[6].topics[1]);
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
