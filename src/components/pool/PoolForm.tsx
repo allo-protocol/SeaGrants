@@ -108,7 +108,7 @@ export default function PoolForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
   const [strategy, setStrategy] = useState<TStrategyType>(
-    StrategyType.MicroGrants
+    StrategyType.MicroGrants as TStrategyType
   );
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const [poolToken, setPoolToken] = useState("");
