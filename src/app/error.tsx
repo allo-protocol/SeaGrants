@@ -14,10 +14,10 @@ export default function Error({
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-lg p-4 max-w-sm mx-auto">
-        <h2 className="text-xl font-semibold text-red-800">
+        <h2 className="text-xl font-semibold text-red-800 text-center">
           Something went wrong!
         </h2>
-        <p className="text-red-700">
+        <p className="text-red-700 text-center">
           {error.message}
           {error.digest && (
             <span>
@@ -26,7 +26,7 @@ export default function Error({
             </span>
           )}
         </p>
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-row justify-between items-center mt-4">
           <button
             onClick={() => reset()}
             className="mt-4 bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none"
