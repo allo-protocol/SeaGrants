@@ -78,8 +78,8 @@ const schema = yup.object({
   }),
   snapshotReference: yup.string().when("strategyType", {
     is: (strategyType: string) => strategyType === StrategyType.Gov,
-    then: () => yup.number().required(),
-    otherwise: () => yup.number().notRequired(),
+    then: () => yup.string().required(),
+    otherwise: () => yup.string().notRequired(),
   }),
   minVotePower: yup.string().when("strategyType", {
     is: (strategyType: string) => strategyType === StrategyType.Gov,
@@ -469,7 +469,7 @@ export default function PoolForm() {
                         name="snapshotReference"
                         type="string"
                         value={latestBlockNumber.toString()}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <p className="text-xs leading-5 text-gray-600 mt-2">
                         Latest BlockNumber: {latestBlockNumber.toString()}
@@ -501,20 +501,18 @@ export default function PoolForm() {
                           aria-describedby="price-currency"
                           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         />
-                        {(govType === "prior" ||
-                          govType === "past" ||
-                          true) && (
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span
-                              className="text-gray-500 sm:text-sm"
-                              id="price-currency"
-                            >
-                              {govTokenInstance.data
-                                ? govTokenInstance.data?.symbol
-                                : ""}
-                            </span>
-                          </div>
-                        )}
+
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span
+                            className="text-gray-500 sm:text-sm"
+                            id="price-currency"
+                          >
+                            {govTokenInstance.data
+                              ? govTokenInstance.data?.symbol
+                              : ""}
+                          </span>
+                        </div>
+
                       </div>
                       <p className="text-xs leading-5 text-gray-600 mt-2">
                         The minimum token balance to be eligible to allocate
