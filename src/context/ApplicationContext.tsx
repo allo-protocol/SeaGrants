@@ -288,17 +288,11 @@ export const ApplicationContextProvider = (props: {
         });
 
       const { logs } = reciept;
-      const decodedLogs = logs.map(
-        (
-          log: DecodeEventLogParameters<
-            Abi | readonly unknown[],
-            undefined,
-            `0x${string}`[],
-            undefined,
-            true
-          >
-        ) => decodeEventLog({ ...log, abi: MicroGrantsABI })
+      const decodedLogs = logs.map((log) =>
+        decodeEventLog({ ...log, abi: MicroGrantsABI }),
       );
+
+      console.log("LOGS", logs);
 
       recipientId = (decodedLogs[0].args as any)["recipientId"].toLowerCase();
 

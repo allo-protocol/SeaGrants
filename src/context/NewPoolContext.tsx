@@ -419,6 +419,9 @@ export const NewPoolContextProvider = (props: {
       // TODO: @0xKurt flagged that this may be an issue when creating a pool the redirect fails
       // because of the pool ids format.
       const { logs } = reciept;
+
+      console.log("LOGS", logs);
+
       poolId = Number(logs[6].topics[1]);
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
