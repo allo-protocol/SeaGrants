@@ -160,7 +160,7 @@ export const PoolContextProvider = (props: {
   const allocate = async (data: Allocation) => {
     setSteps([
       {
-        id: 0,
+        id: "0",
         content: "Allocating",
         target: ETarget.POOL,
         href: "#",
