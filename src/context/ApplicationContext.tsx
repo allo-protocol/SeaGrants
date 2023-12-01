@@ -1,37 +1,37 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import { MicroGrantsStrategy, Registry } from "@allo-team/allo-v2-sdk/";
+import React, { useState } from "react";
 
-import { getIPFSClient } from "@/services/ipfs";
+import { MicroGrantsABI } from "@/abi/Microgrants";
 import {
   EProgressStatus,
   ETarget,
   TNewApplication,
   TProgressStep,
 } from "@/app/types";
-import { sendTransaction } from "@wagmi/core";
+import { getIPFSClient } from "@/services/ipfs";
 import { getChain, wagmiConfigData } from "@/services/wagmi";
-import { decodeEventLog } from "viem";
-import { MicroGrantsABI } from "@/abi/Microgrants";
 import {
   ethereumHashRegExp,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
 import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
-import { useAccount } from "wagmi";
+import { getProfileById } from "@/utils/request";
 import {
   TransactionData,
   ZERO_ADDRESS,
 } from "@allo-team/allo-v2-sdk/dist/Common/types";
-import { getProfileById } from "@/utils/request";
+import { sendTransaction } from "@wagmi/core";
+import { Abi, DecodeEventLogParameters, decodeEventLog } from "viem";
+import { useAccount } from "wagmi";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
   createApplication: (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ) => Promise<string>;
 }
 
@@ -74,7 +74,7 @@ export const ApplicationContext = React.createContext<IApplicationContextProps>(
     createApplication: async () => {
       return "";
     },
-  },
+  }
 );
 
 export const ApplicationContextProvider = (props: {
@@ -119,9 +119,18 @@ export const ApplicationContextProvider = (props: {
   const createApplication = async (
     data: TNewApplication,
     chain: number,
-    poolId: number,
+    poolId: number
   ): Promise<string> => {
-    const chainInfo = getChain(chain);
+    // todo: check for supported chain. Update steps if not supported.
+    if (chain !== 5) {
+      // todo: update steps
+      updateStepStatus(steps.length, false);
+      updateStepContent(steps.length, "Unsupported chain");
+
+      return "0x";
+    }
+
+    const chainInfo: any | unknown = getChain(chain);
 
     const newSteps = [...steps];
     newSteps.map((step, index) => {
@@ -191,7 +200,7 @@ export const ApplicationContextProvider = (props: {
 
         updateStepHref(
           stepIndex,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
         );
       } catch (e) {
         updateStepStatus(stepIndex, false);
@@ -274,20 +283,28 @@ export const ApplicationContextProvider = (props: {
         });
 
       const { logs } = reciept;
-      const decodedLogs = logs.map((log) =>
-        decodeEventLog({ ...log, abi: MicroGrantsABI }),
+      const decodedLogs = logs.map(
+        (
+          log: DecodeEventLogParameters<
+            Abi | readonly unknown[],
+            undefined,
+            `0x${string}`[],
+            undefined,
+            true
+          >
+        ) => decodeEventLog({ ...log, abi: MicroGrantsABI })
       );
 
       recipientId = (decodedLogs[0].args as any)["recipientId"].toLowerCase();
 
       updateStepTarget(
         stepIndex,
-        `${chainInfo.name} at ${tx.hash.slice(0, 6)}`,
+        `${chainInfo.name} at ${tx.hash.slice(0, 6)}`
       );
 
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
       );
 
       updateStepStatus(stepIndex, true);
@@ -307,7 +324,7 @@ export const ApplicationContextProvider = (props: {
     const pollingResult: boolean = await pollUntilDataIsIndexed(
       checkIfRecipientIsIndexedQuery,
       pollingData,
-      "microGrantRecipient",
+      "microGrantRecipient"
     );
 
     if (pollingResult) {
@@ -323,7 +340,7 @@ export const ApplicationContextProvider = (props: {
 
     console.log("pointer.IpfsHash", pointer.IpfsHash);
     const pollingMetadataResult = await pollUntilMetadataIsAvailable(
-      pointer.IpfsHash,
+      pointer.IpfsHash
     );
 
     console.log("pollingMetadataResult", pollingMetadataResult);

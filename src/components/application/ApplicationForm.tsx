@@ -1,11 +1,5 @@
 "use client";
 
-import Error from "@/components/shared/Error";
-import Modal from "../shared/Modal";
-import { useContext, useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
-import * as yup from "yup";
-import { useParams, useRouter } from "next/navigation";
 import {
   TApplicationData,
   TApplicationMetadata,
@@ -13,17 +7,26 @@ import {
   TPoolData,
   TProfilesByOwnerResponse,
 } from "@/app/types";
+import Error from "@/components/shared/Error";
 import { ApplicationContext } from "@/context/ApplicationContext";
-import ImageUpload from "../shared/ImageUpload";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { MarkdownEditor } from "../shared/Markdown";
-import { parseUnits } from "viem";
 import { humanReadableAmount } from "@/utils/common";
-import { useAccount } from "wagmi";
 import getProfilesByOwner from "@/utils/request";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useParams, useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { parseUnits } from "viem";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import * as yup from "yup";
+import ImageUpload from "../shared/ImageUpload";
+import { MarkdownEditor } from "../shared/Markdown";
+import Modal from "../shared/Modal";
 import ApplicationDetail from "./ApplicationDetail";
 
 export default function ApplicationForm(props: { microGrant: TPoolData }) {
+  const { chain } = useNetwork();
+  const { chains, error, isLoading, pendingChainId, switchNetwork } =
+    useSwitchNetwork();
   const maxRequestedAmount = Number(
     humanReadableAmount(
       props.microGrant.maxRequestedAmount,
@@ -76,12 +79,9 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   >(undefined);
   const { address } = useAccount();
   const router = useRouter();
-
   const params = useParams();
-
   const chainId = params["chainId"];
   const poolId = params["poolId"];
-
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -91,8 +91,13 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   } = useForm({
     resolver: yupResolver(schema),
   });
-
   const isUsingRegistryAnchor = props.microGrant.useRegistryAnchor;
+
+  const handleSwitchNetwork = async () => {
+    switchNetwork?.(5);
+
+    // todo: update steps...
+  };
 
   const handleCancel = () => {
     if (isPreview) {
@@ -105,6 +110,13 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
   };
 
   const onHandlePreview = async (data: any) => {
+    if (Number(chain!.id) !== 5) {
+      setIsPreview(false);
+      await handleSwitchNetwork();
+
+      // return;
+    }
+
     const newProfileName = !createNewProfile
       ? undefined
       : data.profilename
@@ -131,7 +143,6 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     if (!newApplicationData) return;
 
     setIsOpen(true);
-
     const recipientId = await createApplication(
       newApplicationData,
       Number(chainId),
@@ -216,7 +227,7 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
     };
 
     fetchProfiles();
-  }, [address]);
+  }, [address, chainId]);
 
   return (
     <form onSubmit={handleSubmit(onHandlePreview)}>
