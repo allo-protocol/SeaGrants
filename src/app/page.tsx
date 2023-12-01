@@ -78,11 +78,9 @@ export default async function Home() {
             <span className="text-sky-600">Grants</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Micro Grant programs are a common way for web3 communities like
-            Gitcoin, Celo, and ENS to engage their members and encourage them to
-            contribute to projects that align with a community&apos;s goals. However,
-            these programs often face challenges in making sure that everyone
-            has the opportunity to participate.
+            Micro-grant programs, common in web3 communities like Gitcoin, Celo,
+            and ENS to engage members and empower project contributions aligned
+            with their mission, often present challenges in accessibility.
           </p>
         </div>
       </div>
