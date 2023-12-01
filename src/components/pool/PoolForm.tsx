@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
+  AbiComponent,
+  AbiItem,
   TNewPool,
   TPoolData,
   TProfilesByOwnerResponse,
@@ -17,7 +19,14 @@ import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";
 import ImageUpload from "../shared/ImageUpload";
 import { MarkdownEditor } from "../shared/Markdown";
-import { parseUnits } from "viem";
+import {
+  decodeAbiParameters,
+  decodeEventLog,
+  keccak256,
+  parseAbiParameters,
+  parseUnits,
+  stringToBytes,
+} from "viem";
 import getProfilesByOwner from "@/utils/request";
 import PoolOverview from "./PoolOverview";
 import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
@@ -135,12 +144,6 @@ export default function PoolForm() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-    // defaultValues: {
-    //   snapshotReference:
-    //     strategy === StrategyType.Gov
-    //       ? latestBlockNumber.toString()
-    //       : undefined,
-    // },
   });
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
