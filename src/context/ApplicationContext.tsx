@@ -129,6 +129,14 @@ export const ApplicationContextProvider = (props: {
     chain: number,
     poolId: number
   ): Promise<string> => {
+
+    // reset steps
+    steps.map((step, index) => {
+      if (index == 0) step.status = EProgressStatus.IN_PROGRESS;
+      else step.status = EProgressStatus.NOT_STARTED;
+    })
+    setSteps(steps);
+
     // todo: check for supported chain. Update steps if not supported.
     if (chain !== 5) {
       // todo: update steps

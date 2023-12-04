@@ -150,6 +150,13 @@ export const NewPoolContextProvider = (props: {
       chain: chain,
     });
 
+    // reset steps
+    steps.map((step, index) => {
+      if (index == 0) step.status = EProgressStatus.IN_PROGRESS;
+      else step.status = EProgressStatus.NOT_STARTED;
+    })
+    setSteps(steps);
+
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
       const newSteps = [...prevSteps];
