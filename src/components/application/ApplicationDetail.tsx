@@ -300,7 +300,7 @@ export default function ApplicationDetail(props: {
           <div className="flex flex-row">
             <Breadcrumb breadcrumbs={application.breadcrumbs} />
             <div className="ml-auto space-x-2 px-4 sm:px-6 lg:px-8">
-              {/* todo: check if address is profile owner */}
+              {/* todo: check if address is profile owner and if the application has NO reviews */}
               <Link
                 href={`/${microGrant.chainId}/${microGrant.poolId}/${application.recipientId}/edit`}
               >
