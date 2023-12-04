@@ -105,7 +105,7 @@ export const ApplicationContextProvider = (props: {
       newSteps[index].status = EProgressStatus.IS_ERROR;
     }
 
-    if (steps.length > index + 1)
+    if (flag && steps.length > index + 1)
       newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
 
     setSteps(newSteps);
