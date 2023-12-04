@@ -18,7 +18,6 @@ import {
 import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
   NATIVE,
-  extractLogByEventName,
   getEventValues,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
@@ -29,9 +28,9 @@ import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
 import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { abi } from "@/utils/erc20.abi";
-import { decodeEventLog, encodeFunctionData } from "viem";
-import { AlloABI } from "@/abi/Allo";
+import { encodeFunctionData } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
+import { RegistryABI } from "@/abi/Registry";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -151,8 +150,6 @@ export const NewPoolContextProvider = (props: {
       chain: chain,
     });
 
-    console.log("DATA", data);
-
     // if step target is CHAIN update target to chainInfo.name
     setSteps((prevSteps) => {
       const newSteps = [...prevSteps];
@@ -187,7 +184,7 @@ export const NewPoolContextProvider = (props: {
 
     // return values
     let strategyAddress: string = "0x";
-    let poolId: number = -1;
+    let poolId = -1;
     const walletClient = await getWalletClient({ chainId: chain });
 
     let profileId = data.profileId;
@@ -221,10 +218,9 @@ export const NewPoolContextProvider = (props: {
             confirmations: 2,
           });
 
-        console.log("RECEIPT", { receipt });
-
-        const { logs } = receipt;
-        profileId = logs[0].topics[1] || "0x";
+        profileId =
+          getEventValues(receipt, RegistryABI, "ProfileCreated").profileId ||
+          "0x";
 
         if (profileId === "0x") {
           throw new Error("Profile creation failed");
@@ -313,10 +309,6 @@ export const NewPoolContextProvider = (props: {
         functionName: "allowance",
         args: [address, allo.address()],
       });
-
-      console.log("Allowance", allowance as bigint);
-      console.log("Fund Pool Amount", data.fundPoolAmount);
-      console.log("diff", (allowance as bigint) - BigInt(data.fundPoolAmount));
 
       if ((allowance as bigint) <= BigInt(data.fundPoolAmount)) {
         const approvalAmount =
@@ -427,7 +419,8 @@ export const NewPoolContextProvider = (props: {
         });
 
       const logValues = getEventValues(receipt, MicroGrantsABI, "Initialized");
-      poolId = logValues.poolId;
+      // poolId is a BigInt and we eed to parse it to a number
+      if (logValues.poolId) poolId = Number(logValues.poolId);
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(

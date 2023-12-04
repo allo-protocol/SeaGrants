@@ -14,6 +14,7 @@ import { getChain, wagmiConfigData } from "@/services/wagmi";
 import {
   ethereumHashRegExp,
   extractLogByEventName,
+  getEventValues,
   pollUntilDataIsIndexed,
   pollUntilMetadataIsAvailable,
 } from "@/utils/common";
@@ -26,6 +27,7 @@ import {
 import { sendTransaction } from "@wagmi/core";
 import { decodeEventLog } from "viem";
 import { useAccount } from "wagmi";
+import { RegistryABI } from "@/abi/Registry";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -197,8 +199,9 @@ export const ApplicationContextProvider = (props: {
             hash: tx.hash,
           });
 
-        const { logs } = receipt;
-        profileId = logs[0].topics[1] || "0x";
+        profileId =
+          getEventValues(receipt, RegistryABI, "ProfileCreated").profileId ||
+          "0x";
 
         if (profileId === "0x") {
           throw new Error("Profile creation failed");
@@ -206,7 +209,7 @@ export const ApplicationContextProvider = (props: {
 
         updateStepHref(
           stepIndex,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
         );
       } catch (e) {
         updateStepStatus(stepIndex, false);
@@ -302,12 +305,12 @@ export const ApplicationContextProvider = (props: {
 
       updateStepTarget(
         stepIndex,
-        `${chainInfo.name} at ${tx.hash.slice(0, 6)}`
+        `${chainInfo.name} at ${tx.hash.slice(0, 6)}`,
       );
 
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
       );
 
       updateStepStatus(stepIndex, true);
@@ -327,7 +330,7 @@ export const ApplicationContextProvider = (props: {
     const pollingResult: boolean = await pollUntilDataIsIndexed(
       checkIfRecipientIsIndexedQuery,
       pollingData,
-      "microGrantRecipient"
+      "microGrantRecipient",
     );
 
     if (pollingResult) {
@@ -340,13 +343,9 @@ export const ApplicationContextProvider = (props: {
     stepIndex++;
 
     // 5. Index Metadata
-
-    console.log("pointer.IpfsHash", pointer.IpfsHash);
     const pollingMetadataResult = await pollUntilMetadataIsAvailable(
-      pointer.IpfsHash
+      pointer.IpfsHash,
     );
-
-    console.log("pollingMetadataResult", pollingMetadataResult);
 
     if (pollingMetadataResult) {
       updateStepStatus(stepIndex, true);
