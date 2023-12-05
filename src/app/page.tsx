@@ -1,3 +1,4 @@
+"use client";
 import PoolList from "@/components/pool/PoolList";
 import { getMicroGrantsQuery, graphqlEndpoint } from "@/utils/query";
 import request from "graphql-request";
