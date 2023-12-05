@@ -29,12 +29,16 @@ import {
   getPriorVotesAddressUint256,
 } from "@/utils/4byte";
 
+const nowPlus10Minutes = new Date();
+nowPlus10Minutes.setMinutes(nowPlus10Minutes.getMinutes() + 10);
+const minDate = nowPlus10Minutes.toISOString().slice(0, -8);
+
 const schema = yup.object({
   profileId: yup
     .string()
     .required("Profile ID is required")
     .test("address-check", "Must start with 0x", (value) =>
-      value?.toLowerCase()?.startsWith("0x"),
+      value?.toLowerCase()?.startsWith("0x")
     ),
   name: yup.string().required().min(6, "Must be at least 6 characters"),
   website: yup.string().required().url("Must be a valid website address"),
@@ -44,18 +48,29 @@ const schema = yup.object({
     .test(
       "is-number",
       "fund pool amount is required",
-      (value) => !isNaN(Number(value)),
+      (value) => !isNaN(Number(value))
     ),
   maxAmount: yup
     .string()
     .test(
       "is-number",
       "max amount is required",
-      (value) => !isNaN(Number(value)),
+      (value) => !isNaN(Number(value))
     ),
   approvalThreshold: yup.number().required("approval threshold is required"),
-  startDate: yup.date().required("Start time is required"),
-  endDate: yup.date().required("End time is required"),
+  startDate: yup
+    .date()
+    .min(minDate, "Start date must be at least 10 minutes in the future")
+    .required("Start date is required"),
+  endDate: yup
+    .date()
+    .when(
+      "startDate",
+      (startDate, schema) =>
+        startDate &&
+        schema.min(startDate, "End date must be after the start date")
+    )
+    .required("End time is required"),
   tokenAddress: yup.string().notRequired(),
   useRegistryAnchor: yup.string().required("Registry anchor is required"),
   profilename: yup.string().when("profileId", {
@@ -108,7 +123,7 @@ export default function PoolForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [profiles, setProfiles] = useState<TProfilesByOwnerResponse[]>([]);
   const [strategy, setStrategy] = useState<TStrategyType>(
-    StrategyType.MicroGrants as TStrategyType,
+    StrategyType.MicroGrants as TStrategyType
   );
   const [createNewProfile, setCreateNewProfile] = useState<boolean>(false);
   const [poolToken, setPoolToken] = useState("");
@@ -139,12 +154,8 @@ export default function PoolForm() {
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [newPoolData, setNewPoolData] = useState<TNewPool | undefined>(
-    undefined,
+    undefined
   );
-
-  const nowPlus10Minutes = new Date();
-  nowPlus10Minutes.setMinutes(nowPlus10Minutes.getMinutes() + 10);
-  const minDate = nowPlus10Minutes.toISOString().slice(0, -8);
 
   const chainId = chain?.id;
 
@@ -195,7 +206,7 @@ export default function PoolForm() {
       minVotePower: data?.minVotePower
         ? parseUnits(
             data?.minVotePower,
-            govTokenInstance?.data?.decimals || 18,
+            govTokenInstance?.data?.decimals || 18
           ).toString()
         : "0",
     };
@@ -323,7 +334,7 @@ export default function PoolForm() {
   useEffect(() => {
     const fetchLatestBlockNumber = async () => {
       setLatestBlockNumber(
-        (await wagmiConfigData.publicClient.getBlockNumber()).toString(),
+        (await wagmiConfigData.publicClient.getBlockNumber()).toString()
       );
     };
     fetchLatestBlockNumber();
@@ -740,7 +751,6 @@ export default function PoolForm() {
                 </label>
                 <div className="mt-2">
                   <input
-                    min={minDate}
                     {...register("startDate")}
                     id="startDate"
                     name="startDate"
@@ -764,7 +774,6 @@ export default function PoolForm() {
                 </label>
                 <div className="mt-2">
                   <input
-                    min={minDate}
                     {...register("endDate")}
                     id="endDate"
                     name="endDate"
