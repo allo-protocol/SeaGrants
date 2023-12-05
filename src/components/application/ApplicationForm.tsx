@@ -249,8 +249,6 @@ export default function ApplicationForm(props: { microGrant: TPoolData }) {
             (profile) => profile.anchor === applicationId,
           );
 
-          console.log("profiles", profiles.length);
-
           setDefaultValues({
             ...defaultValues,
             profileId: profiles[0].profileId,
