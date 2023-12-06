@@ -52,22 +52,26 @@ const microGrantsQuery = `
 `;
 
 export const getActiveMicroGrantsQuery = gql`
-  {
-    activeMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC)
+  query getActiveMicroGrantsQuery($first: Int!, $offset: Int!) {
+    activeMicroGrants(
+      orderBy: BLOCK_TIMESTAMP_DESC,
+      first: $first,
+      offset: $offset
+    )
       ${microGrantsQuery}
   }
 `;
 
 export const getUpcomingMicroGrantsQuery = gql`
-  {
-    upcomingMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC)
+  query getUpcomingMicroGrantsQuery($first: Int!, $offset: Int!) {
+    upcomingMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC, first: $first, offset: $offset)
       ${microGrantsQuery}
   }
 `;
 
 export const getEndedMicroGrantsQuery = gql`
-  {
-    endedMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC)
+  query getEndedMicroGrantsQuery($first: Int!, $offset: Int!) {
+    endedMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC, first: $first, offset: $offset)
       ${microGrantsQuery}
   }
 `;

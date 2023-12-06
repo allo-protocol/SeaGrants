@@ -38,7 +38,10 @@ export default async function Home() {
       const response: any = await request(
         graphqlEndpoint,
         graphqlQuery,
-        {}
+        {
+          first: 10,
+          offset: 0
+        }
       );
       pools = response[responseObject];
       for (const pool of pools) {
