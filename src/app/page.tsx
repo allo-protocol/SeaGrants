@@ -1,3 +1,4 @@
+"use client";
 import PoolList from "@/components/pool/PoolList";
 import { getMicroGrantsQuery, graphqlEndpoint } from "@/utils/query";
 import request from "graphql-request";
@@ -15,7 +16,7 @@ export default async function Home() {
     const response: any = await request(
       graphqlEndpoint,
       getMicroGrantsQuery,
-      {}
+      {},
     );
     pools = response["microGrants"];
     for (const pool of pools) {
@@ -41,19 +42,19 @@ export default async function Home() {
   const upcomingPools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.UPCOMING
+      EPoolStatus.UPCOMING,
   );
 
   const activePools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.ACTIVE
+      EPoolStatus.ACTIVE,
   );
 
   const endedPools = pools.filter(
     (pool) =>
       getPoolStatus(pool.allocationStartTime, pool.allocationEndTime) ===
-      EPoolStatus.ENDED
+      EPoolStatus.ENDED,
   );
 
   return (
