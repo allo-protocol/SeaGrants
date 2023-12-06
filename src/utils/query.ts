@@ -26,30 +26,49 @@ export const checkIfPoolIsIndexedQuery = gql`
   }
 `;
 
-export const getMicroGrantsQuery = gql`
+const microGrantsQuery = `
   {
-    microGrants(orderBy: BLOCK_TIMESTAMP_DESC) {
-      poolId
-      chainId
+    poolId
+    chainId
+    strategy
+    allocationStartTime
+    allocationEndTime
+    approvalThreshold
+    maxRequestedAmount
+    blockTimestamp
+    pool {
       strategy
-      allocationStartTime
-      allocationEndTime
-      approvalThreshold
-      maxRequestedAmount
-      blockTimestamp
-      pool {
-        strategy
-        strategyName
-        tokenMetadata
-        token
-        amount
-        metadataPointer
-        profile {
-          profileId
-          name
-        }
+      strategyName
+      tokenMetadata
+      token
+      amount
+      metadataPointer
+      profile {
+        profileId
+        name
       }
     }
+  }
+`;
+
+export const getActiveMicroGrantsQuery = gql`
+  {
+    activeMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC)
+      ${microGrantsQuery}
+  }
+`;
+
+export const getUpcomingMicroGrantsQuery = gql`
+  {
+    upcomingMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC)
+      ${microGrantsQuery}
+  }
+`;
+
+export const getEndedMicroGrantsQuery = gql`
+  {
+    endedMicroGrants(orderBy: BLOCK_TIMESTAMP_DESC)
+      ${microGrantsQuery}
   }
 `;
 
