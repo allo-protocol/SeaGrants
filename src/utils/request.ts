@@ -91,7 +91,7 @@ export const getApplicationData = async (
       const bannerImage = await ipfsClient.fetchJson(metadata.base64Image);
       banner = bannerImage!.data ? bannerImage.data : "";
     } catch (error) {
-      throw new Error("Error fetching banner image");
+      console.error("unable to load banner");
     }
 
     return {
