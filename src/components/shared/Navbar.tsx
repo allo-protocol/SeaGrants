@@ -53,9 +53,6 @@ export default function Navbar() {
                     href={`/${chainId || chain?.id}/new`}
                     className="flex items-center mr-4"
                   >
-                    <div className="mt-4 shrink-0 items-center justify-center text-white sm:h-12">
-                      <NewPoolIcon />
-                    </div>
                     <p className="text-sm font-medium text-gray-900 ml-2 mr-4">
                       Create a Pool
                     </p>
