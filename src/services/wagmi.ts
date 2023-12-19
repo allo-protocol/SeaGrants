@@ -4,16 +4,12 @@ import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
-  arbitrumGoerli,
   base,
-  celoAlfajores,
   celo,
   goerli,
-  sepolia,
   mainnet,
   optimism,
-  polygon,
-  polygonMumbai,
+  polygon
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -25,8 +21,8 @@ dotenv.config();
 
 const stagingChains = [
   // celoAlfajores,
-  // goerli,
-  sepolia,
+  goerli,
+  // sepolia,
   // polygonMumbai,
   // arbitrumGoerli,
 ];
