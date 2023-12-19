@@ -5,7 +5,6 @@ import { PoolContextProvider } from "@/context/PoolContext";
 import { getIPFSClient } from "@/services/ipfs";
 import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
 import request from "graphql-request";
-import { Suspense } from "react";
 
 export default async function Pool({
   params,
