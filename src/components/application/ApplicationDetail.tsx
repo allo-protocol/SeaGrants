@@ -28,7 +28,7 @@ import { useAccount } from "wagmi";
 import Link from "next/link";
 import ProgressBar from "../shared/ProgressBar";
 
-export default function <ApplicationDetail>(props: {
+export default function ApplicationDetail(props: {
   application: TApplicationData;
   metadata: TApplicationMetadata;
   bannerImage: string;
