@@ -3,8 +3,7 @@ import PoolOverview from "@/components/pool/PoolOverview";
 import Container from "@/components/shared/Container";
 import { PoolContextProvider } from "@/context/PoolContext";
 import { getIPFSClient } from "@/services/ipfs";
-import { graphqlEndpoint, getMicroGrantsRecipientsQuery } from "@/utils/query";
-import request from "graphql-request";
+import { getPoolData } from "@/utils/request";
 
 export default async function Pool({
   params,
@@ -12,20 +11,8 @@ export default async function Pool({
   params: { chainId: string; poolId: string };
 }) {
   try {
-    // TODO: MAKE SURE POOL ID IS VALID
-    // NOTE: Not sure how to handle this other than creating a middleware.ts file, we can't
-    // make this a client component because it needs to use the async data fetching.
-    const response: any = await request(
-      graphqlEndpoint,
-      getMicroGrantsRecipientsQuery,
-      { chainId: params.chainId, poolId: params.poolId },
-    );
-
-    const pool: TPoolData = response.microGrant;
-
-    const poolMetadata: TPoolMetadata = await getIPFSClient().fetchJson(
-      pool.pool.metadataPointer,
-    );
+    const pool: TPoolData = await getPoolData(params.chainId, params.poolId);
+    const poolMetadata = pool.pool.metadata;
 
     let poolBanner = undefined;
 
