@@ -90,6 +90,12 @@ export default function ApplicationDetail(props: {
     (allocation) => allocation.status === Status.Rejected.toString(),
   );
 
+  const status =
+    approvals.length === props.pool?.approvalThreshold &&
+    application.status === "Accepted"
+      ? "Paid"
+      : application.status;
+
   const distributeds = microGrant.distributeds.filter(
     (distributed) =>
       distributed.recipientId === microGrantRecipient.recipientId.toLowerCase(),
@@ -238,13 +244,11 @@ export default function ApplicationDetail(props: {
           <dd className="mt-1 text-sm leading-6 text-gray-700 text-center sm:mt-0">
             <div
               className={classNames(
-                statusColorsScheme[
-                  application.status as keyof typeof statusColorsScheme
-                ],
+                statusColorsScheme[status as keyof typeof statusColorsScheme],
                 "rounded-md py-1 px-2 text-sm font-medium ring-1 ring-inset",
               )}
             >
-              {application.status.toString()}
+              {status.toString()}
             </div>
           </dd>
         </div>
@@ -267,21 +271,21 @@ export default function ApplicationDetail(props: {
           </div>
         ))}
 
-          <div
-            className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
+        <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt className="text-sm font-medium leading-6 text-gray-900">
+            Approvals
+          </dt>
+          <dd
+            className={classNames(
+              "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
+            )}
           >
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Approvals
-            </dt>
-            <dd
-              className={classNames(
-                "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
-              )}
-            >
-              <ProgressBar current={2} total={4} />
-            </dd>
-          </div>
-
+            <ProgressBar
+              current={approvals.length}
+              total={props?.pool?.approvalThreshold || 0}
+            />
+          </dd>
+        </div>
       </dl>
     );
   }
@@ -362,24 +366,22 @@ export default function ApplicationDetail(props: {
               <div className="-mx-4 px-4 py-4 lg:col-span-2 lg:row-span-2 lg:row-end-2">
                 <div className="lg:col-start-3 mt-1">
                   <ApplicationOverView />
-                  {isAllocator &&
-                    application.status !== "Accepted" &&
-                    !hasAllocated && (
-                      <div className="mt-5 mb-5">
-                        <button
-                          onClick={() => onAllocate(true)}
-                          className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => onAllocate(false)}
-                          className="mt-4 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:ring-offset-2"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    )}
+                  {isAllocator && status !== "Accepted" && !hasAllocated && (
+                    <div className="mt-5 mb-5">
+                      <button
+                        onClick={() => onAllocate(true)}
+                        className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => onAllocate(false)}
+                        className="mt-4 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:ring-offset-2"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  )}
 
                   <div className="pt-4 border-t border-gray-100">
                     <Activity activity={generateActivity()} />
