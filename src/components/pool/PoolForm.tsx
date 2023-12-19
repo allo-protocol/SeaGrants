@@ -57,7 +57,7 @@ const schema = yup.object({
       "max amount is required",
       (value) => !isNaN(Number(value))
     ),
-  approvalThreshold: yup.number().required("approval threshold is required"),
+  approvalThreshold: yup.number().typeError('Must be a number').required("approval threshold is required"),
   startDate: yup
     .date()
     .min(minDate, "Start date must be at least 10 minutes in the future")
