@@ -26,6 +26,7 @@ import {
 import Activity from "../shared/Activity";
 import { useAccount } from "wagmi";
 import Link from "next/link";
+import ProgressBar from "../shared/ProgressBar";
 
 export default function ApplicationDetail(props: {
   application: TApplicationData;
@@ -34,7 +35,7 @@ export default function ApplicationDetail(props: {
   isError?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { isAllocator, isPoolManager, steps, allocate } =
+  const { pool: poolData, isAllocator, steps, allocate } =
     useContext(PoolContext);
   const { address } = useAccount();
   const microGrantRecipient = props.application;
@@ -59,7 +60,7 @@ export default function ApplicationDetail(props: {
       { id: 1, name: "Home", href: "/" },
       {
         id: 2,
-        name: `Pool ${microGrant.poolId}`,
+        name: `${poolData?.pool?.metadata.name}`,
         href: `/${microGrant.chainId}/${microGrant.poolId}`,
       },
       { id: 3, name: props.metadata?.name, href: "#" },
@@ -177,11 +178,6 @@ export default function ApplicationDetail(props: {
       )} - ${prettyTimestamp(microGrant.allocationEndTime)}`,
     },
     {
-      description: "Approvals",
-      name: approvals.length,
-      color: "text-green-700",
-    },
-    {
       description: "Rejections",
       name: rejections.length,
       color: "text-red-700",
@@ -249,7 +245,6 @@ export default function ApplicationDetail(props: {
             </div>
           </dd>
         </div>
-
         {overviews.map((overview, index) => (
           <div
             key={index}
@@ -268,6 +263,22 @@ export default function ApplicationDetail(props: {
             </dd>
           </div>
         ))}
+
+          <div
+            className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
+          >
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              Approvals
+            </dt>
+            <dd
+              className={classNames(
+                "mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0",
+              )}
+            >
+              <ProgressBar current={2} total={4} />
+            </dd>
+          </div>
+
       </dl>
     );
   }
