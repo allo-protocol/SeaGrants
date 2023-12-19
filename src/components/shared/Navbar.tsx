@@ -74,7 +74,7 @@ export default function Navbar() {
                           <Popover.Button
                             className={`
                                 ${open ? "text-black" : "text-black/90"}
-                                group inline-flex items-center rounded-md px-3 py-2 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75`}
+                                group mr-2 inline-flex items-center rounded-md px-3 py-2 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75`}
                           >
                             Create
                             <ChevronDownIcon
