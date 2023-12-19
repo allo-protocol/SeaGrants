@@ -4,35 +4,27 @@ import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
-  arbitrumGoerli,
+  arbitrumSepolia,
   base,
-  celoAlfajores,
   celo,
-  goerli,
-  sepolia,
   mainnet,
   optimism,
   polygon,
-  polygonMumbai,
+  sepolia,
 } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
-
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { infuraProvider } from "wagmi/providers/infura";
+import { publicProvider } from "wagmi/providers/public";
 
+// Load environment variables
 import dotenv from "dotenv";
 dotenv.config();
 
-const stagingChains = [
-  // celoAlfajores,
-  // goerli,
-  sepolia,
-  // polygonMumbai,
-  // arbitrumGoerli,
-];
+// Supported staging/test networks
+const stagingChains = [sepolia, arbitrumSepolia];
 
+// Supported production networks
 const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
-
 const availableChains =
   process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
     ? stagingChains
@@ -51,7 +43,7 @@ const { chains, publicClient } = configureChains(
         (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
     }),
     publicProvider(),
-  ],
+  ]
 );
 
 const { connectors } = getDefaultWallets({
@@ -76,4 +68,4 @@ export const getChain = (chainId: number) => {
   }
 
   throw new Error(`Chain with id ${chainId} not found`);
-}
+};
