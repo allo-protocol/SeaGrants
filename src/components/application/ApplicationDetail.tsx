@@ -10,7 +10,7 @@ import {
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import NotificationToast from "../shared/NotificationToast";
-import { TActivity, TApplicationData, TApplicationMetadata } from "@/app/types";
+import { TActivity, TApplicationData, TApplicationMetadata, TPoolData } from "@/app/types";
 import { useContext, useState } from "react";
 import { MarkdownView } from "../shared/Markdown";
 import { PoolContext } from "@/context/PoolContext";
@@ -28,14 +28,15 @@ import { useAccount } from "wagmi";
 import Link from "next/link";
 import ProgressBar from "../shared/ProgressBar";
 
-export default function ApplicationDetail(props: {
+export default function <ApplicationDetail>(props: {
   application: TApplicationData;
   metadata: TApplicationMetadata;
   bannerImage: string;
+  pool?: TPoolData;
   isError?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { pool: poolData, isAllocator, steps, allocate } =
+  const { isAllocator, steps, allocate } =
     useContext(PoolContext);
   const { address } = useAccount();
   const microGrantRecipient = props.application;
@@ -51,6 +52,8 @@ export default function ApplicationDetail(props: {
 
   const token = tokenMetadata.symbol ?? "ETH";
 
+  const poolIdName = props.pool?.pool?.metadata.name || `Pool #${microGrant.poolId}`;
+
   const application = {
     name: props.metadata?.name,
     status: microGrantRecipient.status,
@@ -60,7 +63,7 @@ export default function ApplicationDetail(props: {
       { id: 1, name: "Home", href: "/" },
       {
         id: 2,
-        name: `${poolData?.pool?.metadata.name}`,
+        name: poolIdName,
         href: `/${microGrant.chainId}/${microGrant.poolId}`,
       },
       { id: 3, name: props.metadata?.name, href: "#" },

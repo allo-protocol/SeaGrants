@@ -3,11 +3,14 @@
 import {
   TApplicationData,
   TApplicationMetadata,
+  TPoolData,
+  TPoolMetadata,
   TProfileResponse,
   TProfilesByOwnerResponse,
 } from "@/app/types";
 import {
   getMicroGrantRecipientQuery,
+  getMicroGrantsRecipientsQuery,
   getProfile,
   getProfilesByOwnerQuery,
   graphqlEndpoint,
@@ -55,6 +58,28 @@ export const getProfileById = async ({
 };
 
 export default getProfilesByOwner;
+
+
+export const getPoolData = async(
+  chainId: string,
+  poolId: string,
+): Promise<TPoolData> => {
+  const response: any = await request(
+    graphqlEndpoint,
+    getMicroGrantsRecipientsQuery,
+    { chainId: chainId, poolId: poolId },
+  );
+
+  const pool: TPoolData = response.microGrant;
+
+  const poolMetadata: TPoolMetadata = await getIPFSClient().fetchJson(
+    pool.pool.metadataPointer,
+  );
+
+  pool.pool.metadata = poolMetadata;
+
+  return pool;
+};
 
 export const getApplicationData = async (
   chainId: string,
