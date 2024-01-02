@@ -1,4 +1,4 @@
-import { TPoolData } from "@/app/types";
+import type { TPoolData } from "@/types";
 import ApplicationDetail from "@/components/application/ApplicationDetail";
 import Container from "@/components/shared/Container";
 import { PoolContextProvider } from "@/context/PoolContext";

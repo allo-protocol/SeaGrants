@@ -1,4 +1,6 @@
-export const AlloABI = [
+import type { ContractAbi } from "@/types";
+
+export const AlloABI: ContractAbi = [
   { inputs: [], name: "ALLOCATION_ACTIVE", type: "error" },
   { inputs: [], name: "ALLOCATION_NOT_ACTIVE", type: "error" },
   { inputs: [], name: "ALLOCATION_NOT_ENDED", type: "error" },

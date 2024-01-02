@@ -4,7 +4,7 @@ export const useMediaQuery = (width: number) => {
   const [targetReached, setTargetReached] = useState(false);
 
   useEffect(() => {
-    const updateTarget = (event: any) => {
+    const updateTarget = (event: { matches: boolean }) => {
       setTargetReached(event.matches);
     };
 

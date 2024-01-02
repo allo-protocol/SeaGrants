@@ -1,4 +1,4 @@
-import { TNewApplicationResponse, TPoolData } from "@/app/types";
+import { TNewApplicationResponse, TPoolData } from "@/types";
 import ApplicationCard from "./ApplicationCard";
 
 const ApplicationList = (props: {

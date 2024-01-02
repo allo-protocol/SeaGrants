@@ -1,64 +1,28 @@
-# 🌊 Allo SeaGrants
+# Create T3 App
 
-## Getting Started
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-This is a grants application for Allo. It is built using
-[Spec](https://spec.dev), [Bun](https://bun.sh/) and
-[Next.js](https://nextjs.org/).
+## What's next? How do I make an app with this?
 
-### Prerequisites
+We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
 
-- [Node.js](https://nodejs.org/en/) (v18.x.x)
-- [Bun](https://bun.sh/) (v1.x)
-- Add env vars:
+If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
 
-Required
-```
-NEXT_PUBLIC_IPFS_READ_GATEWAY=
-NEXT_PUBLIC_PINATA_JWT=
-NEXT_PUBLIC_IPFS_READ_GATEWAY=
-NEXT_PUBLIC_IPFS_WRITE_GATEWAY=
-```
+- [Next.js](https://nextjs.org)
+- [NextAuth.js](https://next-auth.js.org)
+- [Prisma](https://prisma.io)
+- [Tailwind CSS](https://tailwindcss.com)
+- [tRPC](https://trpc.io)
 
-Optional
-```
-NEXT_PUBLIC_ENVIRONMENT=
-ALCHEMY_ID=
-INFURA_ID=
-NEXT_PUBLIC_GRAPHQL_URL=
-```
+## Learn More
 
-### Installation
+To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
 
-```bash
-# Install dependencies
-bun install
-```
+- [Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
 
-### Development
+You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
-```bash
-# Start the development server
-bun dev
-```
+## How do I deploy this?
 
-### Testing
-
-TBD 🤔
-
-### Linting
-
-```bash
-# Lint the application
-bun lint
-```
-
-### Production
-
-```bash
-# Build the application
-bun build
-
-# Start the production server
-bun start
-```
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.

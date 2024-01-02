@@ -1,15 +1,18 @@
 "use client";
 
 import { getDefaultWallets } from "@rainbow-me/rainbowkit";
-import { configureChains, createConfig } from "wagmi";
+import { configureChains, createConfig, sepolia } from "wagmi";
 import {
   arbitrum,
+  arbitrumSepolia,
   base,
+  baseSepolia,
   celo,
-  goerli,
+  celoAlfajores,
   mainnet,
   optimism,
-  polygon
+  polygon,
+  polygonMumbai,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -17,20 +20,21 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { infuraProvider } from "wagmi/providers/infura";
 
 import dotenv from "dotenv";
+import { env } from "@/env";
 dotenv.config();
 
 const stagingChains = [
-  // celoAlfajores,
-  goerli,
-  // sepolia,
-  // polygonMumbai,
-  // arbitrumGoerli,
+  arbitrumSepolia,
+  baseSepolia,
+  sepolia,
+  polygonMumbai,
+  celoAlfajores,
 ];
 
 const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
 
 const availableChains =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
+  env.NEXT_PUBLIC_ENVIRONMENT === "development"
     ? stagingChains
     : productionChains;
 
@@ -39,20 +43,20 @@ const { chains, publicClient } = configureChains(
   [
     alchemyProvider({
       apiKey:
-        (process.env.ALCHEMY_ID as string) ||
+        env.NEXT_PUBLIC_ALCHEMY_ID ??
         "ajWJk5YwtfTZ5vCAhMg8I8L61XFhyJpa",
     }),
     infuraProvider({
       apiKey:
-        (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
+        env.NEXT_PUBLIC_INFURA_ID ?? "ae484befdd004b64bfe2059d3526a138",
     }),
     publicProvider(),
-  ],
+  ]
 );
 
 const { connectors } = getDefaultWallets({
   appName: "Micro Grants",
-  projectId: (process.env.PROJECT_ID as string) || "YOUR_PROJECT_ID",
+  projectId: env.NEXT_PUBLIC_PROJECT_ID ?? "YOUR_PROJECT_ID",
   chains,
 });
 
@@ -72,4 +76,4 @@ export const getChain = (chainId: number) => {
   }
 
   throw new Error(`Chain with id ${chainId} not found`);
-}
+};

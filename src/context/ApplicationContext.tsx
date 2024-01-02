@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { MicroGrantsStrategy, Registry } from "@allo-team/allo-v2-sdk/";
 import React, { useState } from "react";
@@ -6,11 +7,11 @@ import { MicroGrantsABI } from "@/abi/Microgrants";
 import {
   EProgressStatus,
   ETarget,
-  TNewApplication,
-  TProgressStep,
-} from "@/app/types";
+  type TNewApplication,
+  type TProgressStep,
+} from "@/types";
 import { getIPFSClient } from "@/services/ipfs";
-import { getChain, wagmiConfigData } from "@/services/wagmi";
+import { chainData, getChain, wagmiConfigData } from "@/services/wagmi";
 import {
   ethereumHashRegExp,
   extractLogByEventName,
@@ -21,13 +22,14 @@ import {
 import { checkIfRecipientIsIndexedQuery } from "@/utils/query";
 import { getProfileById } from "@/utils/request";
 import {
-  TransactionData,
+  type TransactionData,
   ZERO_ADDRESS,
 } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { sendTransaction } from "@wagmi/core";
 import { decodeEventLog } from "viem";
 import { useAccount } from "wagmi";
 import { RegistryABI } from "@/abi/Registry";
+import { Chain } from "@rainbow-me/rainbowkit";
 
 export interface IApplicationContextProps {
   steps: TProgressStep[];
@@ -93,20 +95,20 @@ export const ApplicationContextProvider = (props: {
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
-    newSteps[index].target = target;
+    newSteps[index]!.target = target;
     setSteps(newSteps);
   };
 
   const updateStepStatus = (index: number, flag: boolean) => {
     const newSteps = [...steps];
     if (flag) {
-      newSteps[index].status = EProgressStatus.IS_SUCCESS;
+      newSteps[index]!.status = EProgressStatus.IS_SUCCESS;
     } else {
-      newSteps[index].status = EProgressStatus.IS_ERROR;
+      newSteps[index]!.status = EProgressStatus.IS_ERROR;
     }
 
     if (flag && steps.length > index + 1)
-      newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
+      newSteps[index + 1]!.status = EProgressStatus.IN_PROGRESS;
 
     setSteps(newSteps);
     return newSteps;
@@ -114,13 +116,13 @@ export const ApplicationContextProvider = (props: {
 
   const updateStepHref = (index: number, href: string) => {
     const newSteps = [...steps];
-    newSteps[index].href = href;
+    newSteps[index]!.href = href;
     setSteps(newSteps);
   };
 
   const updateStepContent = (index: number, content: string) => {
     const newSteps = [...steps];
-    newSteps[index].content = content;
+    newSteps[index]!.content = content;
     setSteps(newSteps);
   };
 
@@ -138,7 +140,7 @@ export const ApplicationContextProvider = (props: {
     setSteps(steps);
 
     // todo: check for supported chain. Update steps if not supported.
-    if (chain !== 5) {
+    if (!chainData.map((chain) => chain.id as number).includes(chain)) {
       // todo: update steps
       updateStepStatus(steps.length, false);
       updateStepContent(steps.length, "Unsupported chain");
@@ -146,7 +148,7 @@ export const ApplicationContextProvider = (props: {
       return "0x";
     }
 
-    const chainInfo: any | unknown = getChain(chain);
+    const chainInfo: Chain = getChain(chain);
 
     const newSteps = [...steps];
     newSteps.map((step, index) => {
@@ -157,8 +159,8 @@ export const ApplicationContextProvider = (props: {
 
     let stepIndex = 0;
 
-    let profileContent = steps[0].content;
-    let profileTarget = steps[0].target;
+    let profileContent = steps[0]!.content;
+    let profileTarget = steps[0]!.target;
 
     // if data.profileName set a new step at index 0 of steps
     if (data.profileName) {
@@ -217,7 +219,7 @@ export const ApplicationContextProvider = (props: {
 
         updateStepHref(
           stepIndex,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash,
         );
       } catch (e) {
         updateStepStatus(stepIndex, false);
@@ -318,7 +320,7 @@ export const ApplicationContextProvider = (props: {
 
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash,
       );
 
       updateStepStatus(stepIndex, true);

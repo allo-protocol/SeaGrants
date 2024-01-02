@@ -3,7 +3,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import ProgressFeed from "./ProgressFeed";
-import { TProgressStep } from "@/app/types";
+import { TProgressStep } from "@/types";
 
 export default function Modal(props: {
   isOpen: boolean;

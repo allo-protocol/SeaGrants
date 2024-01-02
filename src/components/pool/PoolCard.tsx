@@ -1,5 +1,5 @@
 "use client";
-import { EPoolStatus, TPoolData } from "@/app/types";
+import { EPoolStatus, TPoolData } from "@/types";
 import {
   classNames,
   getPoolStatus,

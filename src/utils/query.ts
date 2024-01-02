@@ -1,6 +1,7 @@
+import { env } from "@/env";
 import { gql } from "graphql-request";
 
-export const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_URL || "";
+export const graphqlEndpoint = env.NEXT_PUBLIC_GRAPHQL_URL ?? "";
 
 export const checkIfRecipientIsIndexedQuery = gql`
   query checkIfRecipientIsIndexedQuery(

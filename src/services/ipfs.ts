@@ -1,3 +1,5 @@
+import { env } from "@/env";
+
 export type Config = {
   jwt: string;
   readGateway: string;
@@ -5,10 +7,9 @@ export type Config = {
 };
 
 export const getIPFSClient = (): IPFSClient => {
-
-  const jwt = process.env.NEXT_PUBLIC_PINATA_JWT;
-  const readGateway = process.env.NEXT_PUBLIC_IPFS_READ_GATEWAY;
-  const writeGateway = process.env.NEXT_PUBLIC_IPFS_WRITE_GATEWAY;
+  const jwt = env.NEXT_PUBLIC_PINATA_JWT;
+  const readGateway = env.NEXT_PUBLIC_IPFS_READ_GATEWAY;
+  const writeGateway = env.NEXT_PUBLIC_IPFS_WRITE_GATEWAY;
 
   if (!jwt || !readGateway || !writeGateway) {
     throw new Error("Missing IPFS configuration");
@@ -37,12 +38,12 @@ export default class IPFSClient {
     this.readGateway = config.readGateway;
     this.writeGateway = config.writeGateway;
 
-    this.pinJSONToIPFSUrl = `${this.writeGateway}pinning/pinJSONToIPFS`;
-    this.pinFileToIPFSUrl = `${this.writeGateway}pinning/pinFileToIPFS`;
+    this.pinJSONToIPFSUrl = `${this.writeGateway}/pinning/pinJSONToIPFS`;
+    this.pinFileToIPFSUrl = `${this.writeGateway}/pinning/pinFileToIPFS`;
   }
 
   fileUrl(cid: string) {
-    return `${this.readGateway}ipfs/${cid}`;
+    return `${this.readGateway}/ipfs/${cid}`;
   }
 
   async fetchText(cid: string) {
@@ -51,10 +52,11 @@ export default class IPFSClient {
     return await resp.text();
   }
 
-  async fetchJson(cid: string) {
+  async fetchJson<T>(cid: string): Promise<T> {
     const url = this.fileUrl(cid);
     const resp = await fetch(url);
-    return await resp.json();
+
+    return await resp.json() as T;
   }
 
   baseRequestData(name: string) {
@@ -71,7 +73,7 @@ export default class IPFSClient {
     };
   }
 
-  async pinJSON(object: any) {
+  async pinJSON(object: unknown) {
     const data = {
       ...this.baseRequestData("micro-grants"),
       pinataContent: object,

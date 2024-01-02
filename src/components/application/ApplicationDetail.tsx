@@ -10,7 +10,7 @@ import {
 } from "@/utils/common";
 import Breadcrumb from "../shared/Breadcrumb";
 import NotificationToast from "../shared/NotificationToast";
-import { TActivity, TApplicationData, TApplicationMetadata, TPoolData } from "@/app/types";
+import { TActivity, TApplicationData, TApplicationMetadata, TPoolData } from "@/types";
 import { useContext, useState } from "react";
 import { MarkdownView } from "../shared/Markdown";
 import { PoolContext } from "@/context/PoolContext";

@@ -1,135 +1,82 @@
-import PoolList from "@/components/pool/PoolList";
-import { getActiveMicroGrantsQuery, getEndedMicroGrantsQuery, getUpcomingMicroGrantsQuery, graphqlEndpoint } from "@/utils/query";
-import request from "graphql-request";
-import { TPoolData, TPoolMetadata } from "@/app/types";
-import { getIPFSClient } from "@/services/ipfs";
-import logo from "./assets/logo.svg";
-import Image from "next/image";
+import Link from "next/link";
 
-enum TPoolType {
-  UPCOMING = "upcoming",
-  ACTIVE = "active",
-  ENDED = "ended",
-}
+import { CreatePost } from "@/components/post/create-post";
+import { getServerAuthSession } from "@/server/auth";
+import { api } from "@/services/trpc/server";
 
-export const dynamic = "force-dynamic";
 export default async function Home() {
-  const ipfsClient = getIPFSClient();
-
-  const getPools = async (type: TPoolType) => {
-    let pools: TPoolData[] = [];
-
-    let graphqlQuery;
-    let responseObject;
-
-    if (type === TPoolType.UPCOMING) {
-      graphqlQuery = getUpcomingMicroGrantsQuery;
-      responseObject = "upcomingMicroGrants";
-    } else if (type === TPoolType.ACTIVE) {
-      graphqlQuery = getActiveMicroGrantsQuery;
-      responseObject = "activeMicroGrants";
-    } else if (type === TPoolType.ENDED) {
-      graphqlQuery = getEndedMicroGrantsQuery;
-      responseObject = "endedMicroGrants";
-    } else {
-      return pools;
-    }
-
-    try {
-      const response: any = await request(
-        graphqlEndpoint,
-        graphqlQuery,
-        {
-          first: 10,
-          offset: 0
-        }
-      );
-      pools = response[responseObject];
-      for (const pool of pools) {
-        let metadata: TPoolMetadata;
-        try {
-          metadata = await ipfsClient.fetchJson(pool.pool.metadataPointer);
-          pool.pool.metadata = metadata;
-          if (metadata.base64Image) {
-            let poolBanner = await ipfsClient.fetchJson(metadata.base64Image);
-            pool.pool.poolBanner = poolBanner.data;
-          }
-          if (!metadata.name) {
-            metadata.name = `Pool ${pool.poolId}`;
-          }
-        } catch {
-          console.log("IPFS", "Unable to fetch metadata");
-        }
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    return pools;
-  }
-
-  const upcomingPools = await getPools(TPoolType.UPCOMING);
-
-  const activePools = await getPools(TPoolType.ACTIVE);
-  
-  const endedPools = await getPools(TPoolType.ENDED);
+  const hello = await api.post.hello.query({ text: "from tRPC" });
+  const session = await getServerAuthSession();
 
   return (
-    <main>
-      <div className="mx-auto max-w-2xl py-4 sm:py-32">
-        <Image
-          src="https://tailwindui.com/img/beams-basic.png"
-          alt=""
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
-          width={100}
-          height={100}
-        />
-        <div className="text-center">
-          <Image
-            className="mx-auto mb-3"
-            src={logo}
-            alt="Sea Grants"
-            width={128}
-          />
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            <span className="text-sky-400">Sea</span>
-            <span className="text-sky-600">Grants</span>
-          </h1>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
-            Micro-grant programs, common in web3 communities like Gitcoin, Celo,
-            and ENS to engage members and empower project contributions aligned
-            with their mission, often present challenges in accessibility.
-          </p>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
+          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
+        </h1>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+          <Link
+            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+            href="https://create.t3.gg/en/usage/first-steps"
+            target="_blank"
+          >
+            <h3 className="text-2xl font-bold">First Steps →</h3>
+            <div className="text-lg">
+              Just the basics - Everything you need to know to set up your
+              database and authentication.
+            </div>
+          </Link>
+          <Link
+            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+            href="https://create.t3.gg/en/introduction"
+            target="_blank"
+          >
+            <h3 className="text-2xl font-bold">Documentation →</h3>
+            <div className="text-lg">
+              Learn more about Create T3 App, the libraries it uses, and how to
+              deploy it.
+            </div>
+          </Link>
         </div>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-2xl text-white">
+            {hello ? hello.greeting : "Loading tRPC query..."}
+          </p>
+
+          <div className="flex flex-col items-center justify-center gap-4">
+            <p className="text-center text-2xl text-white">
+              {session && <span>Logged in as {session.user?.name}</span>}
+            </p>
+            <Link
+              href={session ? "/api/auth/signout" : "/api/auth/signin"}
+              className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+            >
+              {session ? "Sign out" : "Sign in"}
+            </Link>
+          </div>
+        </div>
+
+        <CrudShowcase />
       </div>
-      <PoolList
-        pools={upcomingPools}
-        title={"Upcoming Pools"}
-        flyoutOptions={{
-          useFlyout: true,
-          startIndex: 2,
-          label: `Show all upcoming pools (${upcomingPools.length})`,
-        }}
-      />
-      <PoolList
-        pools={activePools}
-        title={"Active Pools"}
-        flyoutOptions={{
-          useFlyout: true,
-          startIndex: 2,
-          label: `Show all active pools (${
-            activePools.length > 2 ? activePools.length - 2 : activePools.length
-          })`,
-        }}
-      />
-      <PoolList
-        pools={endedPools}
-        title={"Ended Pools"}
-        flyoutOptions={{
-          useFlyout: true,
-          startIndex: 0,
-          label: `Show all ended pools (${endedPools.length})`,
-        }}
-      />
     </main>
+  );
+}
+
+async function CrudShowcase() {
+  const session = await getServerAuthSession();
+  if (!session?.user) return null;
+
+  const latestPost = await api.post.getLatest.query();
+
+  return (
+    <div className="w-full max-w-xs">
+      {latestPost ? (
+        <p className="truncate">Your most recent post: {latestPost.name}</p>
+      ) : (
+        <p>You have no posts yet.</p>
+      )}
+
+      <CreatePost />
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
+import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/types";
 import { useContext, useEffect, useState } from "react";
 import Breadcrumb from "../shared/Breadcrumb";
 import { classNames, getStrategyTypeFromStrategyName } from "@/utils/common";

@@ -1,15 +1,19 @@
+// /* eslint-disable */
+
 "use client";
 import React, { useState } from "react";
 import { MicroGrantsStrategy, Allo, Registry } from "@allo-team/allo-v2-sdk/";
 
 import { getIPFSClient } from "@/services/ipfs";
-import {
-  EProgressStatus,
-  ETarget,
+import type {
   TNewPool,
   TNewPoolResponse,
   TProgressStep,
-} from "@/app/types";
+} from "@/types";
+import {
+  EProgressStatus,
+  ETarget,
+} from "@/types";
 import {
   sendTransaction,
   getWalletClient,
@@ -24,13 +28,14 @@ import {
 } from "@/utils/common";
 import { checkIfPoolIsIndexedQuery } from "@/utils/query";
 import { useAccount } from "wagmi";
-import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
+import type { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
 import { getProfileById } from "@/utils/request";
-import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import { type InitializeParams, StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 import { abi } from "@/utils/erc20.abi";
 import { encodeFunctionData } from "viem";
 import { MicroGrantsABI } from "@/abi/Microgrants";
 import { RegistryABI } from "@/abi/Registry";
+import type { Chain } from "@rainbow-me/rainbowkit";
 
 export interface INewPoolContextProps {
   steps: TProgressStep[];
@@ -109,32 +114,32 @@ export const NewPoolContextProvider = (props: {
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
-    newSteps[index].target = target;
+    newSteps[index]!.target = target;
     setSteps(newSteps);
   };
 
   const updateStepHref = (index: number, href: string) => {
     const newSteps = [...steps];
-    newSteps[index].href = href;
+    newSteps[index]!.href = href;
     setSteps(newSteps);
   };
 
   const updateStepContent = (index: number, content: string) => {
     const newSteps = [...steps];
-    newSteps[index].content = content;
+    newSteps[index]!.content = content;
     setSteps(newSteps);
   };
 
   const updateStepStatus = (index: number, flag: boolean) => {
     const newSteps = [...steps];
     if (flag) {
-      newSteps[index].status = EProgressStatus.IS_SUCCESS;
+      newSteps[index]!.status = EProgressStatus.IS_SUCCESS;
     } else {
-      newSteps[index].status = EProgressStatus.IS_ERROR;
+      newSteps[index]!.status = EProgressStatus.IS_ERROR;
     }
 
     if (flag && steps.length > index + 1)
-      newSteps[index + 1].status = EProgressStatus.IN_PROGRESS;
+      newSteps[index + 1]!.status = EProgressStatus.IN_PROGRESS;
 
     setSteps(newSteps);
     return newSteps;
@@ -144,7 +149,7 @@ export const NewPoolContextProvider = (props: {
     data: TNewPool,
     chain: number,
   ): Promise<TNewPoolResponse> => {
-    const chainInfo: any = getChain(chain);
+    const chainInfo: Chain = getChain(chain);
 
     const allo = new Allo({
       chain: chain,
@@ -170,8 +175,8 @@ export const NewPoolContextProvider = (props: {
 
     let stepIndex = 0;
 
-    let profileContent = steps[0].content;
-    let profileTarget = steps[0].target;
+    let profileContent = steps[0]!.content;
+    let profileTarget = steps[0]!.target;
 
     if (data.profileName) {
       profileContent = "Creating new profile ";
@@ -179,7 +184,7 @@ export const NewPoolContextProvider = (props: {
     } else {
       const profile = await getProfileById({
         chainId: chain.toString(),
-        profileId: data.profileId!.toLowerCase(),
+        profileId: data.profileId.toLowerCase(),
       });
 
       profileTarget = profile.name;
@@ -190,7 +195,7 @@ export const NewPoolContextProvider = (props: {
     updateStepHref(stepIndex, "");
 
     // return values
-    let strategyAddress: string = "0x";
+    let strategyAddress = "0x";
     let poolId = -1;
     const walletClient = await getWalletClient({ chainId: chain });
 
@@ -201,7 +206,7 @@ export const NewPoolContextProvider = (props: {
       const registry = new Registry({ chain: chain });
       const randomNumber = Math.floor(Math.random() * 10000000000);
 
-      const txCreateProfile: TransactionData = await registry.createProfile({
+      const txCreateProfile: TransactionData = registry.createProfile({
         nonce: randomNumber,
         name: data.profileName,
         metadata: {
@@ -225,8 +230,10 @@ export const NewPoolContextProvider = (props: {
             confirmations: 2,
           });
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         profileId =
-          getEventValues(receipt, RegistryABI, "ProfileCreated").profileId ||
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          getEventValues(receipt, RegistryABI, "ProfileCreated").profileId ??
           "0x";
 
         if (profileId === "0x") {
@@ -235,7 +242,7 @@ export const NewPoolContextProvider = (props: {
 
         updateStepHref(
           stepIndex,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+          `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash,
         );
       } catch (e) {
         updateStepStatus(stepIndex, false);
@@ -257,18 +264,19 @@ export const NewPoolContextProvider = (props: {
       base64Image: data.base64Image,
     };
 
-    let imagePointer;
-    let pointer;
+    type MetadataPointer = { IpfsHash: string };
+    let imagePointer: MetadataPointer;
+    let pointer: MetadataPointer = { IpfsHash: "" };
 
     try {
       if (metadata.base64Image && metadata.base64Image.includes("base64")) {
         imagePointer = await ipfsClient.pinJSON({
           data: metadata.base64Image,
-        });
+        }) as MetadataPointer;
         metadata.base64Image = imagePointer.IpfsHash;
       }
 
-      pointer = await ipfsClient.pinJSON(metadata);
+      pointer = await ipfsClient.pinJSON(metadata) as MetadataPointer;
       updateStepHref(stepIndex, "https://ipfs.io/ipfs/" + pointer.IpfsHash);
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -289,7 +297,7 @@ export const NewPoolContextProvider = (props: {
     try {
       const hash = await walletClient!.deployContract({
         abi: deployParams.abi,
-        bytecode: deployParams.bytecode as `0x${string}`,
+        bytecode: deployParams.bytecode,
         args: [],
       });
 
@@ -299,7 +307,7 @@ export const NewPoolContextProvider = (props: {
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + strategyAddress,
+        `${chainInfo.blockExplorers?.default.url}/tx/` + strategyAddress,
       );
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -341,7 +349,7 @@ export const NewPoolContextProvider = (props: {
 
           updateStepHref(
             stepIndex,
-            `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+            `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash,
           );
           updateStepStatus(stepIndex, true);
         } catch (e) {
@@ -366,7 +374,7 @@ export const NewPoolContextProvider = (props: {
       new Date(data.endDate).getTime() / 1000,
     );
 
-    const initParams: any = {
+    const initParams: InitializeParams = {
       useRegistryAnchor: data.useRegistryAnchor,
       allocationStartTime: BigInt(startDateInSeconds),
       allocationEndTime: BigInt(endDateInSeconds),
@@ -374,23 +382,23 @@ export const NewPoolContextProvider = (props: {
       maxRequestedAmount: BigInt(data.maxAmount),
     };
 
-    if (data.strategyType == StrategyType.Hats) {
-      initParams["hats"] = "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137";
-      initParams["hatId"] = data.hatId;
-    } else if (data.strategyType == StrategyType.Gov) {
-      initParams["gov"] = data.gov;
-      initParams["minVotePower"] = BigInt(data!.minVotePower!);
-      initParams["snapshotReference"] = data!.snapshotReference!;
-    }
-
     let initStrategyData;
 
     if (data.strategyType === StrategyType.MicroGrants) {
       initStrategyData = await strategy.getInitializeData(initParams);
-    } else if (data.strategyType === StrategyType.Hats) {
-      initStrategyData = await strategy.getInitializeDataHats(initParams);
-    } else if (data.strategyType === StrategyType.Gov) {
-      initStrategyData = await strategy.getInitializeDataGov(initParams);
+    } else if (data.strategyType == StrategyType.Hats) {
+      initStrategyData = await strategy.getInitializeDataHats({
+        ...initParams,
+        hats: "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137",
+        hatId: BigInt(data.hatId!)
+      });
+    } else if (data.strategyType == StrategyType.Gov) {
+      initStrategyData = await strategy.getInitializeDataGov({
+        ...initParams,
+        gov: data.gov as `0x${string}`,
+        minVotePower: BigInt(data.minVotePower!),
+        snapshotReference: BigInt(data.snapshotReference!)
+      });
     } else {
       throw new Error("Invalid strategy type");
     }
@@ -408,7 +416,7 @@ export const NewPoolContextProvider = (props: {
       managers: data.managers,
     };
 
-    const createPoolData = await allo.createPoolWithCustomStrategy(
+    const createPoolData = allo.createPoolWithCustomStrategy(
       poolCreationData,
     );
 
@@ -425,14 +433,15 @@ export const NewPoolContextProvider = (props: {
           confirmations: 2,
         });
 
-      const logValues = getEventValues(receipt, MicroGrantsABI, "Initialized");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const logValues: { poolId: bigint } = getEventValues(receipt, MicroGrantsABI, "Initialized");
       // poolId is a BigInt and we eed to parse it to a number
       if (logValues.poolId) poolId = Number(logValues.poolId);
 
       updateStepTarget(stepIndex, `${chainInfo.name}`);
       updateStepHref(
         stepIndex,
-        `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash,
+        `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash,
       );
       updateStepStatus(stepIndex, true);
     } catch (e) {
@@ -443,11 +452,11 @@ export const NewPoolContextProvider = (props: {
     stepIndex++;
 
     // 4. Index Pool
-    const pollingData: any = {
+    const pollingData = {
       chainId: chain,
       poolId: poolId,
     };
-    let pollingResult = await pollUntilDataIsIndexed(
+    const pollingResult = await pollUntilDataIsIndexed(
       checkIfPoolIsIndexedQuery,
       pollingData,
       "microGrant",
@@ -477,6 +486,7 @@ export const NewPoolContextProvider = (props: {
 
     stepIndex++;
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     setTimeout(() => {}, 5000);
 
     return {

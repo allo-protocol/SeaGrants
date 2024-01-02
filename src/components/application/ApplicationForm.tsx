@@ -6,7 +6,7 @@ import {
   TNewApplication,
   TPoolData,
   TProfilesByOwnerResponse,
-} from "@/app/types";
+} from "@/types";
 import Error from "@/components/shared/Error";
 import { ApplicationContext } from "@/context/ApplicationContext";
 import { humanReadableAmount } from "@/utils/common";

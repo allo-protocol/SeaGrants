@@ -1,4 +1,4 @@
-import { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import type { StrategyType } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
 
 export type TStrategyType = keyof typeof StrategyType;
 
@@ -52,6 +52,12 @@ export type TApplicationMetadata = {
   base64Image: string;
 };
 
+export type TApplicationWithMetadata = {
+  application: TApplicationData;
+  metadata: TApplicationMetadata;
+  bannerImage: string;
+}
+
 export type TNewApplication = TApplicationMetadata & {
   requestedAmount: bigint;
   recipientAddress: `0x${string}`;
@@ -87,6 +93,7 @@ export type TMicroGrantRecipient = {
   blockTimestamp: string;
   isUsingRegistryAnchor: boolean;
   status: ApplicationStatus;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: any;
   applicationBanner?: string;
 };

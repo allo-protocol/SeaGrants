@@ -1,4 +1,4 @@
-import { TAllocatedData } from "@/app/types";
+import { TAllocatedData } from "@/types";
 import {
   classNames,
   prettyTimestamp,

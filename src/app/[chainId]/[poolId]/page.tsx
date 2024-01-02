@@ -1,4 +1,4 @@
-import { TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/app/types";
+import type { TApplicationMetadata, TNewApplicationResponse, TPoolData, TPoolMetadata } from "@/types";
 import PoolOverview from "@/components/pool/PoolOverview";
 import Container from "@/components/shared/Container";
 import { PoolContextProvider } from "@/context/PoolContext";
@@ -12,28 +12,27 @@ export default async function Pool({
 }) {
   try {
     const pool: TPoolData = await getPoolData(params.chainId, params.poolId);
-    const poolMetadata = pool.pool.metadata;
+    const poolMetadata: TPoolMetadata = pool.pool.metadata;
 
     let poolBanner = undefined;
 
     if (poolMetadata.base64Image) {
-      poolBanner = await getIPFSClient().fetchJson(poolMetadata.base64Image);
-      if (poolBanner!.data) {
-        poolBanner = poolBanner.data;
+      const poolMetadataJson: {data: string} = await getIPFSClient().fetchJson(poolMetadata.base64Image);
+      if (poolMetadataJson.data) {
+        poolBanner = poolMetadataJson.data;
       }
     }
 
-    let applications: TNewApplicationResponse[] = [];
+    const applications: TNewApplicationResponse[] = [];
 
-    for (let i = 0; i < pool.microGrantRecipients.length; i++) {
-      const application = pool.microGrantRecipients[i];
+    for (const application of pool.microGrantRecipients) {
       if (application.metadataPointer !== "") {
-        const metadata = await getIPFSClient().fetchJson(
+        const metadata: TApplicationMetadata = await getIPFSClient().fetchJson(
           application.metadataPointer,
         );
         application.metadata = metadata;
         if (metadata.base64Image) {
-          const image = await getIPFSClient().fetchJson(metadata.base64Image);
+          const image: { data: string } = await getIPFSClient().fetchJson(metadata.base64Image);
           application.applicationBanner = image.data;
         }
       }

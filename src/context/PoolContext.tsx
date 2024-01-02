@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 "use client";
 
-import { EProgressStatus, ETarget, TProgressStep } from "@/app/types";
+import  { EProgressStatus, ETarget, type TProgressStep } from "@/types";
 import { Allo, MicroGrantsStrategy } from "@allo-team/allo-v2-sdk";
-import { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
-import {
+import type { TransactionData } from "@allo-team/allo-v2-sdk/dist/Common/types";
+import type {
   Allocation,
   Recipient,
   SetAllocatorData,
 } from "@allo-team/allo-v2-sdk/dist/strategies/MicroGrantsStrategy/types";
+import type { Chain } from "@rainbow-me/rainbowkit";
+
 import { createContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
@@ -97,35 +100,36 @@ export const PoolContextProvider = (props: {
 
         const recipient: Recipient = await microGrants.getRecipient(address);
 
-        setIsRecipient(recipient.recipientStatus !== 0);
+        setIsRecipient(Number(recipient.recipientStatus) !== 0);
         setIsLoaded(true);
       }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     checkAllocator();
   }, [props.chainId, props.poolId, address, isConnected]);
 
   const updateStepTarget = (index: number, target: string) => {
     const newSteps = [...steps];
-    newSteps[index].target = target;
+    newSteps[index]!.target = target;
     setSteps(newSteps);
   };
 
   const updateStepStatus = (index: number, status: EProgressStatus) => {
     const newSteps = [...steps];
-    newSteps[index].status = status;
+    newSteps[index]!.status = status;
     setSteps(newSteps);
   };
 
   const updateStepHref = (index: number, href: string) => {
     const newSteps = [...steps];
-    newSteps[index].href = href;
+    newSteps[index]!.href = href;
     setSteps(newSteps);
   };
 
   const batchSetAllocator = async (data: SetAllocatorData[]) => {
     if (strategy) {
-      const chainInfo: any | unknown = getChain(Number(props.chainId));
+      const chainInfo: Chain = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getBatchSetAllocatorData(data);
 
@@ -143,7 +147,7 @@ export const PoolContextProvider = (props: {
         updateStepTarget(0, ` at ${trucateString(tx.hash.toString())}`);
         updateStepHref(
           0,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+          `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);
@@ -169,7 +173,7 @@ export const PoolContextProvider = (props: {
     ]);
 
     if (strategy) {
-      const chainInfo: any | unknown = getChain(Number(props.chainId));
+      const chainInfo: Chain = getChain(Number(props.chainId));
 
       const txData: TransactionData = strategy.getAllocationData(
         data.recipientId,
@@ -190,7 +194,7 @@ export const PoolContextProvider = (props: {
         updateStepTarget(0, `${chainInfo.name} at ${trucateString(tx.hash)}`);
         updateStepHref(
           0,
-          `${chainInfo.blockExplorers.default.url}/tx/` + tx.hash
+          `${chainInfo.blockExplorers?.default.url}/tx/` + tx.hash
         );
 
         updateStepStatus(0, EProgressStatus.IS_SUCCESS);

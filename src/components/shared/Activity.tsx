@@ -1,4 +1,4 @@
-import { TActivity } from "@/app/types";
+import { TActivity } from "@/types";
 import { classNames } from "@/utils/common";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import {

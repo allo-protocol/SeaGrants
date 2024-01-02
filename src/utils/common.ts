@@ -1,6 +1,8 @@
-import { AbiComponent, AbiItem, ContractAbi, EPoolStatus } from "@/app/types";
+/* eslint-disable */
+import type { AbiComponent, AbiItem, ContractAbi } from "@/types";
+import { EPoolStatus } from "@/types";
 import {
-  TransactionReceipt,
+  type TransactionReceipt,
   decodeAbiParameters,
   decodeEventLog,
   formatUnits,
@@ -11,7 +13,6 @@ import {
 import { graphqlEndpoint } from "./query";
 import request from "graphql-request";
 import { getIPFSClient } from "@/services/ipfs";
-import { parse } from "path";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -32,7 +33,7 @@ export const statusColorsScheme = {
 };
 
 export function stringToColor(text: string) {
-  let str = text;
+  const str = text;
   let hash = 0;
   for (let i = 0; i < str.length / 2; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -52,7 +53,7 @@ function toTwoDigits(value: number) {
 }
 
 export function humanReadableAmount(amount: string, decimals?: number) {
-  const amountInUnits = Number(formatUnits(BigInt(amount), decimals || 18));
+  const amountInUnits = Number(formatUnits(BigInt(amount), decimals ?? 18));
 
   for (let i = 5; i <= 15; i++) {
     const formattedValue = amountInUnits.toFixed(i);
@@ -103,7 +104,7 @@ export const pollUntilMetadataIsAvailable = async (
   const ipfsClient = getIPFSClient();
   let counter = 0;
 
-  const fetchMetadata: any = async () => {
+  const fetchMetadata = async (): Promise<boolean> => {
     const metadata = await ipfsClient.fetchJson(pointer);
 
     console.log("metadata", metadata);
@@ -125,13 +126,13 @@ export const pollUntilMetadataIsAvailable = async (
 };
 
 export const pollUntilDataIsIndexed = async (
-  QUERY_ENDPOINT: any,
+  QUERY_ENDPOINT: string,
   data: any,
   propToCheck: string,
 ): Promise<boolean> => {
   let counter = 0;
-  const fetchData: any = async () => {
-    const response: any = request(graphqlEndpoint, QUERY_ENDPOINT, data);
+  const fetchData = async (): Promise<boolean> => {
+    const response: Record<string, any> = request(graphqlEndpoint, QUERY_ENDPOINT, data);
 
     if (response && response[propToCheck] !== null) {
       // Data is found, return true
@@ -160,8 +161,8 @@ export const convertAddressToShortString = (address: string) => {
   return address.slice(0, 6) + "..." + address.slice(-4);
 };
 
-export const copy = (data: string) => {
-  navigator.clipboard.writeText(data);
+export const copy = async (data: string) => {
+  await navigator.clipboard.writeText(data);
 };
 
 export const formatDateDifference = (dateString: string): string => {
@@ -205,7 +206,7 @@ export const getEventValues = (
   receipt: TransactionReceipt,
   abi: ContractAbi,
   eventName: string,
-): any => {
+): any | any[] => {
   const { logs } = receipt;
   const event = abi.filter(
     (item) => item.type === "event" && item.name === eventName,
@@ -213,7 +214,7 @@ export const getEventValues = (
 
   console.log("event", event);
 
-  const eventTopic = getEventTopic(event);
+  const eventTopic = getEventTopic(event!);
 
   const log = logs.find(
     (log) => log.topics[0]?.toLowerCase() === eventTopic.toLowerCase(),

@@ -1,4 +1,4 @@
-import { ContractAbi } from "@/app/types";
+import type { ContractAbi } from "@/types";
 
 export const MicroGrantsGovABI: ContractAbi = [
   {

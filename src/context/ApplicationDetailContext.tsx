@@ -6,7 +6,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { TApplicationData, TApplicationMetadata } from "@/app/types";
+import type { TApplicationData, TApplicationMetadata, TApplicationWithMetadata } from "@/types";
 import { getApplicationData } from "@/utils/request";
 
 // Define types for the context
@@ -16,11 +16,7 @@ type TApplications = Record<
     string,
     Record<
       string,
-      {
-        application: TApplicationData;
-        metadata: TApplicationMetadata;
-        bannerImage: string;
-      }
+      TApplicationWithMetadata
     >
   >
 >;
@@ -31,20 +27,12 @@ interface ApplicationDetailContextProps {
     chainId: string,
     poolId: string,
     applicationId: string,
-  ) => Promise<{
-    application: TApplicationData;
-    metadata: TApplicationMetadata;
-    bannerImage: string;
-  }>;
+  ) => Promise<TApplicationWithMetadata>;
   refetchApplication: (
     chainId: string,
     poolId: string,
     applicationId: string,
-  ) => Promise<{
-    application: TApplicationData;
-    metadata: TApplicationMetadata;
-    bannerImage: string;
-  }>;
+  ) => Promise<TApplicationWithMetadata>;
 }
 
 // Create the context
@@ -62,7 +50,7 @@ export const ApplicationDetailContextProvider = (props: {
     async (chainId: string, poolId: string, applicationId: string) => {
       // Check if application data is already in the state
       if (applications[chainId]?.[poolId]?.[applicationId]) {
-        return applications[chainId][poolId][applicationId];
+        return applications[chainId]![poolId]![applicationId];
       }
 
       console.log("=====> fetch application: ", chainId, poolId, applicationId);
@@ -168,6 +156,7 @@ export const useApplication = (
       setIsLoading(false);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch();
   }, []);
 

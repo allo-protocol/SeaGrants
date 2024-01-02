@@ -1,4 +1,4 @@
-import { EProgressStatus, TProgressStep } from "@/app/types";
+import { EProgressStatus, TProgressStep } from "@/types";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 

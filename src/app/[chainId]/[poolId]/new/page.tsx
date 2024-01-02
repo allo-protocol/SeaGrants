@@ -1,4 +1,4 @@
-import { TPoolData } from "@/app/types";
+import type { TPoolData } from "@/types";
 import ApplicationForm from "@/components/application/ApplicationForm";
 import Container from "@/components/shared/Container";
 import { ApplicationContextProvider } from "@/context/ApplicationContext";

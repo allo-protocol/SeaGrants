@@ -11,7 +11,7 @@ import {
   TPoolData,
   TProfilesByOwnerResponse,
   TStrategyType,
-} from "@/app/types";
+} from "@/types";
 import { useAccount, useNetwork, useToken } from "wagmi";
 import { NewPoolContext } from "@/context/NewPoolContext";
 import { useRouter } from "next/navigation";

@@ -1,4 +1,4 @@
-import { EPoolStatus, TPoolData, TPoolMetadata } from "@/app/types";
+import { EPoolStatus, TPoolData, TPoolMetadata } from "@/types";
 import {
   classNames,
   getPoolStatus,

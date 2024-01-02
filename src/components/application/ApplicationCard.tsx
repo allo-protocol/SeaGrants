@@ -1,4 +1,4 @@
-import { TNewApplicationResponse, TPoolData } from "@/app/types";
+import { TNewApplicationResponse, TPoolData } from "@/types";
 import {
   classNames,
   humanReadableAmount,

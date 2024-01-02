@@ -1,6 +1,6 @@
 import PoolCard from "./PoolCard";
 import Container from "../shared/Container";
-import { TFlyoutOptions, TPoolData } from "@/app/types";
+import { TFlyoutOptions, TPoolData } from "@/types";
 import Flyout from "../shared/Flyout";
 
 const PoolList = (props: {

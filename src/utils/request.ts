@@ -1,13 +1,14 @@
 "use server";
 
-import {
+import type {
   TApplicationData,
   TApplicationMetadata,
+  TApplicationWithMetadata,
   TPoolData,
   TPoolMetadata,
   TProfileResponse,
   TProfilesByOwnerResponse,
-} from "@/app/types";
+} from "@/types";
 import {
   getMicroGrantRecipientQuery,
   getMicroGrantsRecipientsQuery,
@@ -23,6 +24,7 @@ const getProfilesByOwner = async ({
   account,
 }: {
   chainId: string;
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   account: string | `0x${string}`;
 }): Promise<TProfilesByOwnerResponse[]> => {
   const response: {
@@ -64,7 +66,7 @@ export const getPoolData = async(
   chainId: string,
   poolId: string,
 ): Promise<TPoolData> => {
-  const response: any = await request(
+  const response: { microGrant: TPoolData } = await request(
     graphqlEndpoint,
     getMicroGrantsRecipientsQuery,
     { chainId: chainId, poolId: poolId },
@@ -85,13 +87,9 @@ export const getApplicationData = async (
   chainId: string,
   poolId: string,
   applicationId: string,
-): Promise<{
-  application: TApplicationData;
-  metadata: TApplicationMetadata;
-  bannerImage: string;
-}> => {
+): Promise<TApplicationWithMetadata> => {
   try {
-    let banner;
+    let banner = "";
 
     const response: { microGrantRecipient: TApplicationData } = await request(
       graphqlEndpoint,
@@ -113,8 +111,8 @@ export const getApplicationData = async (
     if (!metadata.name) metadata.name = `Pool ${application.microGrant.poolId}`;
 
     try {
-      const bannerImage = await ipfsClient.fetchJson(metadata.base64Image);
-      banner = bannerImage!.data ? bannerImage.data : "";
+      const bannerImage: { data: string } = await ipfsClient.fetchJson(metadata.base64Image);
+      banner = bannerImage.data;
     } catch (error) {
       console.error("unable to load banner");
     }
