@@ -23,7 +23,7 @@ const nextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "http://localhost:5555",
+            value: "https://alloscan.spec.dev/graphql",
           },
           {
             key: "Access-Control-Allow-Methods",
