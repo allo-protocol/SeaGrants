@@ -40,11 +40,11 @@ const { chains, publicClient } = configureChains(
     alchemyProvider({
       apiKey:
         (process.env.ALCHEMY_ID as string) ||
-        "ajWJk5YwtfTZ5vCAhMg8I8L61XFhyJpa",
+        "s7TJ6rGOukJ11mysb07TLtR0qtF0wVGd",
     }),
     infuraProvider({
       apiKey:
-        (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
+        (process.env.INFURA_ID as string) || "ae7716bbd9e540efb367c0694f9c4667",
     }),
     publicProvider(),
   ],
