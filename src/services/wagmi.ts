@@ -4,12 +4,14 @@ import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
+  arbitrumSepolia,
   base,
   celo,
   goerli,
   mainnet,
   optimism,
-  polygon
+  polygon,
+  arbitrumGoerli,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -21,13 +23,15 @@ dotenv.config();
 
 const stagingChains = [
   // celoAlfajores,
-  goerli,
+  //goerli,
   // sepolia,
   // polygonMumbai,
   // arbitrumGoerli,
+  arbitrumSepolia,
+  arbitrumGoerli
 ];
 
-const productionChains = [goerli];
+const productionChains = [arbitrumGoerli];
 
 const availableChains =
   process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
@@ -40,7 +44,7 @@ const { chains, publicClient } = configureChains(
     alchemyProvider({
       apiKey:
         (process.env.ALCHEMY_ID as string) ||
-        "s7TJ6rGOukJ11mysb07TLtR0qtF0wVGd",
+        "Ws39Z-twSPfg7p8ubLkjKXPARyfsUGBl",
     }),
     infuraProvider({
       apiKey:
