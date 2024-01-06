@@ -14,7 +14,6 @@ This is a grants application for Allo. It is built using
 
 Required
 ```
-NEXT_PUBLIC_IPFS_READ_GATEWAY=
 NEXT_PUBLIC_PINATA_JWT=
 NEXT_PUBLIC_IPFS_READ_GATEWAY=
 NEXT_PUBLIC_IPFS_WRITE_GATEWAY=
@@ -26,6 +25,7 @@ NEXT_PUBLIC_ENVIRONMENT=
 ALCHEMY_ID=
 INFURA_ID=
 NEXT_PUBLIC_GRAPHQL_URL=
+PROJECT_ID=
 ```
 
 ### Installation
@@ -41,6 +41,8 @@ bun install
 # Start the development server
 bun dev
 ```
+
+Then go to http://localhost:3000/ on a browser and interact with the app.
 
 ### Testing
 
