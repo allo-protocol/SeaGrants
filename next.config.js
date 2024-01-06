@@ -23,7 +23,7 @@ const nextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "http://localhost:5555",
+            value: "https://sea-grants.vercel.app",
           },
           {
             key: "Access-Control-Allow-Methods",

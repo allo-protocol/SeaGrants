@@ -4,12 +4,14 @@ import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
+  arbitrumSepolia,
   base,
   celo,
   goerli,
   mainnet,
   optimism,
-  polygon
+  polygon,
+  arbitrumGoerli,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -21,13 +23,15 @@ dotenv.config();
 
 const stagingChains = [
   // celoAlfajores,
-  goerli,
+  //goerli,
   // sepolia,
   // polygonMumbai,
   // arbitrumGoerli,
+  arbitrumSepolia,
+  arbitrumGoerli
 ];
 
-const productionChains = [arbitrum, base, celo, mainnet, polygon, optimism];
+const productionChains = [arbitrumGoerli];
 
 const availableChains =
   process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
@@ -40,11 +44,11 @@ const { chains, publicClient } = configureChains(
     alchemyProvider({
       apiKey:
         (process.env.ALCHEMY_ID as string) ||
-        "ajWJk5YwtfTZ5vCAhMg8I8L61XFhyJpa",
+        "Ws39Z-twSPfg7p8ubLkjKXPARyfsUGBl",
     }),
     infuraProvider({
       apiKey:
-        (process.env.INFURA_ID as string) || "ae484befdd004b64bfe2059d3526a138",
+        (process.env.INFURA_ID as string) || "ae7716bbd9e540efb367c0694f9c4667",
     }),
     publicProvider(),
   ],
@@ -52,7 +56,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "Micro Grants",
-  projectId: (process.env.PROJECT_ID as string) || "YOUR_PROJECT_ID",
+  projectId: (process.env.PROJECT_ID as string) || "950dbdf6f1d331fbc81e384788249b0b",
   chains,
 });
 
