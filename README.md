@@ -12,7 +12,7 @@ This is a grants application for Allo. It is built using
 - [Bun](https://bun.sh/) (v1.x)
 - Add env vars:
 
-Required
+You can get all these Required details from https://app.pinata.cloud/
 ```
 NEXT_PUBLIC_IPFS_READ_GATEWAY=
 NEXT_PUBLIC_PINATA_JWT=
@@ -33,6 +33,9 @@ NEXT_PUBLIC_GRAPHQL_URL=
 ```bash
 # Install dependencies
 bun install
+
+# Add env variables
+cp .env.sample .env
 ```
 
 ### Development
